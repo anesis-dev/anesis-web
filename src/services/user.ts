@@ -1,10 +1,11 @@
+import { api } from "@/api/client";
+import { parseMeResponse, parseUsersResponse } from "@/lib/api-contracts";
 import { IUser } from "@/types/user";
 
 export async function fetchMe(): Promise<IUser> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/info`, {
-    credentials: "include",
-  });
-  if (!res.ok) throw new Error("unauthenticated");
+	return parseMeResponse(await api.get<unknown>("/user/info"));
+}
 
-  return res.json();
+export async function fetchAllUsers(): Promise<IUser[]> {
+	return parseUsersResponse(await api.get<unknown>("/user/all"));
 }

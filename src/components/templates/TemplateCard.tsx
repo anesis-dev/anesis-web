@@ -49,7 +49,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
 	return (
 		<Card className="gap-4 py-5 h-full transition-colors hover:border-foreground/30">
 			<CardHeader className="gap-1.5 pb-0">
-				<div className="flex items-start justify-between gap-2">
+				<div className="flex flex-col items-start gap-2 sm:flex-row sm:justify-between">
 					<CardTitle className="text-base leading-snug">
 						{metadata.displayName}
 					</CardTitle>
@@ -112,7 +112,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
 				)}
 			</CardContent>
 
-			<CardFooter className="mt-auto flex items-center justify-between gap-2 border-t pt-4">
+			<CardFooter className="mt-auto flex flex-col items-start gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
 				{/* Author */}
 				<Link
 					href={`/user/${author.github}`}
@@ -122,14 +122,14 @@ export function TemplateCard({ template }: TemplateCardProps) {
 					{author.github}
 				</Link>
 
-				<div className="flex items-center gap-2">
+				<div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
 					{/* Version */}
 					<span className="font-mono text-[11px] text-muted-foreground">
 						v{config.version}
 					</span>
 
 					{/* View button */}
-					<Button asChild size="xs" variant="outline">
+					<Button asChild size="xs" variant="outline" className="shrink-0">
 						<Link
 							href={config.repository.url}
 							target="_blank"

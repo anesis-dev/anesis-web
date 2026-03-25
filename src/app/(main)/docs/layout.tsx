@@ -6,7 +6,7 @@ export default function DocsLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<div className="flex min-h-[calc(100dvh-8vh)] flex-col lg:flex-row">
+		<div className="flex flex-col lg:min-h-dvh lg:flex-row">
 			<DocsSidebar />
 			<div className="min-w-0 flex-1">{children}</div>
 		</div>

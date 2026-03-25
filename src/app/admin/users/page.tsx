@@ -90,8 +90,8 @@ export default function AdminUsersPage() {
 	);
 
 	return (
-		<div className="flex flex-col gap-6 p-8">
-			<div className="flex items-start justify-between gap-4">
+		<div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<h1 className="text-2xl font-bold tracking-tight">Users</h1>
 					<p className="mt-1 text-sm text-muted-foreground">
@@ -115,7 +115,7 @@ export default function AdminUsersPage() {
 					setSearch(event.target.value);
 					setPage(1);
 				}}
-				className="max-w-sm"
+				className="w-full sm:max-w-sm"
 			/>
 
 			{isError && (
@@ -137,7 +137,7 @@ export default function AdminUsersPage() {
 
 			<div className="rounded-xl border overflow-hidden">
 				<div className="overflow-x-auto">
-					<table className="w-full text-sm">
+					<table className="min-w-[720px] w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/40 text-left text-xs font-medium text-muted-foreground">
 								<th className="py-3 px-4">Avatar</th>

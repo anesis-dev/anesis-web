@@ -11,7 +11,7 @@ export function DocsSidebar() {
 	return (
 		<>
 			<div className="overflow-x-auto border-b lg:hidden">
-				<nav className="flex min-w-max gap-2 p-4">
+				<nav className="flex min-w-max gap-2 p-3 sm:p-4">
 					{docsNav.map((item) => {
 						const active = pathname === item.href;
 						return (
@@ -32,8 +32,8 @@ export function DocsSidebar() {
 				</nav>
 			</div>
 
-			<aside className="hidden lg:flex lg:w-60 lg:shrink-0">
-				<div className="sticky top-0 flex h-[calc(100dvh-8vh)] w-full flex-col border-r bg-card/60">
+			<aside className="hidden lg:flex lg:w-60 lg:shrink-0 xl:w-64">
+				<div className="sticky top-0 flex h-dvh w-full flex-col border-r bg-card/60">
 					<div className="px-5 py-4">
 						<p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
 							Docs

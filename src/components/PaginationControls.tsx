@@ -16,15 +16,16 @@ export function PaginationControls({
 	}
 
 	return (
-		<div className="flex items-center justify-between gap-4 border-t pt-4">
+		<div className="flex flex-col items-stretch gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
 			<p className="text-xs text-muted-foreground">
 				Page {page} of {totalPages}
 			</p>
-			<div className="flex items-center gap-2">
+			<div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
 				<Button
 					type="button"
 					variant="outline"
 					size="sm"
+					className="w-full sm:w-auto"
 					onClick={() => onPageChange(page - 1)}
 					disabled={page <= 1}
 				>
@@ -34,6 +35,7 @@ export function PaginationControls({
 					type="button"
 					variant="outline"
 					size="sm"
+					className="w-full sm:w-auto"
 					onClick={() => onPageChange(page + 1)}
 					disabled={page >= totalPages}
 				>

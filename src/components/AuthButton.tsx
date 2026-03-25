@@ -8,17 +8,24 @@ export default function AuthButton() {
 	const { user, isLoading, login, logout } = useAuth();
 
 	if (isLoading) {
-		return <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />;
+		return (
+			<div className="h-9 w-full animate-pulse rounded-md bg-muted sm:w-9 sm:rounded-full" />
+		);
 	}
 
 	if (user) {
-		return <AvatarButton user={user} logout={logout} />;
+		return (
+			<div className="flex w-full justify-end sm:w-auto">
+				<AvatarButton user={user} logout={logout} />
+			</div>
+		);
 	}
 
 	return (
-		<Button type="button" onClick={login}>
+		<Button type="button" onClick={login} className="w-full sm:w-auto">
 			<GitHubIcon />
-			Login with GitHub
+			<span className="sm:hidden">Login</span>
+			<span className="hidden sm:inline">Login with GitHub</span>
 		</Button>
 	);
 }

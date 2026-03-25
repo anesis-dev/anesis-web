@@ -59,12 +59,13 @@ export default function DashboardPage() {
 
 	if (!user) {
 		return (
-			<div className="mx-auto flex min-h-[50vh] w-full max-w-5xl items-center justify-center px-5 py-10">
+			<div className="mx-auto flex min-h-[50vh] w-full max-w-5xl items-center justify-center px-4 py-10 sm:px-5">
 				<Card className="w-full max-w-xl">
 					<CardHeader>
 						<CardTitle>Account dashboard</CardTitle>
 						<CardDescription>
-							Sign in with GitHub to view your templates and publishing activity.
+							Sign in with GitHub to view your templates and publishing
+							activity.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -78,7 +79,7 @@ export default function DashboardPage() {
 	}
 
 	return (
-		<div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-10">
+		<div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-5 lg:px-8">
 			<div className="space-y-1">
 				<h1 className="text-3xl font-semibold tracking-tight">
 					Account dashboard
@@ -124,22 +125,22 @@ export default function DashboardPage() {
 							Jump into the parts of the account area you will use most often.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="flex flex-wrap gap-3">
-						<Link href="/account/templates">
-							<Button className="gap-2">
+					<CardContent className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+						<Link href="/account/templates" className="w-full sm:w-auto">
+							<Button className="w-full gap-2 sm:w-auto">
 								<PackageIcon className="size-4" />
 								Manage templates
 							</Button>
 						</Link>
-						<Link href="/templates">
-							<Button variant="outline" className="gap-2">
+						<Link href="/templates" className="w-full sm:w-auto">
+							<Button variant="outline" className="w-full gap-2 sm:w-auto">
 								<BookOpenIcon className="size-4" />
 								Browse registry
 							</Button>
 						</Link>
 						{user.role === "admin" && (
-							<Link href="/admin">
-								<Button variant="outline" className="gap-2">
+							<Link href="/admin" className="w-full sm:w-auto">
+								<Button variant="outline" className="w-full gap-2 sm:w-auto">
 									<ShieldIcon className="size-4" />
 									Open admin panel
 								</Button>
@@ -152,8 +153,8 @@ export default function DashboardPage() {
 					<CardHeader>
 						<CardTitle>Publishing reminder</CardTitle>
 						<CardDescription>
-							Oxide itself does not require login for scaffolding. Sign-in is only
-							required when you want to publish your own template.
+							Oxide itself does not require login for scaffolding. Sign-in is
+							only required when you want to publish your own template.
 						</CardDescription>
 					</CardHeader>
 				</Card>

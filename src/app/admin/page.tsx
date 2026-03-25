@@ -89,7 +89,7 @@ export default function AdminDashboard() {
 		.slice(0, 8);
 
 	return (
-		<div className="flex flex-col gap-8 p-8">
+		<div className="flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
 			{/* Header */}
 			<div>
 				<h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
@@ -142,7 +142,7 @@ export default function AdminDashboard() {
 				</CardHeader>
 				<CardContent className="p-0">
 					<div className="overflow-x-auto">
-						<table className="w-full text-sm">
+						<table className="min-w-[680px] w-full text-sm">
 							<thead>
 								<tr className="border-b bg-muted/40 text-left text-xs font-medium text-muted-foreground">
 									<th className="py-3 px-4">Name</th>

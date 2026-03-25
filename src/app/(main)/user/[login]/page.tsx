@@ -8,12 +8,7 @@ import { useTemplates } from "@/hooks/useTemplates";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { ITemplate } from "@/types/template";
-import {
-	UsersIcon,
-	BookOpenIcon,
-	PackageIcon,
-	UserIcon,
-} from "lucide-react";
+import { UsersIcon, BookOpenIcon, PackageIcon, UserIcon } from "lucide-react";
 
 function Stat({ label, value }: { label: string; value: number }) {
 	return (
@@ -47,7 +42,11 @@ function TemplateSkeleton() {
 			</div>
 			<div className="flex gap-1.5">
 				{[80, 60, 72].map((w) => (
-					<div key={w} className="h-5 rounded-md bg-muted" style={{ width: w }} />
+					<div
+						key={w}
+						className="h-5 rounded-md bg-muted"
+						style={{ width: w }}
+					/>
 				))}
 			</div>
 			<div className="flex items-center justify-between border-t pt-4">
@@ -64,7 +63,11 @@ export default function UserProfilePage({
 	params: Promise<{ login: string }>;
 }) {
 	const { login } = use(params);
-	const { githubUser, isLoading: userLoading, isError: userError } = useGitHubUser(login);
+	const {
+		githubUser,
+		isLoading: userLoading,
+		isError: userError,
+	} = useGitHubUser(login);
 	const { templates, isLoading: templatesLoading } = useTemplates();
 
 	const userTemplates: ITemplate[] = templates.filter(
@@ -73,7 +76,7 @@ export default function UserProfilePage({
 
 	if (userError) {
 		return (
-			<div className="mx-auto w-full max-w-5xl px-5 py-20 flex flex-col items-center gap-4 text-center">
+			<div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-4 px-4 py-20 text-center sm:px-5">
 				<UserIcon className="size-12 text-muted-foreground" />
 				<div>
 					<p className="font-semibold text-lg">User not found</p>
@@ -93,7 +96,7 @@ export default function UserProfilePage({
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-5xl px-5 py-10 flex flex-col gap-10">
+		<div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-10 sm:px-5">
 			{/* Profile header */}
 			{userLoading ? (
 				<AvatarSkeleton />
@@ -105,6 +108,7 @@ export default function UserProfilePage({
 							src={githubUser.avatar_url}
 							alt={githubUser.login}
 							fill
+							sizes="96px"
 							className="object-cover grayscale"
 						/>
 					</div>
@@ -129,11 +133,9 @@ export default function UserProfilePage({
 						)}
 
 						{/* Stats */}
-						<div className="flex items-center gap-6">
+						<div className="grid w-full max-w-sm grid-cols-3 gap-4 sm:w-auto sm:max-w-none sm:flex sm:items-center sm:gap-6">
 							<Stat label="Followers" value={githubUser.followers} />
-							<div className="h-6 w-px bg-border" />
 							<Stat label="Following" value={githubUser.following} />
-							<div className="h-6 w-px bg-border" />
 							<Stat label="Repos" value={githubUser.public_repos} />
 						</div>
 

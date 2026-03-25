@@ -88,9 +88,9 @@ export default function Home() {
 	return (
 		<div className="w-full">
 			<section className="border-b">
-				<div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-8 px-5 py-16 text-center lg:px-8 lg:py-24">
+				<div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-8 px-4 py-14 text-center sm:px-5 lg:px-8 lg:py-24">
 					<div className="max-w-4xl space-y-5">
-						<h1 className="text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl">
+						<h1 className="text-4xl font-black tracking-tight sm:text-5xl lg:text-7xl">
 							A fast Rust CLI for generating projects from reusable templates.
 						</h1>
 						<p className="mx-auto max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
@@ -100,14 +100,19 @@ export default function Home() {
 						</p>
 					</div>
 
-					<div className="flex flex-wrap items-center justify-center gap-3">
-						<Button size="lg" asChild>
+					<div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
+						<Button size="lg" className="w-full sm:w-auto" asChild>
 							<Link href="/docs/installation">
 								<BookOpenIcon className="size-4" />
 								Get started
 							</Link>
 						</Button>
-						<Button size="lg" variant="outline" asChild>
+						<Button
+							size="lg"
+							variant="outline"
+							className="w-full sm:w-auto"
+							asChild
+						>
 							<Link href="/templates">
 								Browse templates
 								<ArrowRightIcon className="size-4" />
@@ -118,10 +123,15 @@ export default function Home() {
 								label="Publish template"
 								size="lg"
 								variant="ghost"
-								className="gap-1.5"
+								className="w-full gap-1.5 sm:w-auto"
 							/>
 						) : (
-							<Button size="lg" variant="ghost" onClick={login}>
+							<Button
+								size="lg"
+								variant="ghost"
+								onClick={login}
+								className="w-full sm:w-auto"
+							>
 								<GitBranchPlusIcon className="size-4" />
 								Login to publish
 							</Button>
@@ -225,7 +235,7 @@ export default function Home() {
 			</section>
 
 			<section className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-14 lg:px-8">
-				<div className="flex items-end justify-between gap-4">
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 					<div className="space-y-2">
 						<p className="text-sm font-medium text-primary">
 							Featured templates
@@ -234,7 +244,7 @@ export default function Home() {
 							Recent starters from the registry
 						</h2>
 					</div>
-					<Button variant="outline" asChild>
+					<Button variant="outline" className="w-full sm:w-auto" asChild>
 						<Link href="/templates">
 							View all
 							<ArrowRightIcon className="size-4" />

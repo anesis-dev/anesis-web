@@ -94,8 +94,8 @@ export default function AdminTemplatesPage() {
 	);
 
 	return (
-		<div className="flex flex-col gap-6 p-8">
-			<div className="flex items-start justify-between gap-4">
+		<div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<h1 className="text-2xl font-bold tracking-tight">Templates</h1>
 					<p className="mt-1 text-sm text-muted-foreground">
@@ -120,7 +120,7 @@ export default function AdminTemplatesPage() {
 					setSearch(e.target.value);
 					setPage(1);
 				}}
-				className="max-w-sm"
+				className="w-full sm:max-w-sm"
 			/>
 
 			<Card className="border-dashed">
@@ -142,7 +142,7 @@ export default function AdminTemplatesPage() {
 
 			<div className="rounded-xl border overflow-hidden">
 				<div className="overflow-x-auto">
-					<table className="w-full text-sm">
+					<table className="min-w-[820px] w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/40 text-left text-xs font-medium text-muted-foreground">
 								<th className="py-3 px-4">Name</th>
@@ -182,7 +182,7 @@ export default function AdminTemplatesPage() {
 									</td>
 								</tr>
 							) : (
-								filtered.map((t) => (
+								paginatedTemplates.map((t) => (
 									<tr
 										key={t.id}
 										className="border-b transition-colors last:border-0 hover:bg-muted/30"

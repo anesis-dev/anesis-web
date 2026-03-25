@@ -59,8 +59,8 @@ export default function AccountTemplatesPage() {
 
 	if (!user) {
 		return (
-			<div className="mx-auto flex min-h-[50vh] w-full max-w-5xl items-center justify-center px-5 py-10">
-				<div className="flex w-full max-w-xl flex-col gap-3 rounded-2xl border bg-card p-6">
+			<div className="mx-auto flex min-h-[50vh] w-full max-w-5xl items-center justify-center px-4 py-10 sm:px-5">
+				<div className="flex w-full max-w-xl flex-col gap-3 rounded-2xl border bg-card p-5 sm:p-6">
 					<h1 className="text-2xl font-semibold tracking-tight">
 						Your templates
 					</h1>
@@ -78,7 +78,7 @@ export default function AccountTemplatesPage() {
 	}
 
 	return (
-		<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 py-10">
+		<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 sm:px-5 lg:px-8">
 			<div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 				<div className="space-y-1">
 					<h1 className="text-3xl font-semibold tracking-tight">
@@ -89,7 +89,7 @@ export default function AccountTemplatesPage() {
 						to publish a new one.
 					</p>
 				</div>
-				<PublishTemplateDialog />
+				<PublishTemplateDialog className="w-full gap-1.5 sm:w-auto" />
 			</div>
 
 			<div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -100,7 +100,7 @@ export default function AccountTemplatesPage() {
 						setPage(1);
 					}}
 					placeholder="Search your templates"
-					className="max-w-sm"
+					className="w-full sm:max-w-sm"
 				/>
 				<p className="text-xs text-muted-foreground">
 					{isLoading

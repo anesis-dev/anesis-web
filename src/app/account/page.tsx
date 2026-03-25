@@ -67,7 +67,7 @@ function TemplateSkeleton() {
 
 function NotLoggedIn() {
 	return (
-		<div className="flex flex-1 flex-col items-center justify-center gap-4 text-center py-20">
+		<div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-20 text-center">
 			<UsersIcon className="size-12 text-muted-foreground" />
 			<div>
 				<p className="font-semibold text-lg">You are not logged in</p>
@@ -96,7 +96,7 @@ export default function AccountPage() {
 
 	if (authLoading) {
 		return (
-			<div className="mx-auto w-full max-w-5xl px-5 py-10 flex flex-col gap-10">
+			<div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-10 sm:px-5">
 				<ProfileSkeleton />
 				<div className="h-px w-full bg-border" />
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -113,7 +113,7 @@ export default function AccountPage() {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-5xl px-5 py-10 flex flex-col gap-10">
+		<div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-10 sm:px-5">
 			{/* Profile header */}
 			{githubLoading ? (
 				<ProfileSkeleton />
@@ -125,6 +125,7 @@ export default function AccountPage() {
 							src={user.avatar_url}
 							alt={user.login}
 							fill
+							sizes="96px"
 							className="object-cover grayscale"
 						/>
 					</div>
@@ -150,17 +151,15 @@ export default function AccountPage() {
 
 						{/* Stats */}
 						{githubUser && (
-							<div className="flex items-center gap-6">
+							<div className="grid w-full max-w-sm grid-cols-3 gap-4 sm:w-auto sm:max-w-none sm:flex sm:items-center sm:gap-6">
 								<Stat label="Followers" value={githubUser.followers} />
-								<div className="h-6 w-px bg-border" />
 								<Stat label="Following" value={githubUser.following} />
-								<div className="h-6 w-px bg-border" />
 								<Stat label="Repos" value={githubUser.public_repos} />
 							</div>
 						)}
 
 						{/* Actions */}
-						<div className="flex items-center gap-2">
+						<div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
 							{user.role === "admin" && (
 								<Link href="/admin">
 									<Button variant="default" size="sm" className="gap-1.5">

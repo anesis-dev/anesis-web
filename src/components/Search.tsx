@@ -41,12 +41,14 @@ export function Search() {
 		<>
 			<Button
 				onClick={() => setOpen(true)}
-				className="min-w-50 flex justify-between gap-6"
+				className="w-full min-w-0 justify-between gap-3 px-3 sm:min-w-50 sm:gap-6"
 				variant="outline"
 				aria-label="Open site search"
 			>
 				<span className="text-muted-foreground">Search...</span>
-				<kbd className="text-xs text-muted-foreground tracking-widest">⌘K</kbd>
+				<kbd className="hidden text-xs tracking-widest text-muted-foreground sm:inline-flex">
+					⌘K
+				</kbd>
 			</Button>
 
 			<CommandDialog open={open} onOpenChange={setOpen}>

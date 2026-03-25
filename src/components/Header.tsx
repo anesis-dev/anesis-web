@@ -9,26 +9,23 @@ export default function Header() {
 		<header className="w-full border-b bg-background">
 			<div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-4 sm:px-5">
 				<div className="flex items-center justify-between gap-3">
-					<div className="flex min-w-0 items-center gap-4 lg:flex-1">
+					<div className="flex min-w-0 items-center gap-4 xl:flex-1">
 						<Logo />
-						<div className="hidden min-w-0 flex-1 lg:block">
+						<div className="hidden min-w-0 flex-1 xl:block">
 							<Nav />
 						</div>
 					</div>
 
-					<div className="hidden items-center gap-3 lg:flex">
-						<Search />
-						<AuthButton />
+					<div className="hidden min-w-0 flex-1 items-center justify-end gap-3 xl:flex">
+						<Search className="w-[11rem] xl:w-[12rem] 2xl:w-[14rem]" />
+						<div className="shrink-0">
+							<AuthButton />
+						</div>
 					</div>
 
-					<div className="lg:hidden">
+					<div className="flex items-center gap-2 xl:hidden">
+						<Search variant="icon" />
 						<MobileHeaderMenu />
-					</div>
-				</div>
-
-				<div className="lg:hidden">
-					<div className="w-full">
-						<Search />
 					</div>
 				</div>
 			</div>

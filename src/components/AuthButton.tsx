@@ -22,10 +22,9 @@ export default function AuthButton() {
 	}
 
 	return (
-		<Button type="button" onClick={login} className="w-full sm:w-auto">
+		<Button type="button" onClick={login} className="w-full sm:w-auto xl:px-4">
 			<GitHubIcon />
-			<span className="sm:hidden">Login</span>
-			<span className="hidden sm:inline">Login with GitHub</span>
+			<span>Sign in with GitHub</span>
 		</Button>
 	);
 }

@@ -1,21 +1,19 @@
 "use client";
 
+import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useAuth } from "@/hooks/useAuth";
-import { useTemplates } from "@/hooks/useTemplates";
 import { useGitHubUser } from "@/hooks/useGitHubUser";
+import { useTemplates } from "@/hooks/useTemplates";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
-import { Button } from "@/components/ui/button";
-import {
-	BookOpenIcon,
-	LogOutIcon,
-	PackageIcon,
-	ShieldIcon,
-	UsersIcon,
-} from "lucide-react";
 import { ITemplate } from "@/types/template";
+import {
+	UsersIcon,
+	BookOpenIcon,
+	PackageIcon,
+	UserIcon,
+} from "lucide-react";
 
 function Stat({ label, value }: { label: string; value: number }) {
 	return (
@@ -26,15 +24,14 @@ function Stat({ label, value }: { label: string; value: number }) {
 	);
 }
 
-function ProfileSkeleton() {
+function AvatarSkeleton() {
 	return (
 		<div className="flex flex-col items-center gap-5 sm:flex-row sm:items-start animate-pulse">
 			<div className="size-24 shrink-0 rounded-full bg-muted" />
-			<div className="flex flex-col items-center gap-3 sm:items-start w-full">
+			<div className="flex flex-col items-center gap-3 sm:items-start">
 				<div className="h-6 w-40 rounded bg-muted" />
 				<div className="h-4 w-24 rounded bg-muted" />
 				<div className="h-4 w-64 rounded bg-muted" />
-				<div className="h-8 w-32 rounded-md bg-muted" />
 			</div>
 		</div>
 	);
@@ -50,11 +47,7 @@ function TemplateSkeleton() {
 			</div>
 			<div className="flex gap-1.5">
 				{[80, 60, 72].map((w) => (
-					<div
-						key={w}
-						className="h-5 rounded-md bg-muted"
-						style={{ width: w }}
-					/>
+					<div key={w} className="h-5 rounded-md bg-muted" style={{ width: w }} />
 				))}
 			</div>
 			<div className="flex items-center justify-between border-t pt-4">
@@ -65,65 +58,52 @@ function TemplateSkeleton() {
 	);
 }
 
-function NotLoggedIn() {
-	return (
-		<div className="flex flex-1 flex-col items-center justify-center gap-4 text-center py-20">
-			<UsersIcon className="size-12 text-muted-foreground" />
-			<div>
-				<p className="font-semibold text-lg">You are not logged in</p>
-				<p className="text-sm text-muted-foreground mt-1">
-					Sign in with GitHub to view your account.
-				</p>
-			</div>
-			<Link href="/">
-				<Button variant="outline">← Go to home</Button>
-			</Link>
-		</div>
-	);
-}
-
-export default function AccountPage() {
-	const { user, isLoading: authLoading, logout } = useAuth();
-	const { githubUser, isLoading: githubLoading } = useGitHubUser(
-		user?.login ?? "",
-	);
+export default function UserProfilePage({
+	params,
+}: {
+	params: Promise<{ login: string }>;
+}) {
+	const { login } = use(params);
+	const { githubUser, isLoading: userLoading, isError: userError } = useGitHubUser(login);
 	const { templates, isLoading: templatesLoading } = useTemplates();
 
-	const myTemplates: ITemplate[] = templates.filter(
-		(t) =>
-			user && t.config.author.github.toLowerCase() === user.login.toLowerCase(),
+	const userTemplates: ITemplate[] = templates.filter(
+		(t) => t.config.author.github.toLowerCase() === login.toLowerCase(),
 	);
 
-	if (authLoading) {
+	if (userError) {
 		return (
-			<div className="mx-auto w-full max-w-5xl px-5 py-10 flex flex-col gap-10">
-				<ProfileSkeleton />
-				<div className="h-px w-full bg-border" />
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{Array.from({ length: 3 }).map((_, i) => (
-						<TemplateSkeleton key={i} />
-					))}
+			<div className="mx-auto w-full max-w-5xl px-5 py-20 flex flex-col items-center gap-4 text-center">
+				<UserIcon className="size-12 text-muted-foreground" />
+				<div>
+					<p className="font-semibold text-lg">User not found</p>
+					<p className="text-sm text-muted-foreground mt-1">
+						No GitHub user with the login{" "}
+						<span className="font-mono text-foreground">@{login}</span> exists.
+					</p>
 				</div>
+				<Link
+					href="/templates"
+					className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+				>
+					← Back to templates
+				</Link>
 			</div>
 		);
-	}
-
-	if (!user) {
-		return <NotLoggedIn />;
 	}
 
 	return (
 		<div className="mx-auto w-full max-w-5xl px-5 py-10 flex flex-col gap-10">
 			{/* Profile header */}
-			{githubLoading ? (
-				<ProfileSkeleton />
-			) : (
+			{userLoading ? (
+				<AvatarSkeleton />
+			) : githubUser ? (
 				<div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
 					{/* Avatar */}
 					<div className="relative size-24 shrink-0 overflow-hidden rounded-full border">
 						<Image
-							src={user.avatar_url}
-							alt={user.login}
+							src={githubUser.avatar_url}
+							alt={githubUser.login}
 							fill
 							className="object-cover grayscale"
 						/>
@@ -132,81 +112,57 @@ export default function AccountPage() {
 					{/* Info */}
 					<div className="flex flex-1 flex-col items-center gap-3 sm:items-start">
 						<div className="flex flex-col items-center gap-0.5 sm:items-start">
-							{githubUser?.name && (
+							{githubUser.name && (
 								<h1 className="text-2xl font-bold tracking-tight">
 									{githubUser.name}
 								</h1>
 							)}
 							<p className="font-mono text-sm text-muted-foreground">
-								@{user.login}
+								@{githubUser.login}
 							</p>
 						</div>
 
-						{githubUser?.bio && (
+						{githubUser.bio && (
 							<p className="max-w-md text-center text-sm text-muted-foreground sm:text-left">
 								{githubUser.bio}
 							</p>
 						)}
 
 						{/* Stats */}
-						{githubUser && (
-							<div className="flex items-center gap-6">
-								<Stat label="Followers" value={githubUser.followers} />
-								<div className="h-6 w-px bg-border" />
-								<Stat label="Following" value={githubUser.following} />
-								<div className="h-6 w-px bg-border" />
-								<Stat label="Repos" value={githubUser.public_repos} />
-							</div>
-						)}
-
-						{/* Actions */}
-						<div className="flex items-center gap-2">
-							{user.role === "admin" && (
-								<Link href="/admin">
-									<Button variant="default" size="sm" className="gap-1.5">
-										<ShieldIcon className="size-3.5" />
-										Admin Panel
-									</Button>
-								</Link>
-							)}
-
-							<Link
-								href={`https://github.com/${user.login}`}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								<Button variant="outline" size="sm" className="gap-1.5">
-									<GitHubIcon className="size-3.5" />
-									View on GitHub
-								</Button>
-							</Link>
-
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={logout}
-								className="gap-1.5 text-muted-foreground hover:text-destructive"
-							>
-								<LogOutIcon className="size-3.5" />
-								Log out
-							</Button>
+						<div className="flex items-center gap-6">
+							<Stat label="Followers" value={githubUser.followers} />
+							<div className="h-6 w-px bg-border" />
+							<Stat label="Following" value={githubUser.following} />
+							<div className="h-6 w-px bg-border" />
+							<Stat label="Repos" value={githubUser.public_repos} />
 						</div>
+
+						{/* GitHub link */}
+						<Link
+							href={githubUser.html_url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+						>
+							<GitHubIcon className="size-3.5" />
+							View on GitHub
+						</Link>
 					</div>
 				</div>
-			)}
+			) : null}
 
 			{/* Divider */}
 			<div className="h-px w-full bg-border" />
 
-			{/* My templates */}
+			{/* Templates section */}
 			<div className="flex flex-col gap-5">
 				<div className="flex items-center gap-2">
 					<PackageIcon className="size-4 text-muted-foreground" />
 					<h2 className="font-semibold">
-						My Templates
+						Templates
 						{!templatesLoading && (
 							<span className="ml-2 font-mono text-sm font-normal text-muted-foreground">
-								{myTemplates.length}
+								{userTemplates.length}
 							</span>
 						)}
 					</h2>
@@ -220,21 +176,21 @@ export default function AccountPage() {
 					</div>
 				)}
 
-				{!templatesLoading && myTemplates.length === 0 && (
+				{!templatesLoading && userTemplates.length === 0 && (
 					<div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-14 text-center">
 						<BookOpenIcon className="size-7 text-muted-foreground" />
 						<div>
 							<p className="text-sm font-medium">No templates yet</p>
 							<p className="mt-1 text-xs text-muted-foreground">
-								You haven&apos;t published any templates.
+								This user hasn&apos;t published any templates.
 							</p>
 						</div>
 					</div>
 				)}
 
-				{!templatesLoading && myTemplates.length > 0 && (
+				{!templatesLoading && userTemplates.length > 0 && (
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						{myTemplates.map((template) => (
+						{userTemplates.map((template) => (
 							<TemplateCard key={template.id} template={template} />
 						))}
 					</div>

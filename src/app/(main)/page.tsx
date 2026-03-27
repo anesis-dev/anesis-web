@@ -192,11 +192,12 @@ export default function Home() {
 					<div className="rounded-2xl border bg-card p-6">
 						<p className="text-sm font-medium text-primary">Documentation</p>
 						<h2 className="mt-2 text-2xl font-bold tracking-tight">
-							Installation, CLI usage, and template publishing
+							Installation, CLI usage, templates, and addons
 						</h2>
 						<p className="mt-3 text-sm leading-6 text-muted-foreground">
 							The docs section explains how to install Oxide, use the CLI, and
-							structure `oxide.template.json` correctly for any stack.
+							structure both `oxide.template.json` and `oxide.addon.json`
+							correctly.
 						</p>
 						<div className="mt-5 flex flex-wrap gap-3">
 							<Button variant="outline" asChild>
@@ -207,6 +208,9 @@ export default function Home() {
 							</Button>
 							<Button variant="outline" asChild>
 								<Link href="/docs/templates">Templates</Link>
+							</Button>
+							<Button variant="outline" asChild>
+								<Link href="/docs/addons">Addons</Link>
 							</Button>
 						</div>
 					</div>

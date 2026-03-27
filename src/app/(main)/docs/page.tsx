@@ -62,13 +62,14 @@ export default function DocsOverviewPage() {
 				</div>
 				<div className="max-w-3xl space-y-4">
 					<h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-						Install Oxide, scaffold projects, and ship your own templates
+						Install Oxide, scaffold projects, and author templates and addons
 					</h1>
 					<p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
 						Oxide is a CLI for generating project starters, working with
-						reusable templates, and publishing your own template directories.
-						Day-to-day scaffolding should feel lightweight, while authenticated
-						flows stay out of the way until you actually need them.
+						reusable templates, and extending generated projects through
+						declarative addon manifests. Day-to-day scaffolding should feel
+						lightweight, while authenticated flows stay out of the way until you
+						actually need them.
 					</p>
 				</div>
 				<div className="mt-6 flex flex-wrap gap-3">
@@ -77,6 +78,9 @@ export default function DocsOverviewPage() {
 							Start with installation
 							<ArrowRightIcon className="size-4" />
 						</Link>
+					</Button>
+					<Button variant="outline" asChild>
+						<Link href="/docs/addons">Read addon docs</Link>
 					</Button>
 					<Button variant="outline" asChild>
 						<Link href="/templates">Browse templates</Link>

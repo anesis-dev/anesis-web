@@ -21,6 +21,10 @@ export const docsNav: DocsNavItem[] = [
 		href: "/docs/templates",
 	},
 	{
+		title: "Addons",
+		href: "/docs/addons",
+	},
+	{
 		title: "Reference",
 		href: "/docs/reference",
 	},

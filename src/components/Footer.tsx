@@ -5,7 +5,12 @@ const footerLinks = [
 	{ title: "Installation", href: "/docs/installation" },
 	{ title: "CLI", href: "/docs/cli" },
 	{ title: "Templates", href: "/docs/templates" },
-	{ title: "GitHub", href: "https://github.com/oxide-cli/oxide", external: true },
+	{ title: "Addons", href: "/docs/addons" },
+	{
+		title: "GitHub",
+		href: "https://github.com/oxide-cli/oxide",
+		external: true,
+	},
 ];
 
 export default function Footer() {
@@ -42,15 +47,17 @@ export default function Footer() {
 							Docs
 						</p>
 						<div className="flex flex-col gap-2">
-							{footerLinks.slice(0, 3).map((item) => (
-								<Link
-									key={item.href}
-									href={item.href}
-									className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-								>
-									{item.title}
-								</Link>
-							))}
+							{footerLinks
+								.filter((item) => !item.external)
+								.map((item) => (
+									<Link
+										key={item.href}
+										href={item.href}
+										className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+									>
+										{item.title}
+									</Link>
+								))}
 						</div>
 					</div>
 

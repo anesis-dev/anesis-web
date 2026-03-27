@@ -5,6 +5,7 @@ export function getLoginUrl(): string {
 }
 
 export async function logoutRequest(): Promise<void> {
+	localStorage.removeItem("token");
 	await fetch(`${env.apiUrl}/auth/logout`, {
 		method: "GET",
 		credentials: "include",

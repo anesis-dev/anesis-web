@@ -7,7 +7,6 @@ import { getTemplateRef } from "@/lib/template-ref";
 import { deleteTemplate, updateTemplate } from "@/services/template";
 import { ITemplate } from "@/types/template";
 import { TemplateCard } from "@/components/templates/TemplateCard";
-import { TemplateApiUrlButton } from "@/components/templates/TemplateApiUrlButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -107,11 +106,6 @@ export function OwnedTemplateCard({ template }: { template: ITemplate }) {
 							</>
 						)}
 					</Button>
-
-					<TemplateApiUrlButton
-						templateRef={templateRef}
-						onMessage={(message, type) => setNotice({ type, message })}
-					/>
 
 					<Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
 						<DialogTrigger asChild>

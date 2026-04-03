@@ -5,15 +5,23 @@ import { use } from "react";
 import {
 	AlertCircleIcon,
 	ArrowLeftIcon,
-	Clock3Icon,
+	ArrowUpRightIcon,
+	BadgeInfoIcon,
+	BookOpenTextIcon,
+	CalendarDaysIcon,
 	ExternalLinkIcon,
 	GitBranchIcon,
+	GlobeIcon,
+	LinkIcon,
 	PackageIcon,
+	ShieldCheckIcon,
 	TagIcon,
 	UserIcon,
 } from "lucide-react";
 import { useTemplate } from "@/hooks/useTemplate";
+import { useTemplateReadme } from "@/hooks/useTemplateReadme";
 import { getTemplateRef } from "@/lib/template-ref";
+import { TemplateReadme } from "@/components/templates/TemplateReadme";
 import { TemplateApiUrlButton } from "@/components/templates/TemplateApiUrlButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +38,26 @@ function Pill({
 	);
 }
 
+function MetaItem({
+	label,
+	value,
+	icon: Icon,
+}: {
+	label: string;
+	value: React.ReactNode;
+	icon: React.ElementType;
+}) {
+	return (
+		<div className="rounded-2xl border bg-background/70 p-4">
+			<div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+				<Icon className="size-3.5" />
+				<span>{label}</span>
+			</div>
+			<div className="mt-3 text-sm text-foreground">{value}</div>
+		</div>
+	);
+}
+
 export default function TemplateDetailsPage({
 	params,
 }: {
@@ -38,6 +66,12 @@ export default function TemplateDetailsPage({
 	const { templateRef } = use(params);
 	const joinedRef = templateRef.map((segment) => decodeURIComponent(segment)).join("/");
 	const { template, isLoading, isError } = useTemplate(joinedRef);
+	const {
+		readme,
+		fileName,
+		isLoading: isReadmeLoading,
+		isError: isReadmeError,
+	} = useTemplateReadme(template?.url);
 
 	if (isLoading) {
 		return (
@@ -75,9 +109,19 @@ export default function TemplateDetailsPage({
 	}
 
 	const canonicalRef = getTemplateRef(template);
+	const publishedAt = new Date(template.created_at).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
+	const updatedAt = new Date(template.updated_at).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
 
 	return (
-		<div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-5 lg:px-8">
+		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
 			<div>
 				<Link
 					href="/templates"
@@ -88,27 +132,54 @@ export default function TemplateDetailsPage({
 				</Link>
 			</div>
 
-			<Card className="rounded-3xl">
-				<CardHeader className="gap-4">
-					<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-						<div className="space-y-3">
+			<section className="relative overflow-hidden rounded-[2rem] border bg-card">
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.92),rgba(255,255,255,1))]" />
+				<div className="relative flex flex-col gap-8 p-6 sm:p-8 lg:p-10">
+					<div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+						<div className="max-w-4xl space-y-5">
 							<div className="flex flex-wrap items-center gap-2">
-								{template.official ? <Pill>Official</Pill> : <Pill>Community</Pill>}
+								{template.official ? (
+									<Pill>
+										<ShieldCheckIcon className="mr-1 size-3.5" />
+										Official
+									</Pill>
+								) : (
+									<Pill>Community</Pill>
+								)}
 								<Pill>{template.config.specialization || "general"}</Pill>
 								<Pill>{template.config.scope || "unspecified scope"}</Pill>
+								<Pill>{template.config.type}</Pill>
 							</div>
+
 							<div>
-								<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+								<p className="text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground">
+									Template Profile
+								</p>
+								<h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
 									{template.config.metadata.displayName}
 								</h1>
-								<p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
+								<p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">
 									{template.config.metadata.description}
 								</p>
 							</div>
+
+							<div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+								<Link
+									href={`/user/${template.config.author.github}`}
+									className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono transition-colors hover:text-foreground"
+								>
+									<UserIcon className="size-3.5" />
+									@{template.config.author.github}
+								</Link>
+								<span className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono">
+									<BadgeInfoIcon className="size-3.5" />
+									{canonicalRef}
+								</span>
+							</div>
 						</div>
 
-						<div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-							<Button asChild variant="outline">
+						<div className="flex w-full flex-col gap-3 sm:flex-row xl:w-auto xl:flex-col">
+							<Button asChild size="lg" className="sm:flex-1 xl:flex-none">
 								<Link
 									href={template.config.repository.url}
 									target="_blank"
@@ -118,149 +189,222 @@ export default function TemplateDetailsPage({
 									Open repository
 								</Link>
 							</Button>
-							<TemplateApiUrlButton templateRef={canonicalRef} />
+							<Button asChild size="lg" variant="outline" className="sm:flex-1 xl:flex-none">
+								<Link href={`https://github.com/${template.config.author.github}`}>
+									<ArrowUpRightIcon className="size-4" />
+									Author profile
+								</Link>
+							</Button>
+							<TemplateApiUrlButton
+								templateRef={canonicalRef}
+								size="lg"
+								variant="outline"
+								className="sm:flex-1 xl:flex-none"
+							/>
 						</div>
 					</div>
-				</CardHeader>
-				<CardContent className="grid gap-3 border-t pt-6 text-sm text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
-					<div>
-						<p className="text-xs uppercase tracking-wide">Reference</p>
-						<p className="mt-1 font-mono text-foreground">{canonicalRef}</p>
+
+					<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+						<MetaItem
+							label="Version"
+							icon={PackageIcon}
+							value={<span className="font-mono text-base">{template.version}</span>}
+						/>
+						<MetaItem
+							label="Published"
+							icon={CalendarDaysIcon}
+							value={publishedAt}
+						/>
+						<MetaItem
+							label="Updated"
+							icon={CalendarDaysIcon}
+							value={updatedAt}
+						/>
+						<MetaItem
+							label="README"
+							icon={BookOpenTextIcon}
+							value={fileName ?? "README.md not found"}
+						/>
 					</div>
-					<div>
-						<p className="text-xs uppercase tracking-wide">Version</p>
-						<p className="mt-1 text-foreground">{template.version}</p>
-					</div>
-					<div>
-						<p className="text-xs uppercase tracking-wide">Published</p>
-						<p className="mt-1 text-foreground">
-							{new Date(template.created_at).toLocaleDateString("en-US", {
-								year: "numeric",
-								month: "short",
-								day: "numeric",
-							})}
-						</p>
-					</div>
-					<div>
-						<p className="text-xs uppercase tracking-wide">Updated</p>
-						<p className="mt-1 text-foreground">
-							{new Date(template.updated_at).toLocaleDateString("en-US", {
-								year: "numeric",
-								month: "short",
-								day: "numeric",
-							})}
-						</p>
-					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</section>
 
-			<div className="grid gap-4 lg:grid-cols-2">
-				<Card>
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-base">
-							<UserIcon className="size-4 text-muted-foreground" />
-							Author and Source
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-4 text-sm text-muted-foreground">
-						<div>
-							<p className="text-xs uppercase tracking-wide">Author</p>
-							<Link
-								href={`/user/${template.config.author.github}`}
-								className="mt-1 inline-flex items-center gap-2 font-mono text-foreground transition-colors hover:text-primary"
-							>
-								@{template.config.author.github}
-							</Link>
-						</div>
-						<div>
-							<p className="text-xs uppercase tracking-wide">Source URL</p>
-							<p className="mt-1 break-all font-mono text-xs text-foreground">
-								{template.url}
-							</p>
-						</div>
-						<div>
-							<p className="text-xs uppercase tracking-wide">Commit SHA</p>
-							<p className="mt-1 break-all font-mono text-xs text-foreground">
-								{template.commit_sha}
-							</p>
-						</div>
-					</CardContent>
-				</Card>
+			<div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
+				<TemplateReadme
+					content={readme}
+					fileName={fileName}
+					isLoading={isReadmeLoading}
+					isError={isReadmeError}
+				/>
 
-				<Card>
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-base">
-							<PackageIcon className="size-4 text-muted-foreground" />
-							Classification
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-4 text-sm text-muted-foreground">
-						<div>
-							<p className="text-xs uppercase tracking-wide">Type</p>
-							<p className="mt-1 text-foreground">{template.config.type}</p>
-						</div>
-						<div>
-							<p className="text-xs uppercase tracking-wide">Repository type</p>
-							<p className="mt-1 text-foreground">{template.config.repository.type}</p>
-						</div>
-						<div>
-							<p className="text-xs uppercase tracking-wide">Release</p>
-							<p className="mt-1 text-foreground">{template.config.repository.release}</p>
-						</div>
-					</CardContent>
-				</Card>
-			</div>
+				<div className="flex flex-col gap-6">
+					<Card className="rounded-3xl">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 text-base">
+								<UserIcon className="size-4 text-muted-foreground" />
+								Author and Source
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-5 text-sm text-muted-foreground">
+							<div>
+								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+									Author
+								</p>
+								<Link
+									href={`/user/${template.config.author.github}`}
+									className="mt-2 inline-flex items-center gap-2 font-mono text-foreground transition-colors hover:text-primary"
+								>
+									@{template.config.author.github}
+								</Link>
+							</div>
+							<div>
+								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+									Source URL
+								</p>
+								<p className="mt-2 break-all rounded-2xl border bg-muted/25 p-3 font-mono text-xs text-foreground">
+									{template.url}
+								</p>
+							</div>
+							<div>
+								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+									Commit SHA
+								</p>
+								<p className="mt-2 break-all rounded-2xl border bg-muted/25 p-3 font-mono text-xs text-foreground">
+									{template.commit_sha}
+								</p>
+							</div>
+						</CardContent>
+					</Card>
 
-			<div className="grid gap-4 lg:grid-cols-3">
-				<Card className="lg:col-span-1">
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-base">
-							<GitBranchIcon className="size-4 text-muted-foreground" />
-							Technologies
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="flex flex-wrap gap-2">
-						{template.config.technologies.length > 0 ? (
-							template.config.technologies.map((tech) => <Pill key={tech}>{tech}</Pill>)
-						) : (
-							<p className="text-sm text-muted-foreground">No technologies listed.</p>
-						)}
-					</CardContent>
-				</Card>
+					<Card className="rounded-3xl">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 text-base">
+								<PackageIcon className="size-4 text-muted-foreground" />
+								Classification
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-5 text-sm text-muted-foreground">
+							<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Type
+									</p>
+									<p className="mt-2 text-foreground">{template.config.type}</p>
+								</div>
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Repository type
+									</p>
+									<p className="mt-2 text-foreground">
+										{template.config.repository.type}
+									</p>
+								</div>
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Release
+									</p>
+									<p className="mt-2 text-foreground">
+										{template.config.repository.release}
+									</p>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
 
-				<Card className="lg:col-span-1">
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-base">
-							<Clock3Icon className="size-4 text-muted-foreground" />
-							Languages
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="flex flex-wrap gap-2">
-						{template.config.languages.length > 0 ? (
-							template.config.languages.map((language) => (
-								<Pill key={language}>{language}</Pill>
-							))
-						) : (
-							<p className="text-sm text-muted-foreground">No languages listed.</p>
-						)}
-					</CardContent>
-				</Card>
+					<Card className="rounded-3xl">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 text-base">
+								<GitBranchIcon className="size-4 text-muted-foreground" />
+								Stack
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-5">
+							<div>
+								<p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+									Technologies
+								</p>
+								<div className="flex flex-wrap gap-2">
+									{template.config.technologies.length > 0 ? (
+										template.config.technologies.map((tech) => (
+											<Pill key={tech}>{tech}</Pill>
+										))
+									) : (
+										<p className="text-sm text-muted-foreground">
+											No technologies listed.
+										</p>
+									)}
+								</div>
+							</div>
 
-				<Card className="lg:col-span-1">
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-base">
-							<TagIcon className="size-4 text-muted-foreground" />
-							Tags
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="flex flex-wrap gap-2">
-						{template.config.metadata.tags.length > 0 ? (
-							template.config.metadata.tags.map((tag) => <Pill key={tag}>{tag}</Pill>)
-						) : (
-							<p className="text-sm text-muted-foreground">No tags listed.</p>
-						)}
-					</CardContent>
-				</Card>
+							<div>
+								<p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+									Languages
+								</p>
+								<div className="flex flex-wrap gap-2">
+									{template.config.languages.length > 0 ? (
+										template.config.languages.map((language) => (
+											<Pill key={language}>{language}</Pill>
+										))
+									) : (
+										<p className="text-sm text-muted-foreground">
+											No languages listed.
+										</p>
+									)}
+								</div>
+							</div>
+
+							<div>
+								<p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+									Tags
+								</p>
+								<div className="flex flex-wrap gap-2">
+									{template.config.metadata.tags.length > 0 ? (
+										template.config.metadata.tags.map((tag) => (
+											<Pill key={tag}>{tag}</Pill>
+										))
+									) : (
+										<p className="text-sm text-muted-foreground">
+											No tags listed.
+										</p>
+									)}
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+
+					<Card className="rounded-3xl">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 text-base">
+								<LinkIcon className="size-4 text-muted-foreground" />
+								Quick links
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-3">
+							<Button asChild variant="outline" className="justify-between">
+								<Link
+									href={template.config.repository.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<span className="inline-flex items-center gap-2">
+										<ExternalLinkIcon className="size-4" />
+										Open GitHub folder
+									</span>
+									<ArrowUpRightIcon className="size-4" />
+								</Link>
+							</Button>
+							<Button asChild variant="outline" className="justify-between">
+								<Link href={`/user/${template.config.author.github}`}>
+									<span className="inline-flex items-center gap-2">
+										<GlobeIcon className="size-4" />
+										Author page
+									</span>
+									<ArrowUpRightIcon className="size-4" />
+								</Link>
+							</Button>
+						</CardContent>
+					</Card>
+				</div>
 			</div>
 		</div>
 	);

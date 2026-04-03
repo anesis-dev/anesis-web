@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { use } from "react";
 import {
+	ActivityIcon,
 	AlertCircleIcon,
 	ArrowLeftIcon,
 	ArrowUpRightIcon,
 	BadgeInfoIcon,
+	BarChart3Icon,
 	BookOpenTextIcon,
 	CalendarDaysIcon,
 	ExternalLinkIcon,
@@ -54,6 +56,28 @@ function MetaItem({
 				<span>{label}</span>
 			</div>
 			<div className="mt-3 text-sm text-foreground">{value}</div>
+		</div>
+	);
+}
+
+function AnalyticsMetric({
+	label,
+	value = "—",
+	helper,
+}: {
+	label: string;
+	value?: string;
+	helper: string;
+}) {
+	return (
+		<div className="rounded-2xl border bg-muted/20 p-4">
+			<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+				{label}
+			</p>
+			<p className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+				{value}
+			</p>
+			<p className="mt-2 text-xs leading-5 text-muted-foreground">{helper}</p>
 		</div>
 	);
 }
@@ -238,6 +262,50 @@ export default function TemplateDetailsPage({
 				/>
 
 				<div className="flex flex-col gap-6">
+					<Card className="rounded-3xl">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 text-base">
+								<BarChart3Icon className="size-4 text-muted-foreground" />
+								Template Analytics
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-5">
+							<div className="rounded-2xl border border-dashed bg-muted/20 p-4">
+								<div className="flex items-start gap-3">
+									<ActivityIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+									<div>
+										<p className="font-medium text-foreground">
+											Analytics are in progress
+										</p>
+										<p className="mt-1 text-sm text-muted-foreground">
+											Install counts, usage trends, and activity charts will
+											appear here after tracking is added.
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+								<AnalyticsMetric
+									label="Weekly Installs"
+									helper="Will show recent scaffold activity."
+								/>
+								<AnalyticsMetric
+									label="30 Day Trend"
+									helper="Will compare current usage with the previous period."
+								/>
+								<AnalyticsMetric
+									label="Conversion"
+									helper="Will track visits to template details versus actual usage."
+								/>
+								<AnalyticsMetric
+									label="Last Activity"
+									helper="Will show the most recent generation event."
+								/>
+							</div>
+						</CardContent>
+					</Card>
+
 					<Card className="rounded-3xl">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 text-base">

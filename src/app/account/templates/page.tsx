@@ -3,39 +3,29 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/PaginationControls";
+import { OwnedTemplateCard } from "@/components/templates/OwnedTemplateCard";
 import { PublishTemplateDialog } from "@/components/templates/PublishTemplateDialog";
-import { TemplateCard } from "@/components/templates/TemplateCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
-import { useTemplates } from "@/hooks/useTemplates";
+import { useMyTemplates } from "@/hooks/useMyTemplates";
 import { AlertCircleIcon, PackageIcon } from "lucide-react";
 
 const PAGE_SIZE = 6;
 
 export default function AccountTemplatesPage() {
 	const { user } = useAuth();
-	const { templates, isLoading, isError } = useTemplates();
+	const { templates, isLoading, isError } = useMyTemplates(!!user);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
 
 	const myTemplates = useMemo(() => {
-		if (!user) {
-			return [];
-		}
-
 		const query = search.trim().toLowerCase();
-		const owned = templates.filter(
-			(template) =>
-				template.config.author.github.toLowerCase() ===
-				user.login.toLowerCase(),
-		);
-
 		if (!query) {
-			return owned;
+			return templates;
 		}
 
-		return owned.filter((template) =>
+		return templates.filter((template) =>
 			[
 				template.name,
 				template.config.metadata.displayName,
@@ -48,7 +38,7 @@ export default function AccountTemplatesPage() {
 				.toLowerCase()
 				.includes(query),
 		);
-	}, [search, templates, user]);
+	}, [search, templates]);
 
 	const totalPages = Math.max(1, Math.ceil(myTemplates.length / PAGE_SIZE));
 	const currentPage = Math.min(page, totalPages);
@@ -133,7 +123,7 @@ export default function AccountTemplatesPage() {
 				<>
 					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 						{paginatedTemplates.map((template) => (
-							<TemplateCard key={template.id} template={template} />
+							<OwnedTemplateCard key={template.id} template={template} />
 						))}
 					</div>
 					<PaginationControls

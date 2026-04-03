@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { useTemplates } from "@/hooks/useTemplates";
+import { useMyTemplates } from "@/hooks/useMyTemplates";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -48,13 +48,7 @@ function DashboardCard({
 
 export default function DashboardPage() {
 	const { user } = useAuth();
-	const { templates, isLoading } = useTemplates();
-
-	const myTemplates = templates.filter(
-		(template) =>
-			user &&
-			template.config.author.github.toLowerCase() === user.login.toLowerCase(),
-	);
+	const { templates: myTemplates, isLoading } = useMyTemplates(!!user);
 	const officialTemplates = myTemplates.filter((template) => template.official);
 
 	if (!user) {

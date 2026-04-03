@@ -117,6 +117,8 @@ function parseTemplate(value: unknown, path: string): ITemplate {
 		owner_id: expectString(template.owner_id, `${path}.owner_id`),
 		url: expectString(template.url, `${path}.url`),
 		official: expectBoolean(template.official, `${path}.official`),
+		commit_sha: expectString(template.commit_sha, `${path}.commit_sha`),
+		version: expectString(template.version, `${path}.version`),
 		created_at: expectString(template.created_at, `${path}.created_at`),
 		updated_at: expectString(template.updated_at, `${path}.updated_at`),
 		config: parseTemplateConfig(template.config, `${path}.config`),
@@ -146,6 +148,10 @@ export function parseTemplatesResponse(value: unknown): ITemplate[] {
 	);
 }
 
+export function parseTemplateResponse(value: unknown): ITemplate {
+	return parseTemplate(value, "template");
+}
+
 export function parsePublishTemplateResponse(
 	value: unknown,
 ): { message: string; name: string } {
@@ -154,6 +160,14 @@ export function parsePublishTemplateResponse(
 	return {
 		message: expectString(payload.message, "publishTemplate.message"),
 		name: expectString(payload.name, "publishTemplate.name"),
+	};
+}
+
+export function parseTemplateUrlResponse(value: unknown): { url: string } {
+	const payload = expectRecord(value, "templateUrl");
+
+	return {
+		url: expectString(payload.url, "templateUrl.url"),
 	};
 }
 

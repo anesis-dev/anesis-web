@@ -36,6 +36,8 @@ export interface ITemplate {
   owner_id: string;
   url: string;
   official: boolean;
+  commit_sha: string;
+  version: string;
   created_at: string;
   updated_at: string;
   config: ITemplateConfig;

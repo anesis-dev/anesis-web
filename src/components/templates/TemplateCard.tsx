@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTemplateHref } from "@/lib/template-ref";
 import { ITemplate } from "@/types/template";
 import {
 	Card,
@@ -45,13 +46,16 @@ function Badge({
 export function TemplateCard({ template }: TemplateCardProps) {
 	const { config } = template;
 	const { metadata, author, technologies, languages, official } = config;
+	const detailsHref = getTemplateHref(template);
 
 	return (
 		<Card className="gap-4 py-5 h-full transition-colors hover:border-foreground/30">
 			<CardHeader className="gap-1.5 pb-0">
 				<div className="flex flex-col items-start gap-2 sm:flex-row sm:justify-between">
 					<CardTitle className="text-base leading-snug">
-						{metadata.displayName}
+						<Link href={detailsHref} className="transition-colors hover:text-primary">
+							{metadata.displayName}
+						</Link>
 					</CardTitle>
 					{official && (
 						<span className="flex items-center gap-1 shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
@@ -128,17 +132,22 @@ export function TemplateCard({ template }: TemplateCardProps) {
 						v{config.version}
 					</span>
 
-					{/* View button */}
-					<Button asChild size="xs" variant="outline" className="shrink-0">
-						<Link
-							href={config.repository.url}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<ExternalLinkIcon />
-							View
-						</Link>
-					</Button>
+					<div className="flex items-center gap-1.5">
+						<Button asChild size="icon-xs" variant="ghost" className="shrink-0">
+							<Link
+								href={config.repository.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label={`Open repository for ${metadata.displayName}`}
+							>
+								<ExternalLinkIcon />
+							</Link>
+						</Button>
+
+						<Button asChild size="xs" variant="outline" className="shrink-0">
+							<Link href={detailsHref}>Details</Link>
+						</Button>
+					</div>
 				</div>
 			</CardFooter>
 		</Card>

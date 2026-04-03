@@ -1,27 +1,18 @@
+import { api, ApiError } from "@/api/client";
 import { parseGitHubUserResponse } from "@/lib/api-contracts";
 import { IGitHubUser } from "@/types/github";
 
 export async function fetchGitHubUser(login: string): Promise<IGitHubUser> {
 	try {
-		const res = await fetch(`https://api.github.com/users/${login}`, {
-			headers: {
-				Accept: "application/vnd.github+json",
-			},
-			next: { revalidate: 60 * 10 },
-		});
-
-		if (res.status === 404) {
+		const url = encodeURIComponent(`https://api.github.com/users/${login}`);
+		return parseGitHubUserResponse(
+			await api.get<unknown>(`/github/proxy?url=${url}`),
+		);
+	} catch (error) {
+		if (error instanceof ApiError && error.status === 404) {
 			throw new Error(`GitHub user not found: ${login}`);
 		}
 
-		if (!res.ok) {
-			throw new Error(
-				`GitHub is temporarily unavailable (${res.status} ${res.statusText}).`,
-			);
-		}
-
-		return parseGitHubUserResponse(await res.json());
-	} catch (error) {
 		if (error instanceof Error) {
 			throw error;
 		}

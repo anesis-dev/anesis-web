@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { GitBranchIcon, BoxIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
+import { CodeBlock } from "@/components/docs/CodeBlock";
+import { env } from "@/config/env";
+import { fetchTemplateSchema } from "@/services/schema";
 import {
 	Card,
 	CardContent,
@@ -33,7 +36,15 @@ const supportedStacks = [
 	},
 ];
 
-export default function DocsReferencePage() {
+export default async function DocsReferencePage() {
+	let schemaPreview: string | null = null;
+
+	try {
+		schemaPreview = await fetchTemplateSchema();
+	} catch {
+		schemaPreview = null;
+	}
+
 	return (
 		<div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-5 py-10 lg:px-8">
 			<section className="space-y-3">
@@ -117,6 +128,38 @@ export default function DocsReferencePage() {
 					</CardContent>
 				</Card>
 			</div>
+
+			<Card>
+				<CardHeader>
+					<CardTitle>Template schema</CardTitle>
+					<CardDescription>
+						The backend exposes the current JSON Schema used to validate
+						`oxide.template.json`.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="flex flex-wrap gap-3">
+						<Button variant="outline" asChild>
+							<Link
+								href={`${env.apiUrl}/schema/oxide.template.schema.json`}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								View raw schema
+							</Link>
+						</Button>
+					</div>
+
+					{schemaPreview ? (
+						<CodeBlock code={schemaPreview} />
+					) : (
+						<p className="text-sm text-muted-foreground">
+							Schema preview is unavailable right now. The raw endpoint is still
+							linked above.
+						</p>
+					)}
+				</CardContent>
+			</Card>
 
 			<DocsPagination currentHref="/docs/reference" />
 		</div>

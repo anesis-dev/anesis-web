@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { useTemplates } from "@/hooks/useTemplates";
 import { useGitHubUser } from "@/hooks/useGitHubUser";
+import { useMyTemplates } from "@/hooks/useMyTemplates";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
 	ShieldIcon,
 	UsersIcon,
 } from "lucide-react";
-import { ITemplate } from "@/types/template";
 
 function Stat({ label, value }: { label: string; value: number }) {
 	return (
@@ -87,11 +86,8 @@ export default function AccountPage() {
 	const { githubUser, isLoading: githubLoading } = useGitHubUser(
 		user?.login ?? "",
 	);
-	const { templates, isLoading: templatesLoading } = useTemplates();
-
-	const myTemplates: ITemplate[] = templates.filter(
-		(t) =>
-			user && t.config.author.github.toLowerCase() === user.login.toLowerCase(),
+	const { templates: myTemplates, isLoading: templatesLoading } = useMyTemplates(
+		!!user,
 	);
 
 	if (authLoading) {

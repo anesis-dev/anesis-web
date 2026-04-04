@@ -6,7 +6,6 @@ import {
 	ActivityIcon,
 	AlertCircleIcon,
 	ArrowLeftIcon,
-	ArrowUpRightIcon,
 	BadgeInfoIcon,
 	BookOpenTextIcon,
 	CalendarDaysIcon,
@@ -16,10 +15,12 @@ import {
 	GitBranchIcon,
 	LinkIcon,
 	PackageIcon,
+	ScaleIcon,
 	ShieldCheckIcon,
 	TerminalSquareIcon,
 	UserIcon,
 } from "lucide-react";
+import { formatDate } from "@/lib/date";
 import { parseGitHubTreeUrl } from "@/lib/github-tree-url";
 import { useTemplate } from "@/hooks/useTemplate";
 import { useTemplateReadme } from "@/hooks/useTemplateReadme";
@@ -111,12 +112,26 @@ function CommandCard({
 	);
 }
 
-function formatDate(value: string): string {
-	return new Date(value).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-	});
+function SnapshotCard({
+	label,
+	value,
+	helper,
+}: {
+	label: string;
+	value: string;
+	helper: string;
+}) {
+	return (
+		<div className="rounded-2xl border bg-background/70 p-4">
+			<p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+				{label}
+			</p>
+			<p className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
+				{value}
+			</p>
+			<p className="mt-2 text-sm leading-6 text-muted-foreground">{helper}</p>
+		</div>
+	);
 }
 
 function getSourceInfo(url: string) {
@@ -148,9 +163,10 @@ export default function TemplateDetailsPage({
 	const {
 		readme,
 		fileName,
+		path,
 		isLoading: isReadmeLoading,
 		isError: isReadmeError,
-	} = useTemplateReadme(template?.url);
+	} = useTemplateReadme(template?.config.repository.url);
 
 	if (isLoading) {
 		return (
@@ -194,6 +210,10 @@ export default function TemplateDetailsPage({
 	const templateName = template.config.name;
 	const createCommand = `oxide new my-app ${templateName}`;
 	const installCommand = `oxide install-template ${templateName}`;
+	const keywordCount = String(template.config.metadata.tags.length);
+	const technologyCount = String(template.config.technologies.length);
+	const languageCount = String(template.config.languages.length);
+	const sourceDepth = String(source.path?.split("/").filter(Boolean).length ?? 0);
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
@@ -322,6 +342,37 @@ export default function TemplateDetailsPage({
 					<Card className="rounded-3xl">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 text-base">
+								<ActivityIcon className="size-4 text-muted-foreground" />
+								Package Snapshot
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="grid gap-4 sm:grid-cols-2">
+							<SnapshotCard
+								label="Keywords"
+								value={keywordCount}
+								helper="Discovery tags attached to this package page."
+							/>
+							<SnapshotCard
+								label="Technologies"
+								value={technologyCount}
+								helper="Framework and tooling markers parsed from template metadata."
+							/>
+							<SnapshotCard
+								label="Languages"
+								value={languageCount}
+								helper="Language signals exposed to registry filters."
+							/>
+							<SnapshotCard
+								label="Source Depth"
+								value={sourceDepth}
+								helper="Nested folder depth inside the GitHub repository tree."
+							/>
+						</CardContent>
+					</Card>
+
+					<Card className="rounded-3xl">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 text-base">
 								<TerminalSquareIcon className="size-4 text-muted-foreground" />
 								Quick Start
 							</CardTitle>
@@ -343,6 +394,8 @@ export default function TemplateDetailsPage({
 					<TemplateReadme
 						content={readme}
 						fileName={fileName}
+						sourceUrl={template.config.repository.url}
+						sourcePath={path}
 						isLoading={isReadmeLoading}
 						isError={isReadmeError}
 					/>
@@ -352,8 +405,8 @@ export default function TemplateDetailsPage({
 					<Card className="rounded-3xl">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 text-base">
-								<PackageIcon className="size-4 text-muted-foreground" />
-								Package Details
+								<ScaleIcon className="size-4 text-muted-foreground" />
+								Package Metadata
 							</CardTitle>
 						</CardHeader>
 						<CardContent className="space-y-5 text-sm text-muted-foreground">
@@ -418,12 +471,17 @@ export default function TemplateDetailsPage({
 								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
 									Author
 								</p>
-								<Link
-									href={`/user/${template.config.author.github}`}
-									className="mt-2 inline-flex items-center gap-2 font-mono text-foreground transition-colors hover:text-primary"
-								>
-									@{template.config.author.github}
-								</Link>
+								<div className="mt-2 space-y-1">
+									<p className="text-foreground">
+										{template.config.author.name}
+									</p>
+									<Link
+										href={`/user/${template.config.author.github}`}
+										className="inline-flex items-center gap-2 font-mono text-foreground transition-colors hover:text-primary"
+									>
+										@{template.config.author.github}
+									</Link>
+								</div>
 							</div>
 							<div>
 								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -523,30 +581,6 @@ export default function TemplateDetailsPage({
 						</CardContent>
 					</Card>
 
-					<Card className="rounded-3xl">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 text-base">
-								<ActivityIcon className="size-4 text-muted-foreground" />
-								Analytics
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<div className="rounded-2xl border border-dashed bg-muted/20 p-4">
-								<div className="flex items-start gap-3">
-									<ActivityIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-									<div>
-										<p className="font-medium text-foreground">
-											In development
-										</p>
-										<p className="mt-1 text-sm text-muted-foreground">
-											Install counts, trend charts, and last activity will land
-											here once tracking is wired in.
-										</p>
-									</div>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
 				</div>
 			</div>
 		</div>

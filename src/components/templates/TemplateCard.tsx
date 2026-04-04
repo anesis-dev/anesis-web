@@ -17,6 +17,7 @@ import {
 	CodeIcon,
 	GlobeIcon,
 	ExternalLinkIcon,
+	PackageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -116,38 +117,44 @@ export function TemplateCard({ template }: TemplateCardProps) {
 				)}
 			</CardContent>
 
-			<CardFooter className="mt-auto flex flex-col items-start gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-				{/* Author */}
-				<Link
-					href={`/user/${author.github}`}
-					className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-				>
-					<GitHubIcon className="size-3.5" />
-					{author.github}
-				</Link>
+			<CardFooter className="mt-auto flex flex-col gap-3 border-t pt-4">
+				<div className="flex w-full items-center justify-between gap-3">
+					<Link
+						href={`/user/${author.github}`}
+						className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+					>
+						<GitHubIcon className="size-3.5 shrink-0" />
+						<span className="truncate">@{author.github}</span>
+					</Link>
 
-				<div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
-					{/* Version */}
-					<span className="font-mono text-[11px] text-muted-foreground">
+					<span className="shrink-0 font-mono text-[11px] text-muted-foreground">
 						v{config.version}
 					</span>
+				</div>
 
-					<div className="flex items-center gap-1.5">
-						<Button asChild size="icon-xs" variant="ghost" className="shrink-0">
-							<Link
-								href={config.repository.url}
-								target="_blank"
-								rel="noopener noreferrer"
-								aria-label={`Open repository for ${metadata.displayName}`}
-							>
-								<ExternalLinkIcon />
-							</Link>
-						</Button>
+				<div className="flex w-full items-center gap-2">
+					<Button asChild size="icon-xs" variant="ghost" className="shrink-0">
+						<Link
+							href={config.repository.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							aria-label={`Open repository for ${metadata.displayName}`}
+						>
+							<ExternalLinkIcon />
+						</Link>
+					</Button>
 
-						<Button asChild size="xs" variant="outline" className="shrink-0">
-							<Link href={detailsHref}>Details</Link>
-						</Button>
-					</div>
+					<Button
+						asChild
+						size="sm"
+						variant="outline"
+						className="min-w-0 flex-1 justify-center gap-1.5"
+					>
+						<Link href={detailsHref}>
+							<PackageIcon className="size-3.5" />
+							Open package
+						</Link>
+					</Button>
 				</div>
 			</CardFooter>
 		</Card>

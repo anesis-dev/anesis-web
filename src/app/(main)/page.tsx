@@ -163,7 +163,7 @@ export default function Home() {
 				</div>
 			</section>
 
-			<section className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-14 lg:px-8">
+			<section className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-5 py-14 lg:px-8">
 				<div className="max-w-2xl space-y-2">
 					<p className="text-sm font-medium text-primary">Core ideas</p>
 					<h2 className="text-3xl font-bold tracking-tight">

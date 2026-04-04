@@ -102,8 +102,8 @@ describe("TemplateDetailsPage", () => {
 		expect(
 			screen.getByText("oxide install-template demo-repo", { exact: false }),
 		).toBeInTheDocument();
-		expect(screen.getByText("Package Details")).toBeInTheDocument();
-		expect(screen.getByText("In development")).toBeInTheDocument();
+		expect(screen.getByText("Package Snapshot")).toBeInTheDocument();
+		expect(screen.getByText("Package Metadata")).toBeInTheDocument();
 		expect(screen.getByText("README.md:# Demo")).toBeInTheDocument();
 		expect(
 			screen.getAllByText("demo-owner/demo-repo@0.1.0", { exact: false }).length,
@@ -111,7 +111,9 @@ describe("TemplateDetailsPage", () => {
 		expect(screen.getByRole("button", { name: /copy demo-owner\/demo-repo@0.1.0/i })).toBeInTheDocument();
 
 		await waitFor(() =>
-			expect(useTemplateReadme).toHaveBeenCalledWith(mockTemplate.url),
+			expect(useTemplateReadme).toHaveBeenCalledWith(
+				mockTemplate.config.repository.url,
+			),
 		);
 	});
 });

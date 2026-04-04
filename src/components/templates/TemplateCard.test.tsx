@@ -12,7 +12,7 @@ describe("TemplateCard", () => {
 		expect(screen.getByText("typescript")).toBeInTheDocument();
 		expect(screen.getByText("responsive")).toBeInTheDocument();
 
-		expect(screen.getByRole("link", { name: "Details" })).toHaveAttribute(
+		expect(screen.getByRole("link", { name: /open package/i })).toHaveAttribute(
 			"href",
 			"/templates/demo-owner/demo-repo@0.1.0",
 		);

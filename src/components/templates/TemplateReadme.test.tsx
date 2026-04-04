@@ -31,4 +31,24 @@ describe("TemplateReadme", () => {
 			"https://github.com/demo-owner/demo-repo",
 		);
 	});
+
+	it("resolves relative github links and images", () => {
+		render(
+			<TemplateReadme
+				content={"[Guide](./docs/guide.md)\n\n![Preview](./assets/preview.png)"}
+				fileName="README.md"
+				sourceUrl="https://github.com/demo-owner/demo-repo/tree/main/template"
+				sourcePath="template/README.md"
+			/>,
+		);
+
+		expect(screen.getByRole("link", { name: "Guide" })).toHaveAttribute(
+			"href",
+			"https://github.com/demo-owner/demo-repo/blob/main/template/docs/guide.md",
+		);
+		expect(screen.getByRole("img", { name: "Preview" })).toHaveAttribute(
+			"src",
+			"https://raw.githubusercontent.com/demo-owner/demo-repo/main/template/assets/preview.png",
+		);
+	});
 });

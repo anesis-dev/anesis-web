@@ -15,9 +15,14 @@ describe("OwnedTemplateCard", () => {
 		renderWithQueryClient(<OwnedTemplateCard template={mockTemplate} />);
 
 		expect(
-			screen.getByRole("button", { name: /refresh from github/i }),
+			screen.getAllByRole("link", { name: /open package/i }).length,
+		).toBeGreaterThan(0);
+		expect(
+			screen.getByRole("button", { name: /refresh metadata/i }),
 		).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /delete/i })).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /delete package/i }),
+		).toBeInTheDocument();
 		expect(screen.queryByRole("button", { name: /copy api url/i })).not.toBeInTheDocument();
 	});
 
@@ -28,7 +33,7 @@ describe("OwnedTemplateCard", () => {
 		);
 		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
-		fireEvent.click(screen.getByRole("button", { name: /refresh from github/i }));
+		fireEvent.click(screen.getByRole("button", { name: /refresh metadata/i }));
 
 		await waitFor(() =>
 			expect(updateTemplate).toHaveBeenCalledWith(mockTemplate.url),
@@ -48,7 +53,7 @@ describe("OwnedTemplateCard", () => {
 		vi.mocked(updateTemplate).mockRejectedValueOnce(new Error("Refresh failed"));
 		renderWithQueryClient(<OwnedTemplateCard template={mockTemplate} />);
 
-		fireEvent.click(screen.getByRole("button", { name: /refresh from github/i }));
+		fireEvent.click(screen.getByRole("button", { name: /refresh metadata/i }));
 
 		await waitFor(() =>
 			expect(screen.getByText("Action failed")).toBeInTheDocument(),
@@ -64,7 +69,7 @@ describe("OwnedTemplateCard", () => {
 		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 		const removeSpy = vi.spyOn(queryClient, "removeQueries");
 
-		fireEvent.click(screen.getByRole("button", { name: /^delete$/i }));
+		fireEvent.click(screen.getByRole("button", { name: /delete package/i }));
 		fireEvent.click(screen.getByRole("button", { name: /delete template/i }));
 		
 		await waitFor(() =>

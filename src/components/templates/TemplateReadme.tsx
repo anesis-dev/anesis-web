@@ -3,21 +3,28 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AlertCircleIcon, BookOpenTextIcon, LoaderIcon } from "lucide-react";
+import { createGitHubReadmeResolver } from "@/lib/github-readme-links";
 import { cn } from "@/lib/utils";
 
 export function TemplateReadme({
 	content,
 	fileName,
+	sourceUrl,
+	sourcePath,
 	isLoading,
 	isError,
 	className,
 }: {
 	content: string | null;
 	fileName?: string;
+	sourceUrl?: string;
+	sourcePath?: string;
 	isLoading?: boolean;
 	isError?: boolean;
 	className?: string;
 }) {
+	const resolver = createGitHubReadmeResolver(sourceUrl, sourcePath);
+
 	if (isLoading) {
 		return (
 			<div className={cn("rounded-3xl border bg-card p-6", className)}>
@@ -85,9 +92,14 @@ export function TemplateReadme({
 				<ReactMarkdown
 					remarkPlugins={[remarkGfm]}
 					components={{
-						a: ({ className: markdownClassName, ...props }) => (
+						a: ({ className: markdownClassName, href = "", ...props }) => {
+							const resolvedHref =
+								typeof href === "string" ? (resolver?.resolveLink(href) ?? href) : undefined;
+
+							return (
 							<a
 								{...props}
+								href={resolvedHref}
 								className={cn(
 									"font-medium text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:text-foreground",
 									markdownClassName,
@@ -95,7 +107,25 @@ export function TemplateReadme({
 								target="_blank"
 								rel="noopener noreferrer"
 							/>
-						),
+							);
+						},
+						img: ({ className: markdownClassName, src = "", alt = "", ...props }) => {
+							const resolvedSrc =
+								typeof src === "string" ? (resolver?.resolveImage(src) ?? src) : undefined;
+
+							return (
+							<img
+								{...props}
+								src={resolvedSrc}
+								alt={alt}
+								loading="lazy"
+								className={cn(
+									"my-6 w-full rounded-2xl border bg-card object-contain",
+									markdownClassName,
+								)}
+							/>
+							);
+						},
 						code: ({ className: markdownClassName, ...props }) => (
 							<code
 								{...props}

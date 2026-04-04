@@ -52,12 +52,12 @@ function MetaItem({
 	icon: React.ElementType;
 }) {
 	return (
-		<div className="rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
+		<div className="min-w-0 rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
 			<div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
 				<Icon className="size-3.5" />
 				<span>{label}</span>
 			</div>
-			<div className="mt-3 text-sm text-foreground">{value}</div>
+			<div className="mt-3 min-w-0 break-words text-sm text-foreground">{value}</div>
 		</div>
 	);
 }
@@ -216,7 +216,7 @@ export default function TemplateDetailsPage({
 	const sourceDepth = String(source.path?.split("/").filter(Boolean).length ?? 0);
 
 	return (
-		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
+		<div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
 			<div>
 				<Link
 					href="/templates"
@@ -251,10 +251,10 @@ export default function TemplateDetailsPage({
 								<p className="text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground">
 									Template Package
 								</p>
-								<h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
+								<h1 className="mt-3 break-words text-4xl font-black tracking-tight sm:text-5xl">
 									{template.config.metadata.displayName}
 								</h1>
-								<p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">
+								<p className="mt-4 max-w-3xl break-words text-base leading-7 text-muted-foreground">
 									{template.config.metadata.description}
 								</p>
 							</div>
@@ -321,12 +321,12 @@ export default function TemplateDetailsPage({
 						<MetaItem
 							label="Package Name"
 							icon={PackageIcon}
-							value={<span className="font-mono text-base">{templateName}</span>}
+							value={<span className="break-all font-mono text-base">{templateName}</span>}
 						/>
 						<MetaItem
 							label="Version"
 							icon={BadgeInfoIcon}
-							value={<span className="font-mono text-base">{template.version}</span>}
+							value={<span className="break-all font-mono text-base">{template.version}</span>}
 						/>
 						<MetaItem
 							label="Published"
@@ -342,8 +342,8 @@ export default function TemplateDetailsPage({
 				</div>
 			</section>
 
-			<div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
-				<div className="flex flex-col gap-6">
+			<div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
+				<div className="min-w-0 flex flex-col gap-6">
 					<Card className="rounded-3xl">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 text-base">
@@ -406,7 +406,7 @@ export default function TemplateDetailsPage({
 					/>
 				</div>
 
-				<div className="flex flex-col gap-6 xl:sticky xl:top-24 xl:self-start">
+				<div className="min-w-0 flex flex-col gap-6 xl:sticky xl:top-24 xl:self-start">
 					<Card className="rounded-3xl">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 text-base">
@@ -482,9 +482,9 @@ export default function TemplateDetailsPage({
 									</p>
 									<Link
 										href={`/user/${template.config.author.github}`}
-										className="inline-flex items-center gap-2 font-mono text-foreground transition-colors hover:text-primary"
+										className="inline-flex max-w-full items-center gap-2 font-mono text-foreground transition-colors hover:text-primary"
 									>
-										@{template.config.author.github}
+										<span className="break-all">@{template.config.author.github}</span>
 									</Link>
 								</div>
 							</div>

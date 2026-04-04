@@ -128,7 +128,7 @@ export function TemplateReadme({
 	}
 
 	return (
-		<div className={cn("rounded-3xl border bg-card p-6 sm:p-8", className)}>
+		<div className={cn("min-w-0 max-w-full overflow-hidden rounded-3xl border bg-card p-6 sm:p-8", className)}>
 			<div className="mb-6 flex flex-wrap items-center gap-3 border-b pb-5">
 				<div>
 					<p className="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">
@@ -140,7 +140,7 @@ export function TemplateReadme({
 				</div>
 			</div>
 
-			<div className="template-readme">
+			<div className="template-readme min-w-0 max-w-full">
 				<ReactMarkdown
 					remarkPlugins={[remarkGfm]}
 					rehypePlugins={[rehypeRaw, [rehypeSanitize, readmeSanitizeSchema]]}
@@ -154,7 +154,7 @@ export function TemplateReadme({
 								{...props}
 								href={resolvedHref}
 								className={cn(
-									"font-medium text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:text-foreground",
+									"break-words font-medium text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:text-foreground",
 									markdownClassName,
 								)}
 								target="_blank"
@@ -182,8 +182,8 @@ export function TemplateReadme({
 								loading="lazy"
 								className={cn(
 									compactImage
-										? "my-1 inline-block max-w-full rounded-none border-0 bg-transparent align-middle shadow-none"
-										: "my-6 block max-w-full rounded-2xl border bg-card object-contain shadow-sm",
+										? "my-1 inline-block h-auto max-w-full rounded-none border-0 bg-transparent align-middle shadow-none"
+										: "my-6 block h-auto max-w-full rounded-2xl border bg-card object-contain shadow-sm",
 									markdownClassName,
 								)}
 							/>
@@ -193,7 +193,7 @@ export function TemplateReadme({
 							<code
 								{...props}
 								className={cn(
-									"rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em]",
+									"break-all rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em]",
 									markdownClassName,
 								)}
 							/>
@@ -202,7 +202,7 @@ export function TemplateReadme({
 							<pre
 								{...props}
 								className={cn(
-									"overflow-x-auto rounded-2xl border bg-muted/35 p-4 text-sm leading-6 [&_code]:bg-transparent [&_code]:p-0",
+									"max-w-full overflow-x-auto whitespace-pre-wrap break-words rounded-2xl border bg-muted/35 p-4 text-sm leading-6 sm:whitespace-pre [&_code]:block [&_code]:min-w-0 [&_code]:bg-transparent [&_code]:p-0",
 									markdownClassName,
 								)}
 							/>
@@ -211,7 +211,7 @@ export function TemplateReadme({
 							<h1
 								{...props}
 								className={cn(
-									"scroll-m-20 text-3xl font-bold tracking-tight sm:text-4xl",
+									"scroll-m-20 break-words text-3xl font-bold tracking-tight sm:text-4xl",
 									markdownClassName,
 								)}
 							/>
@@ -220,7 +220,7 @@ export function TemplateReadme({
 							<h2
 								{...props}
 								className={cn(
-									"mt-10 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0",
+									"mt-10 scroll-m-20 break-words border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0",
 									markdownClassName,
 								)}
 							/>
@@ -229,7 +229,7 @@ export function TemplateReadme({
 							<h3
 								{...props}
 								className={cn(
-									"mt-8 scroll-m-20 text-xl font-semibold tracking-tight",
+									"mt-8 scroll-m-20 break-words text-xl font-semibold tracking-tight",
 									markdownClassName,
 								)}
 							/>
@@ -241,7 +241,7 @@ export function TemplateReadme({
 								<p
 									{...props}
 									className={cn(
-										"leading-7 text-foreground/90 [&:not(:first-child)]:mt-5",
+										"break-words leading-7 text-foreground/90 [&:not(:first-child)]:mt-5",
 										getParagraphAlignmentClass(
 											typeof align === "string" ? align : undefined,
 										),
@@ -254,7 +254,7 @@ export function TemplateReadme({
 							<ul
 								{...props}
 								className={cn(
-									"my-5 ml-6 list-disc space-y-2 text-foreground/90",
+									"my-5 ml-6 break-words list-disc space-y-2 text-foreground/90",
 									markdownClassName,
 								)}
 							/>
@@ -263,7 +263,7 @@ export function TemplateReadme({
 							<ol
 								{...props}
 								className={cn(
-									"my-5 ml-6 list-decimal space-y-2 text-foreground/90",
+									"my-5 ml-6 break-words list-decimal space-y-2 text-foreground/90",
 									markdownClassName,
 								)}
 							/>
@@ -272,16 +272,16 @@ export function TemplateReadme({
 							<blockquote
 								{...props}
 								className={cn(
-									"my-6 border-l-2 border-primary/35 pl-5 italic text-muted-foreground",
+									"my-6 break-words border-l-2 border-primary/35 pl-5 italic text-muted-foreground",
 									markdownClassName,
 								)}
 							/>
 						),
 						table: ({ className: markdownClassName, ...props }) => (
-							<div className="my-6 overflow-x-auto rounded-2xl border">
+							<div className="my-6 max-w-full overflow-x-auto rounded-2xl border">
 								<table
 									{...props}
-									className={cn("w-full text-sm", markdownClassName)}
+									className={cn("min-w-full text-sm", markdownClassName)}
 								/>
 							</div>
 						),
@@ -289,7 +289,7 @@ export function TemplateReadme({
 							<th
 								{...props}
 								className={cn(
-									"border-b bg-muted/40 px-3 py-2 text-left font-medium",
+									"break-words border-b bg-muted/40 px-3 py-2 text-left font-medium",
 									markdownClassName,
 								)}
 							/>
@@ -297,7 +297,7 @@ export function TemplateReadme({
 						td: ({ className: markdownClassName, ...props }) => (
 							<td
 								{...props}
-								className={cn("border-b px-3 py-2 align-top", markdownClassName)}
+								className={cn("break-words border-b px-3 py-2 align-top", markdownClassName)}
 							/>
 						),
 					}}

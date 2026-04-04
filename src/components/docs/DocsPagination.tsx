@@ -17,7 +17,11 @@ export function DocsPagination({ currentHref }: { currentHref: string }) {
 		<div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
 			<div>
 				{previous && (
-					<Button variant="outline" asChild>
+					<Button
+						variant="outline"
+						asChild
+						className="h-auto w-full justify-between whitespace-normal px-4 py-3 text-left sm:w-auto sm:justify-center"
+					>
 						<Link href={previous.href}>
 							<ArrowLeftIcon className="size-4" />
 							{previous.title}
@@ -27,7 +31,11 @@ export function DocsPagination({ currentHref }: { currentHref: string }) {
 			</div>
 			<div className="sm:text-right">
 				{next && (
-					<Button variant="outline" asChild>
+					<Button
+						variant="outline"
+						asChild
+						className="h-auto w-full justify-between whitespace-normal px-4 py-3 text-left sm:w-auto sm:justify-center"
+					>
 						<Link href={next.href}>
 							{next.title}
 							<ArrowRightIcon className="size-4" />

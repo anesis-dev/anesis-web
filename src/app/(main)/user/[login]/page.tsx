@@ -144,7 +144,7 @@ export default function UserProfilePage({
 							href={githubUser.html_url}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+							className="inline-flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-medium transition-colors hover:bg-accent sm:w-auto"
 						>
 							<GitHubIcon className="size-3.5" />
 							View on GitHub

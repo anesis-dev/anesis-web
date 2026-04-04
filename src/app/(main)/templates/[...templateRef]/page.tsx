@@ -36,7 +36,7 @@ function Pill({
 	children: React.ReactNode;
 }) {
 	return (
-		<span className="inline-flex items-center rounded-full border bg-background/75 px-2.5 py-1 text-xs font-medium text-muted-foreground backdrop-blur-sm dark:bg-background/20">
+		<span className="inline-flex max-w-full items-center justify-center rounded-full border bg-background/75 px-2.5 py-1 text-center text-xs font-medium text-muted-foreground backdrop-blur-sm break-words dark:bg-background/20">
 			{children}
 		</span>
 	);
@@ -87,7 +87,7 @@ function CommandCard({
 
 	return (
 		<div className="rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
-			<div className="flex items-start justify-between gap-3">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
 						{label}
@@ -99,7 +99,7 @@ function CommandCard({
 					size="sm"
 					variant="ghost"
 					onClick={handleCopy}
-					className="shrink-0"
+					className="w-full shrink-0 sm:w-auto"
 				>
 					{copied ? <CheckIcon className="size-3.5" /> : <CopyIcon className="size-3.5" />}
 					{copied ? "Copied" : "Copy"}
@@ -259,27 +259,31 @@ export default function TemplateDetailsPage({
 								</p>
 							</div>
 
-							<div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+							<div className="flex flex-wrap items-start gap-3 text-sm text-muted-foreground">
 								<Link
 									href={`/user/${template.config.author.github}`}
-									className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono transition-colors hover:text-foreground"
+									className="inline-flex max-w-full items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono transition-colors hover:text-foreground"
 								>
 									<UserIcon className="size-3.5" />
-									@{template.config.author.github}
+									<span className="break-all">@{template.config.author.github}</span>
 								</Link>
-								<span className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono">
+								<span className="inline-flex max-w-full items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono">
 									<BadgeInfoIcon className="size-3.5" />
-									{canonicalRef}
+									<span className="break-all">{canonicalRef}</span>
 								</span>
-								<span className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono">
+								<span className="inline-flex max-w-full items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono">
 									<PackageIcon className="size-3.5" />
-									{templateName}
+									<span className="break-all">{templateName}</span>
 								</span>
 							</div>
 						</div>
 
 						<div className="flex w-full flex-col gap-3 sm:flex-row xl:w-auto xl:flex-col">
-							<Button asChild size="lg" className="sm:flex-1 xl:flex-none">
+							<Button
+								asChild
+								size="lg"
+								className="h-auto min-h-11 whitespace-normal px-4 py-3 text-center sm:flex-1 xl:flex-none"
+							>
 								<Link
 									href={template.config.repository.url}
 									target="_blank"
@@ -293,7 +297,7 @@ export default function TemplateDetailsPage({
 								asChild
 								size="lg"
 								variant="outline"
-								className="sm:flex-1 xl:flex-none"
+								className="h-auto min-h-11 whitespace-normal px-4 py-3 text-center sm:flex-1 xl:flex-none"
 							>
 								<Link
 									href={source.repositoryUrl}
@@ -308,7 +312,7 @@ export default function TemplateDetailsPage({
 								templateRef={canonicalRef}
 								size="lg"
 								variant="outline"
-								className="sm:flex-1 xl:flex-none"
+								className="h-auto min-h-11 whitespace-normal px-4 py-3 text-center sm:flex-1 xl:flex-none"
 							/>
 						</div>
 					</div>

@@ -74,13 +74,13 @@ function NotLoggedIn({ onLogin }: { onLogin: () => void }) {
 					Sign in with GitHub to view your account.
 				</p>
 			</div>
-			<div className="flex flex-wrap items-center justify-center gap-3">
-				<Button onClick={onLogin}>
+			<div className="flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+				<Button onClick={onLogin} className="w-full sm:w-auto">
 					<GitHubIcon className="size-4" />
 					Sign in with GitHub
 				</Button>
-				<Link href="/">
-					<Button variant="outline">← Go to home</Button>
+				<Link href="/" className="w-full sm:w-auto">
+					<Button variant="outline" className="w-full sm:w-auto">← Go to home</Button>
 				</Link>
 			</div>
 		</div>
@@ -161,10 +161,10 @@ export default function AccountPage() {
 						)}
 
 						{/* Actions */}
-						<div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+						<div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-start">
 							{user.role === "admin" && (
-								<Link href="/admin">
-									<Button variant="default" size="sm" className="gap-1.5">
+								<Link href="/admin" className="w-full sm:w-auto">
+									<Button variant="default" size="sm" className="w-full gap-1.5 sm:w-auto">
 										<ShieldIcon className="size-3.5" />
 										Admin Panel
 									</Button>
@@ -175,8 +175,9 @@ export default function AccountPage() {
 								href={`https://github.com/${user.login}`}
 								target="_blank"
 								rel="noopener noreferrer"
+								className="w-full sm:w-auto"
 							>
-								<Button variant="outline" size="sm" className="gap-1.5">
+								<Button variant="outline" size="sm" className="w-full gap-1.5 sm:w-auto">
 									<GitHubIcon className="size-3.5" />
 									View on GitHub
 								</Button>
@@ -186,7 +187,7 @@ export default function AccountPage() {
 								variant="ghost"
 								size="sm"
 								onClick={logout}
-								className="gap-1.5 text-muted-foreground hover:text-destructive"
+								className="w-full gap-1.5 text-muted-foreground hover:text-destructive sm:w-auto"
 							>
 								<LogOutIcon className="size-3.5" />
 								Log out

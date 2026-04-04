@@ -70,7 +70,10 @@ export function PublishTemplateDialog({
 		try {
 			const result = await publishTemplate(url.trim());
 			setState({ status: "success", name: result.name });
-			queryClient.invalidateQueries({ queryKey: ["templates"] });
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ["templates"] }),
+				queryClient.invalidateQueries({ queryKey: ["my-templates"] }),
+			]);
 		} catch (err) {
 			const message =
 				err instanceof Error ? err.message : "Something went wrong.";

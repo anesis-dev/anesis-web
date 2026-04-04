@@ -14,7 +14,7 @@ import { AlertCircleIcon, PackageIcon } from "lucide-react";
 const PAGE_SIZE = 6;
 
 export default function AccountTemplatesPage() {
-	const { user } = useAuth();
+	const { user, login } = useAuth();
 	const { templates, isLoading, isError } = useMyTemplates(!!user);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
@@ -57,7 +57,10 @@ export default function AccountTemplatesPage() {
 					<p className="text-sm text-muted-foreground">
 						Sign in with GitHub to view templates published from your account.
 					</p>
-					<div>
+					<div className="flex flex-wrap gap-3">
+						<Button onClick={login}>
+							Login with GitHub
+						</Button>
 						<Link href="/">
 							<Button variant="outline">Go back to home</Button>
 						</Link>

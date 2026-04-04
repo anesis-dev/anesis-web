@@ -44,19 +44,19 @@ export function AvatarButton({
 			<DropdownMenuContent className="w-32">
 				<DropdownMenuGroup>
 					{user.role === "admin" && (
-						<Link href="/admin">
-							<DropdownMenuItem className="cursor-pointer">
+						<DropdownMenuItem asChild className="cursor-pointer">
+							<Link href="/admin">
 								<ShieldIcon className="size-4" />
 								Admin Panel
-							</DropdownMenuItem>
-						</Link>
+							</Link>
+						</DropdownMenuItem>
 					)}
 					{accountMenu.map((am, i) => (
-						<Link key={i} href={am.url}>
-							<DropdownMenuItem className="cursor-pointer">
+						<DropdownMenuItem key={i} asChild className="cursor-pointer">
+							<Link href={am.url}>
 								{am.title}
-							</DropdownMenuItem>
-						</Link>
+							</Link>
+						</DropdownMenuItem>
 					))}
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />

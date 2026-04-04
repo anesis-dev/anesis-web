@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { IUser } from "@/types/user";
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
-	const { user, isLoading } = useAuth();
+	const { user, isLoading, login } = useAuth();
 
 	if (isLoading) {
 		return (
@@ -27,9 +27,12 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 						You don&apos;t have permission to view this page.
 					</p>
 				</div>
-				<Link href="/">
-					<Button variant="outline">← Back to site</Button>
-				</Link>
+				<div className="flex flex-wrap items-center justify-center gap-3">
+					{!user ? <Button onClick={login}>Sign in with GitHub</Button> : null}
+					<Link href="/">
+						<Button variant="outline">← Back to site</Button>
+					</Link>
+				</div>
 			</div>
 		);
 	}

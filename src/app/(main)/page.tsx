@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTemplates } from "@/hooks/useTemplates";
+import { getDateTimestamp } from "@/lib/date";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { PublishTemplateDialog } from "@/components/templates/PublishTemplateDialog";
 import { Button } from "@/components/ui/button";
@@ -78,9 +79,7 @@ export default function Home() {
 				if (a.official !== b.official) {
 					return Number(b.official) - Number(a.official);
 				}
-				return (
-					new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-				);
+				return getDateTimestamp(b.created_at) - getDateTimestamp(a.created_at);
 			})
 			.slice(0, 4);
 	}, [templates]);

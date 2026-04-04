@@ -48,6 +48,12 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 npm run dev
 ```
 
+For an explicit Turbopack session, run:
+
+```bash
+npm run dev:turbo
+```
+
 4. Open:
 
 ```text
@@ -60,8 +66,11 @@ To get full functionality, run `oxide-server` locally on port `4000`.
 
 ```bash
 npm run dev
+npm run dev:turbo
 npm run build
 npm run start
+npm run typecheck
+npm run test
 ```
 
 ## App Areas
@@ -101,4 +110,4 @@ src/
 
 - GitHub login/logout depends on `oxide-server`.
 - Admin moderation UI is present, but some destructive admin actions still require backend mutation endpoints.
-- Production builds may require internet access for Google Fonts used by `next/font`.
+- `npm run dev` uses webpack for predictable local development in this workspace layout; `npm run dev:turbo` is available when you explicitly want Turbopack.

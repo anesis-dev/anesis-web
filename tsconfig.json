@@ -32,6 +32,7 @@
   ],
   "exclude": [
     "node_modules",
+    ".next/**/*",
     "**/*.test.ts",
     "**/*.test.tsx",
     "src/test/**/*",

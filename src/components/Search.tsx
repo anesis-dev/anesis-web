@@ -31,9 +31,21 @@ export function Search({
 
 	React.useEffect(() => {
 		const down = (e: KeyboardEvent) => {
-			if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+			const target = e.target;
+			const isEditableTarget =
+				target instanceof HTMLElement &&
+				(target.isContentEditable ||
+					target instanceof HTMLInputElement ||
+					target instanceof HTMLTextAreaElement ||
+					target instanceof HTMLSelectElement);
+
+			if (isEditableTarget || e.altKey || e.shiftKey) {
+				return;
+			}
+
+			if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
 				e.preventDefault();
-				setOpen((prev) => !prev);
+				setOpen(true);
 			}
 		};
 		document.addEventListener("keydown", down);
@@ -69,7 +81,7 @@ export function Search({
 				>
 					<span className="text-muted-foreground">Search...</span>
 					<kbd className="hidden text-xs tracking-widest text-muted-foreground sm:inline-flex">
-						⌘K
+						Ctrl K
 					</kbd>
 				</Button>
 			)}

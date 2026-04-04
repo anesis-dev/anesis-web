@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/date";
 
 function SkeletonRow() {
 	return (
@@ -206,11 +207,7 @@ export default function AdminTemplatesPage() {
 											<OfficialBadge official={t.official} />
 										</td>
 										<td className="py-3 px-4 text-xs text-muted-foreground">
-											{new Date(t.created_at).toLocaleDateString("en-US", {
-												year: "numeric",
-												month: "short",
-												day: "numeric",
-											})}
+											{formatDate(t.created_at)}
 										</td>
 										<td className="py-3 px-4">
 											<div className="flex items-center gap-1">

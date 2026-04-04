@@ -24,7 +24,7 @@ describe("PublishTemplateDialog", () => {
 		expect(publishTemplate).not.toHaveBeenCalled();
 	});
 
-	it("publishes templates and invalidates the templates query", async () => {
+	it("publishes templates and invalidates template queries", async () => {
 		vi.mocked(publishTemplate).mockResolvedValueOnce({
 			message: "ok",
 			name: "demo-owner/demo-repo",
@@ -49,6 +49,7 @@ describe("PublishTemplateDialog", () => {
 			screen.getByText("Published successfully!"),
 		).toBeInTheDocument();
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["templates"] });
+		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["my-templates"] });
 	});
 
 	it("shows backend failures inline", async () => {

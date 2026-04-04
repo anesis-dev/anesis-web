@@ -2,6 +2,7 @@
 
 import { useUsers } from "@/hooks/useUsers";
 import { useTemplates } from "@/hooks/useTemplates";
+import { formatDate, getDateTimestamp } from "@/lib/date";
 import {
 	PackageIcon,
 	ShieldCheckIcon,
@@ -82,10 +83,7 @@ export default function AdminDashboard() {
 	const communityTemplates = totalTemplates - officialTemplates;
 
 	const recent = [...templates]
-		.sort(
-			(a, b) =>
-				new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-		)
+		.sort((a, b) => getDateTimestamp(b.created_at) - getDateTimestamp(a.created_at))
 		.slice(0, 8);
 
 	return (
@@ -184,11 +182,7 @@ export default function AdminDashboard() {
 													)}
 												</td>
 												<td className="py-3 px-4 text-xs text-muted-foreground">
-													{new Date(t.created_at).toLocaleDateString("en-US", {
-														year: "numeric",
-														month: "short",
-														day: "numeric",
-													})}
+													{formatDate(t.created_at)}
 												</td>
 											</tr>
 										))}

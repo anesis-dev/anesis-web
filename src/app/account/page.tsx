@@ -64,7 +64,7 @@ function TemplateSkeleton() {
 	);
 }
 
-function NotLoggedIn() {
+function NotLoggedIn({ onLogin }: { onLogin: () => void }) {
 	return (
 		<div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-20 text-center">
 			<UsersIcon className="size-12 text-muted-foreground" />
@@ -74,15 +74,21 @@ function NotLoggedIn() {
 					Sign in with GitHub to view your account.
 				</p>
 			</div>
-			<Link href="/">
-				<Button variant="outline">← Go to home</Button>
-			</Link>
+			<div className="flex flex-wrap items-center justify-center gap-3">
+				<Button onClick={onLogin}>
+					<GitHubIcon className="size-4" />
+					Sign in with GitHub
+				</Button>
+				<Link href="/">
+					<Button variant="outline">← Go to home</Button>
+				</Link>
+			</div>
 		</div>
 	);
 }
 
 export default function AccountPage() {
-	const { user, isLoading: authLoading, logout } = useAuth();
+	const { user, isLoading: authLoading, login, logout } = useAuth();
 	const { githubUser, isLoading: githubLoading } = useGitHubUser(
 		user?.login ?? "",
 	);
@@ -105,7 +111,7 @@ export default function AccountPage() {
 	}
 
 	if (!user) {
-		return <NotLoggedIn />;
+		return <NotLoggedIn onLogin={login} />;
 	}
 
 	return (

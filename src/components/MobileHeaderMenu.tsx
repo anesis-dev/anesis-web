@@ -109,17 +109,16 @@ export function MobileHeaderMenu() {
 							</div>
 
 							<div className="flex flex-col gap-2 border-t pt-4">
-								<Button
-									type="button"
-									variant="outline"
-									className="w-full justify-start"
-									onClick={() => {
-										closeMenu();
-										window.open(`https://github.com/${user.login}`, "_blank");
-									}}
-								>
-									<GitHubIcon className="size-4" />
-									View GitHub profile
+								<Button asChild type="button" variant="outline" className="w-full justify-start">
+									<Link
+										href={`https://github.com/${user.login}`}
+										target="_blank"
+										rel="noopener noreferrer"
+										onClick={closeMenu}
+									>
+										<GitHubIcon className="size-4" />
+										View GitHub profile
+									</Link>
 								</Button>
 								<Button
 									type="button"

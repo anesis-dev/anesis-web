@@ -14,6 +14,7 @@ import { useUsers } from "@/hooks/useUsers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatDate } from "@/lib/date";
 import {
 	Card,
 	CardDescription,
@@ -206,16 +207,7 @@ export default function AdminUsersPage() {
 											<RoleBadge role={user.role} />
 										</td>
 										<td className="py-3 px-4 text-xs text-muted-foreground">
-											{user.created_at
-												? new Date(user.created_at).toLocaleDateString(
-														"en-US",
-														{
-															year: "numeric",
-															month: "short",
-															day: "numeric",
-														},
-													)
-												: "—"}
+											{formatDate(user.created_at)}
 										</td>
 										<td className="py-3 px-4">
 											<div className="flex items-center gap-1">

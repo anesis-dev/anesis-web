@@ -26,7 +26,7 @@ import { useMyTemplates } from "@/hooks/useMyTemplates";
 const myTemplates = Array.from({ length: 7 }, (_, index) =>
 	createTemplate({
 		id: `mine-${index + 1}`,
-		name: `octocat/template-${index + 1}`,
+		name: `template-${index + 1}`,
 		config: {
 			metadata: {
 				displayName:
@@ -80,7 +80,7 @@ describe("AccountTemplatesPage", () => {
 
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
 		expect(screen.getAllByTestId("owned-template-card")).toHaveLength(1);
-		expect(screen.getByText("octocat/template-7")).toBeInTheDocument();
+		expect(screen.getByText("template-7")).toBeInTheDocument();
 
 		fireEvent.change(screen.getByPlaceholderText(/search your templates/i), {
 			target: { value: "special" },
@@ -90,8 +90,6 @@ describe("AccountTemplatesPage", () => {
 			expect(screen.getByText("1 template(s)")).toBeInTheDocument(),
 		);
 		expect(screen.getAllByTestId("owned-template-card")).toHaveLength(1);
-		expect(
-			screen.getByText("octocat/template-7"),
-		).toBeInTheDocument();
+		expect(screen.getByText("template-7")).toBeInTheDocument();
 	});
 });

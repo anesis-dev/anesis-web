@@ -56,6 +56,7 @@ function applyFilters(
 		if (filters.search.trim()) {
 			const q = filters.search.trim().toLowerCase();
 			const haystack = [
+				t.name,
 				metadata.displayName,
 				metadata.description,
 				...metadata.tags,

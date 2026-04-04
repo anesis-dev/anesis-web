@@ -14,7 +14,7 @@ describe("TemplateCard", () => {
 
 		expect(screen.getByRole("link", { name: /open package/i })).toHaveAttribute(
 			"href",
-			"/templates/demo-owner/demo-repo@0.1.0",
+			"/templates/demo-repo%400.1.0",
 		);
 		expect(screen.getByRole("link", { name: /octocat/i })).toHaveAttribute(
 			"href",

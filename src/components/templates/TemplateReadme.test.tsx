@@ -51,4 +51,29 @@ describe("TemplateReadme", () => {
 			"https://raw.githubusercontent.com/demo-owner/demo-repo/main/template/assets/preview.png",
 		);
 	});
+
+	it("renders sanitized raw html blocks used by some GitHub READMEs", () => {
+		render(
+			<TemplateReadme
+				content={
+					'<p align="center"><a href="https://nestjs.com"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a></p><p align="center">A progressive <a href="http://nodejs.org">Node.js</a> framework.</p>'
+				}
+				fileName="README.md"
+			/>,
+		);
+
+		expect(screen.getByRole("img", { name: "Nest Logo" })).toHaveAttribute(
+			"width",
+			"120",
+		);
+		expect(screen.getByRole("link", { name: "Nest Logo" })).toHaveAttribute(
+			"href",
+			"https://nestjs.com",
+		);
+		expect(screen.getByText(/A progressive/i)).toHaveClass("text-center");
+		expect(screen.getByRole("link", { name: "Node.js" })).toHaveAttribute(
+			"href",
+			"http://nodejs.org",
+		);
+	});
 });

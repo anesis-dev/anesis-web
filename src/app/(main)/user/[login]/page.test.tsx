@@ -56,7 +56,7 @@ describe("UserProfilePage", () => {
 				createTemplate(),
 				createTemplate({
 					id: "template-2",
-					name: "another-owner/template-2",
+					name: "template-2",
 					config: {
 						author: {
 							github: "builder",
@@ -79,6 +79,6 @@ describe("UserProfilePage", () => {
 		expect(await screen.findByRole("heading", { name: "The Octocat" })).toBeInTheDocument();
 		expect(screen.getByText("@octocat")).toBeInTheDocument();
 		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
-		expect(screen.getByText("demo-owner/demo-repo")).toBeInTheDocument();
+		expect(screen.getByText("demo-repo")).toBeInTheDocument();
 	});
 });

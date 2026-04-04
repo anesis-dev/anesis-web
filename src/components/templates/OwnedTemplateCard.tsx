@@ -94,20 +94,26 @@ export function OwnedTemplateCard({ template }: { template: ITemplate }) {
 		<div className="flex flex-col gap-3">
 			<TemplateCard template={template} />
 
-			<div className="rounded-3xl border bg-card p-4">
+			<div className="rounded-3xl border bg-card p-4 shadow-sm">
 				<div className="flex flex-col gap-4">
 					<div className="space-y-1">
 						<p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
 							Owner Actions
 						</p>
-						<p className="font-mono text-sm text-foreground">{templateRef}</p>
+						<p className="break-all font-mono text-sm text-foreground">{templateRef}</p>
 						<p className="text-sm text-muted-foreground">
 							Last synced {formatDate(template.updated_at)} from GitHub.
 						</p>
 					</div>
 
-					<div className="grid gap-2 sm:grid-cols-3">
-						<Button asChild type="button" size="sm" variant="outline">
+					<div className="flex flex-col gap-2">
+						<Button
+							asChild
+							type="button"
+							size="sm"
+							variant="outline"
+							className="h-auto min-h-11 justify-start whitespace-normal px-3 py-2 text-left leading-5"
+						>
 							<Link href={templateHref}>
 								<ExternalLinkIcon className="size-3.5" />
 								Open package
@@ -120,7 +126,7 @@ export function OwnedTemplateCard({ template }: { template: ITemplate }) {
 							variant="outline"
 							onClick={refreshTemplate}
 							disabled={isRefreshing}
-							className="w-full"
+							className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left leading-5"
 						>
 							{isRefreshing ? (
 								<>
@@ -138,13 +144,13 @@ export function OwnedTemplateCard({ template }: { template: ITemplate }) {
 						<Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
 							<DialogTrigger asChild>
 								<Button
-									type="button"
-									size="sm"
-									variant="destructive"
-									className="w-full"
-								>
-									<Trash2Icon className="size-3.5" />
-									Delete package
+								type="button"
+								size="sm"
+								variant="destructive"
+								className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left leading-5"
+							>
+								<Trash2Icon className="size-3.5" />
+								Delete package
 								</Button>
 							</DialogTrigger>
 							<DialogContent className="sm:max-w-md">

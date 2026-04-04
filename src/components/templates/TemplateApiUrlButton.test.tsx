@@ -24,7 +24,7 @@ describe("TemplateApiUrlButton", () => {
 			logout: vi.fn(),
 		});
 		renderWithQueryClient(
-			<TemplateApiUrlButton templateRef="demo-owner/demo-repo@0.1.0" />,
+			<TemplateApiUrlButton templateRef="demo-repo@0.1.0" />,
 		);
 
 		fireEvent.click(screen.getByRole("button", { name: /copy api url/i }));
@@ -41,13 +41,13 @@ describe("TemplateApiUrlButton", () => {
 			logout: vi.fn(),
 		});
 		vi.mocked(fetchTemplateUrl).mockResolvedValueOnce({
-			url: "https://api.example.test/template/demo-owner/demo-repo@0.1.0",
+			url: "https://api.example.test/template/demo-repo@0.1.0",
 		});
 		const onMessage = vi.fn();
 
 		renderWithQueryClient(
 			<TemplateApiUrlButton
-				templateRef="demo-owner/demo-repo@0.1.0"
+				templateRef="demo-repo@0.1.0"
 				onMessage={onMessage}
 			/>,
 		);
@@ -56,11 +56,11 @@ describe("TemplateApiUrlButton", () => {
 
 		await waitFor(() =>
 			expect(fetchTemplateUrl).toHaveBeenCalledWith(
-				"demo-owner/demo-repo@0.1.0",
+				"demo-repo@0.1.0",
 			),
 		);
 		expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-			"https://api.example.test/template/demo-owner/demo-repo@0.1.0",
+			"https://api.example.test/template/demo-repo@0.1.0",
 		);
 		expect(onMessage).toHaveBeenCalledWith(
 			"Template API URL copied to clipboard.",
@@ -77,7 +77,7 @@ describe("TemplateApiUrlButton", () => {
 			logout: vi.fn(),
 		});
 		vi.mocked(fetchTemplateUrl).mockResolvedValueOnce({
-			url: "https://api.example.test/template/demo-owner/demo-repo@0.1.0",
+			url: "https://api.example.test/template/demo-repo@0.1.0",
 		});
 		const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
 		const originalWriteText = navigator.clipboard.writeText;
@@ -86,7 +86,7 @@ describe("TemplateApiUrlButton", () => {
 
 		renderWithQueryClient(
 			<TemplateApiUrlButton
-				templateRef="demo-owner/demo-repo@0.1.0"
+				templateRef="demo-repo@0.1.0"
 				onMessage={onMessage}
 			/>,
 		);
@@ -95,7 +95,7 @@ describe("TemplateApiUrlButton", () => {
 
 		await waitFor(() =>
 			expect(openSpy).toHaveBeenCalledWith(
-				"https://api.example.test/template/demo-owner/demo-repo@0.1.0",
+				"https://api.example.test/template/demo-repo@0.1.0",
 				"_blank",
 				"noopener,noreferrer",
 			),
@@ -122,7 +122,7 @@ describe("TemplateApiUrlButton", () => {
 
 		renderWithQueryClient(
 			<TemplateApiUrlButton
-				templateRef="demo-owner/demo-repo@0.1.0"
+				templateRef="demo-repo@0.1.0"
 				onMessage={onMessage}
 			/>,
 		);

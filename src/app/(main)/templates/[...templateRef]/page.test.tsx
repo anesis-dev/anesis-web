@@ -51,7 +51,7 @@ describe("TemplateDetailsPage", () => {
 				<Suspense fallback={null}>
 					<TemplateDetailsPage
 						params={Promise.resolve({
-							templateRef: ["demo-owner", "missing-repo%400.1.0"],
+							templateRef: ["missing-repo%400.1.0"],
 						})}
 					/>
 				</Suspense>,
@@ -60,9 +60,9 @@ describe("TemplateDetailsPage", () => {
 
 		expect(await screen.findByText("Template not found")).toBeInTheDocument();
 		expect(
-			screen.getByText("demo-owner/missing-repo@0.1.0", { exact: false }),
+			screen.getByText("missing-repo@0.1.0", { exact: false }),
 		).toBeInTheDocument();
-		expect(useTemplate).toHaveBeenCalledWith("demo-owner/missing-repo@0.1.0");
+		expect(useTemplate).toHaveBeenCalledWith("missing-repo@0.1.0");
 	});
 
 	it("renders a package-style template page with quick start and readme content", async () => {
@@ -85,7 +85,7 @@ describe("TemplateDetailsPage", () => {
 				<Suspense fallback={null}>
 					<TemplateDetailsPage
 						params={Promise.resolve({
-							templateRef: ["demo-owner", "demo-repo%400.1.0"],
+							templateRef: ["demo-repo%400.1.0"],
 						})}
 					/>
 				</Suspense>,
@@ -106,9 +106,9 @@ describe("TemplateDetailsPage", () => {
 		expect(screen.getByText("Package Metadata")).toBeInTheDocument();
 		expect(screen.getByText("README.md:# Demo")).toBeInTheDocument();
 		expect(
-			screen.getAllByText("demo-owner/demo-repo@0.1.0", { exact: false }).length,
+			screen.getAllByText("demo-repo@0.1.0", { exact: false }).length,
 		).toBeGreaterThan(0);
-		expect(screen.getByRole("button", { name: /copy demo-owner\/demo-repo@0.1.0/i })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /copy demo-repo@0.1.0/i })).toBeInTheDocument();
 
 		await waitFor(() =>
 			expect(useTemplateReadme).toHaveBeenCalledWith(

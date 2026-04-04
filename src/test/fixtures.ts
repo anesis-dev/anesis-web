@@ -37,7 +37,7 @@ export const mockTemplate: ITemplate = {
 			tags: ["demo", "next", "responsive"],
 		},
 	},
-	name: "demo-owner/demo-repo",
+	name: "demo-repo",
 };
 
 export const mockUser: IUser = {
@@ -71,12 +71,29 @@ type TemplateOverrides = Partial<ITemplate> & {
 };
 
 export function createTemplate(overrides: TemplateOverrides = {}): ITemplate {
+	const name = overrides.name ?? overrides.config?.name ?? mockTemplate.name;
+	const version =
+		overrides.version ?? overrides.config?.version ?? mockTemplate.version;
+	const official =
+		overrides.official ?? overrides.config?.official ?? mockTemplate.official;
+	const repositoryUrl =
+		overrides.url ??
+		overrides.config?.repository?.url ??
+		mockTemplate.config.repository.url;
+
 	return {
 		...mockTemplate,
 		...overrides,
+		name,
+		version,
+		official,
+		url: repositoryUrl,
 		config: {
 			...mockTemplate.config,
 			...overrides.config,
+			name,
+			version,
+			official,
 			author: {
 				...mockTemplate.config.author,
 				...overrides.config?.author,
@@ -84,6 +101,7 @@ export function createTemplate(overrides: TemplateOverrides = {}): ITemplate {
 			repository: {
 				...mockTemplate.config.repository,
 				...overrides.config?.repository,
+				url: repositoryUrl,
 			},
 			metadata: {
 				...mockTemplate.config.metadata,

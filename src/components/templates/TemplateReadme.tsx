@@ -1,10 +1,62 @@
 "use client";
 
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { AlertCircleIcon, BookOpenTextIcon, LoaderIcon } from "lucide-react";
 import { createGitHubReadmeResolver } from "@/lib/github-readme-links";
 import { cn } from "@/lib/utils";
+
+const readmeSanitizeSchema = {
+	...defaultSchema,
+	attributes: {
+		...defaultSchema.attributes,
+		a: [...(defaultSchema.attributes?.a ?? []), "target", "rel"],
+		img: [...(defaultSchema.attributes?.img ?? []), "width", "height"],
+		p: [...(defaultSchema.attributes?.p ?? []), "align"],
+	},
+};
+
+function getParagraphAlignmentClass(align?: string) {
+	switch (align) {
+		case "center":
+			return "text-center";
+		case "right":
+			return "text-right";
+		case "left":
+			return "text-left";
+		default:
+			return "";
+	}
+}
+
+function isCompactReadmeImage({
+	src,
+	alt,
+	width,
+}: {
+	src?: string;
+	alt?: string;
+	width?: number | string;
+}) {
+	const normalizedSrc = src?.toLowerCase() ?? "";
+	const normalizedAlt = alt?.toLowerCase() ?? "";
+	const numericWidth =
+		typeof width === "number"
+			? width
+			: typeof width === "string"
+				? Number.parseInt(width, 10)
+				: Number.NaN;
+
+	return (
+		Number.isFinite(numericWidth) && numericWidth <= 180 ||
+		/img\.shields\.io|badge\.svg|logo-small\.svg/.test(normalizedSrc) ||
+		/logo|badge|version|license|downloads|discord|circleci|backers|sponsors|donate|support|follow/i.test(
+			normalizedAlt,
+		)
+	);
+}
 
 export function TemplateReadme({
 	content,
@@ -91,6 +143,7 @@ export function TemplateReadme({
 			<div className="template-readme">
 				<ReactMarkdown
 					remarkPlugins={[remarkGfm]}
+					rehypePlugins={[rehypeRaw, [rehypeSanitize, readmeSanitizeSchema]]}
 					components={{
 						a: ({ className: markdownClassName, href = "", ...props }) => {
 							const resolvedHref =
@@ -109,18 +162,28 @@ export function TemplateReadme({
 							/>
 							);
 						},
-						img: ({ className: markdownClassName, src = "", alt = "", ...props }) => {
+						img: ({
+							className: markdownClassName,
+							src = "",
+							alt = "",
+							width,
+							...props
+						}) => {
 							const resolvedSrc =
 								typeof src === "string" ? (resolver?.resolveImage(src) ?? src) : undefined;
+							const compactImage = isCompactReadmeImage({ src: resolvedSrc, alt, width });
 
 							return (
 							<img
 								{...props}
 								src={resolvedSrc}
 								alt={alt}
+								width={width}
 								loading="lazy"
 								className={cn(
-									"my-6 w-full rounded-2xl border bg-card object-contain",
+									compactImage
+										? "my-1 inline-block max-w-full rounded-none border-0 bg-transparent align-middle shadow-none"
+										: "my-6 block max-w-full rounded-2xl border bg-card object-contain shadow-sm",
 									markdownClassName,
 								)}
 							/>
@@ -171,15 +234,22 @@ export function TemplateReadme({
 								)}
 							/>
 						),
-						p: ({ className: markdownClassName, ...props }) => (
-							<p
-								{...props}
-								className={cn(
-									"leading-7 text-foreground/90 [&:not(:first-child)]:mt-5",
-									markdownClassName,
-								)}
-							/>
-						),
+						p: ({ className: markdownClassName, ...props }) => {
+							const align = Reflect.get(props, "align");
+
+							return (
+								<p
+									{...props}
+									className={cn(
+										"leading-7 text-foreground/90 [&:not(:first-child)]:mt-5",
+										getParagraphAlignmentClass(
+											typeof align === "string" ? align : undefined,
+										),
+										markdownClassName,
+									)}
+								/>
+							);
+						},
 						ul: ({ className: markdownClassName, ...props }) => (
 							<ul
 								{...props}

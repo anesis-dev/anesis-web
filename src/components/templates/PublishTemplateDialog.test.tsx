@@ -27,7 +27,7 @@ describe("PublishTemplateDialog", () => {
 	it("publishes templates and invalidates template queries", async () => {
 		vi.mocked(publishTemplate).mockResolvedValueOnce({
 			message: "ok",
-			name: "demo-owner/demo-repo",
+			name: "demo-repo",
 		});
 		const { queryClient } = renderWithQueryClient(<PublishTemplateDialog />);
 		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");

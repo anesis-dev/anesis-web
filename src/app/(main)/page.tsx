@@ -237,7 +237,7 @@ export default function Home() {
 				</div>
 			</section>
 
-			<section className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-14 lg:px-8">
+			<section className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-5 py-14 lg:px-8">
 				<div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 					<div className="space-y-2">
 						<p className="text-sm font-medium text-primary">

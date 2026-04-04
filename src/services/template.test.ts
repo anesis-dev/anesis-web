@@ -53,12 +53,10 @@ describe("template services", () => {
 		vi.mocked(api.get).mockResolvedValueOnce({ data: { id: "3" } });
 		vi.mocked(parseTemplateResponse).mockReturnValueOnce({ id: "3" } as never);
 
-		await expect(fetchTemplate("demo-owner/demo-repo@0.1.0")).resolves.toEqual({
+		await expect(fetchTemplate("demo-repo@0.1.0")).resolves.toEqual({
 			id: "3",
 		});
-		expect(api.get).toHaveBeenCalledWith(
-			"/template/demo-owner%2Fdemo-repo%400.1.0",
-		);
+		expect(api.get).toHaveBeenCalledWith("/template/demo-repo%400.1.0");
 	});
 
 	it("fetches the template api url with an encoded ref", async () => {
@@ -67,26 +65,24 @@ describe("template services", () => {
 			url: "https://api.example.test/template/demo",
 		});
 
-		await expect(fetchTemplateUrl("demo-owner/demo-repo@0.1.0")).resolves.toEqual({
+		await expect(fetchTemplateUrl("demo-repo@0.1.0")).resolves.toEqual({
 			url: "https://api.example.test/template/demo",
 		});
-		expect(api.get).toHaveBeenCalledWith(
-			"/template/demo-owner%2Fdemo-repo%400.1.0/url",
-		);
+		expect(api.get).toHaveBeenCalledWith("/template/demo-repo%400.1.0/url");
 	});
 
 	it("publishes template urls through the publish endpoint", async () => {
 		vi.mocked(api.post).mockResolvedValueOnce({ message: "ok" });
 		vi.mocked(parsePublishTemplateResponse).mockReturnValueOnce({
 			message: "ok",
-			name: "demo-owner/demo-repo",
+			name: "demo-repo",
 		});
 
 		await expect(
 			publishTemplate("https://github.com/demo-owner/demo-repo/tree/main/template"),
 		).resolves.toEqual({
 			message: "ok",
-			name: "demo-owner/demo-repo",
+			name: "demo-repo",
 		});
 		expect(api.post).toHaveBeenCalledWith("/template/publish", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
@@ -107,9 +103,7 @@ describe("template services", () => {
 	it("deletes templates using the encoded ref", async () => {
 		vi.mocked(api.delete).mockResolvedValueOnce(undefined);
 
-		await expect(deleteTemplate("demo-owner/demo-repo@0.1.0")).resolves.toBeUndefined();
-		expect(api.delete).toHaveBeenCalledWith(
-			"/template/demo-owner%2Fdemo-repo%400.1.0",
-		);
+		await expect(deleteTemplate("demo-repo@0.1.0")).resolves.toBeUndefined();
+		expect(api.delete).toHaveBeenCalledWith("/template/demo-repo%400.1.0");
 	});
 });

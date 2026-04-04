@@ -36,7 +36,7 @@ function Pill({
 	children: React.ReactNode;
 }) {
 	return (
-		<span className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium text-muted-foreground">
+		<span className="inline-flex items-center rounded-full border bg-background/75 px-2.5 py-1 text-xs font-medium text-muted-foreground backdrop-blur-sm dark:bg-background/20">
 			{children}
 		</span>
 	);
@@ -52,7 +52,7 @@ function MetaItem({
 	icon: React.ElementType;
 }) {
 	return (
-		<div className="rounded-2xl border bg-background/70 p-4">
+		<div className="rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
 			<div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
 				<Icon className="size-3.5" />
 				<span>{label}</span>
@@ -86,7 +86,7 @@ function CommandCard({
 	}
 
 	return (
-		<div className="rounded-2xl border bg-background/70 p-4">
+		<div className="rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
 			<div className="flex items-start justify-between gap-3">
 				<div>
 					<p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
@@ -122,7 +122,7 @@ function SnapshotCard({
 	helper: string;
 }) {
 	return (
-		<div className="rounded-2xl border bg-background/70 p-4">
+		<div className="rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
 			<p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
 				{label}
 			</p>
@@ -207,7 +207,7 @@ export default function TemplateDetailsPage({
 	const publishedAt = formatDate(template.created_at);
 	const updatedAt = formatDate(template.updated_at);
 	const source = getSourceInfo(template.config.repository.url);
-	const templateName = template.config.name;
+	const templateName = template.name;
 	const createCommand = `oxide new my-app ${templateName}`;
 	const installCommand = `oxide install-template ${templateName}`;
 	const keywordCount = String(template.config.metadata.tags.length);
@@ -227,8 +227,9 @@ export default function TemplateDetailsPage({
 				</Link>
 			</div>
 
-			<section className="relative overflow-hidden rounded-[2rem] border bg-card">
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.92),rgba(255,255,255,1))]" />
+			<section className="relative overflow-hidden rounded-[2rem] border bg-card shadow-sm">
+				<div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,250,252,0.8))] dark:bg-[linear-gradient(180deg,rgba(23,23,23,0.48),rgba(23,23,23,0.18))]" />
+				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 				<div className="relative flex flex-col gap-8 p-6 sm:p-8 lg:p-10">
 					<div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
 						<div className="max-w-4xl space-y-5">
@@ -509,14 +510,6 @@ export default function TemplateDetailsPage({
 									</p>
 								</div>
 							) : null}
-							<div>
-								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-									Commit SHA
-								</p>
-								<p className="mt-2 break-all rounded-2xl border bg-muted/25 p-3 font-mono text-xs text-foreground">
-									{template.commit_sha}
-								</p>
-							</div>
 						</CardContent>
 					</Card>
 

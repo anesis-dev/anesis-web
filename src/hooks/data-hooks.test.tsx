@@ -75,12 +75,12 @@ describe("data hooks", () => {
 	it("loads a template by ref when a ref is provided", async () => {
 		vi.mocked(fetchTemplate).mockResolvedValueOnce(mockTemplate);
 
-		const { result } = renderHook(() => useTemplate("demo-owner/demo-repo@0.1.0"), {
+		const { result } = renderHook(() => useTemplate("demo-repo@0.1.0"), {
 			wrapper: getWrapper(),
 		});
 
 		await waitFor(() => expect(result.current.template).toEqual(mockTemplate));
-		expect(fetchTemplate).toHaveBeenCalledWith("demo-owner/demo-repo@0.1.0");
+		expect(fetchTemplate).toHaveBeenCalledWith("demo-repo@0.1.0");
 	});
 
 	it("maps readme payloads into the template readme shape", async () => {

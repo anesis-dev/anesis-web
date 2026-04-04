@@ -26,7 +26,7 @@ import { useTemplates } from "@/hooks/useTemplates";
 const templates = Array.from({ length: 13 }, (_, index) =>
 	createTemplate({
 		id: `template-${index + 1}`,
-		name: `demo-owner/demo-${index + 1}`,
+		name: `demo-${index + 1}`,
 		version: `0.${index}.0`,
 		config: {
 			metadata: {

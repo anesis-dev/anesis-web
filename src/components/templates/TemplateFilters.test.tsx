@@ -6,7 +6,7 @@ const templates = [
 	createTemplate(),
 	createTemplate({
 		id: "template-2",
-		name: "demo-owner/backend-starter",
+		name: "backend-starter",
 		config: {
 			specialization: "backend",
 			technologies: ["nestjs", "fastify"],

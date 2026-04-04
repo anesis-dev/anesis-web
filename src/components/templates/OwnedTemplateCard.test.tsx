@@ -41,7 +41,7 @@ describe("OwnedTemplateCard", () => {
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["templates"] });
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["my-templates"] });
 		expect(invalidateSpy).toHaveBeenCalledWith({
-			queryKey: ["template", "demo-owner/demo-repo@0.1.0"],
+			queryKey: ["template", "demo-repo@0.1.0"],
 		});
 		expect(screen.getByText("Action completed")).toBeInTheDocument();
 		expect(
@@ -74,13 +74,13 @@ describe("OwnedTemplateCard", () => {
 		
 		await waitFor(() =>
 			expect(deleteTemplate).toHaveBeenCalledWith(
-				"demo-owner/demo-repo@0.1.0",
+				"demo-repo@0.1.0",
 			),
 		);
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["templates"] });
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["my-templates"] });
 		expect(removeSpy).toHaveBeenCalledWith({
-			queryKey: ["template", "demo-owner/demo-repo@0.1.0"],
+			queryKey: ["template", "demo-repo@0.1.0"],
 		});
 	});
 });

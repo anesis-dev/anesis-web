@@ -13,7 +13,7 @@ describe("AdminTemplatesPage", () => {
 		const templates = Array.from({ length: 11 }, (_, index) =>
 			createTemplate({
 				id: `admin-template-${index + 1}`,
-				name: `owner/template-${index + 1}`,
+				name: `template-${index + 1}`,
 				config: {
 					specialization: index < 5 ? "backend" : "frontend",
 					metadata: {

@@ -5,11 +5,12 @@ export function getTemplateRef(template: Pick<ITemplate, "name" | "version">): s
 }
 
 export function getTemplateHref(template: Pick<ITemplate, "name" | "version">): string {
-	const [owner, repo] = template.name.split("/");
+	const name = template.name.trim();
+	const version = template.version.trim();
 
-	if (!owner || !repo) {
+	if (!name || !version) {
 		return "/templates";
 	}
 
-	return `/templates/${owner}/${repo}@${template.version}`;
+	return `/templates/${encodeURIComponent(getTemplateRef({ name, version }))}`;
 }

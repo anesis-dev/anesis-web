@@ -1,25 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { use } from "react";
+import { use, useState } from "react";
 import {
 	ActivityIcon,
 	AlertCircleIcon,
 	ArrowLeftIcon,
 	ArrowUpRightIcon,
 	BadgeInfoIcon,
-	BarChart3Icon,
 	BookOpenTextIcon,
 	CalendarDaysIcon,
+	CheckIcon,
+	CopyIcon,
 	ExternalLinkIcon,
 	GitBranchIcon,
-	GlobeIcon,
 	LinkIcon,
 	PackageIcon,
 	ShieldCheckIcon,
-	TagIcon,
+	TerminalSquareIcon,
 	UserIcon,
 } from "lucide-react";
+import { parseGitHubTreeUrl } from "@/lib/github-tree-url";
 import { useTemplate } from "@/hooks/useTemplate";
 import { useTemplateReadme } from "@/hooks/useTemplateReadme";
 import { getTemplateRef } from "@/lib/template-ref";
@@ -60,26 +61,80 @@ function MetaItem({
 	);
 }
 
-function AnalyticsMetric({
+function CommandCard({
 	label,
-	value = "—",
+	command,
 	helper,
 }: {
 	label: string;
-	value?: string;
+	command: string;
 	helper: string;
 }) {
+	const [copied, setCopied] = useState(false);
+
+	async function handleCopy() {
+		if (!navigator.clipboard?.writeText) {
+			return;
+		}
+
+		try {
+			await navigator.clipboard.writeText(command);
+			setCopied(true);
+			window.setTimeout(() => setCopied(false), 1600);
+		} catch {}
+	}
+
 	return (
-		<div className="rounded-2xl border bg-muted/20 p-4">
-			<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-				{label}
-			</p>
-			<p className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
-				{value}
-			</p>
-			<p className="mt-2 text-xs leading-5 text-muted-foreground">{helper}</p>
+		<div className="rounded-2xl border bg-background/70 p-4">
+			<div className="flex items-start justify-between gap-3">
+				<div>
+					<p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+						{label}
+					</p>
+					<p className="mt-2 text-sm text-muted-foreground">{helper}</p>
+				</div>
+				<Button
+					type="button"
+					size="sm"
+					variant="ghost"
+					onClick={handleCopy}
+					className="shrink-0"
+				>
+					{copied ? <CheckIcon className="size-3.5" /> : <CopyIcon className="size-3.5" />}
+					{copied ? "Copied" : "Copy"}
+				</Button>
+			</div>
+			<pre className="mt-4 overflow-x-auto rounded-2xl border bg-muted/35 p-4 text-sm leading-6">
+				<code>{command}</code>
+			</pre>
 		</div>
 	);
+}
+
+function formatDate(value: string): string {
+	return new Date(value).toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
+}
+
+function getSourceInfo(url: string) {
+	try {
+		const repo = parseGitHubTreeUrl(url);
+
+		return {
+			repositoryUrl: `https://github.com/${repo.owner}/${repo.repo}`,
+			branch: repo.branch ?? null,
+			path: repo.path ?? null,
+		};
+	} catch {
+		return {
+			repositoryUrl: url,
+			branch: null,
+			path: null,
+		};
+	}
 }
 
 export default function TemplateDetailsPage({
@@ -133,16 +188,12 @@ export default function TemplateDetailsPage({
 	}
 
 	const canonicalRef = getTemplateRef(template);
-	const publishedAt = new Date(template.created_at).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-	});
-	const updatedAt = new Date(template.updated_at).toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "short",
-		day: "numeric",
-	});
+	const publishedAt = formatDate(template.created_at);
+	const updatedAt = formatDate(template.updated_at);
+	const source = getSourceInfo(template.config.repository.url);
+	const templateName = template.config.name;
+	const createCommand = `oxide new my-app ${templateName}`;
+	const installCommand = `oxide install-template ${templateName}`;
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
@@ -177,7 +228,7 @@ export default function TemplateDetailsPage({
 
 							<div>
 								<p className="text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground">
-									Template Profile
+									Template Package
 								</p>
 								<h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
 									{template.config.metadata.displayName}
@@ -199,6 +250,10 @@ export default function TemplateDetailsPage({
 									<BadgeInfoIcon className="size-3.5" />
 									{canonicalRef}
 								</span>
+								<span className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1.5 font-mono">
+									<PackageIcon className="size-3.5" />
+									{templateName}
+								</span>
 							</div>
 						</div>
 
@@ -210,13 +265,22 @@ export default function TemplateDetailsPage({
 									rel="noopener noreferrer"
 								>
 									<ExternalLinkIcon className="size-4" />
-									Open repository
+									Open template source
 								</Link>
 							</Button>
-							<Button asChild size="lg" variant="outline" className="sm:flex-1 xl:flex-none">
-								<Link href={`https://github.com/${template.config.author.github}`}>
-									<ArrowUpRightIcon className="size-4" />
-									Author profile
+							<Button
+								asChild
+								size="lg"
+								variant="outline"
+								className="sm:flex-1 xl:flex-none"
+							>
+								<Link
+									href={source.repositoryUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<GitBranchIcon className="size-4" />
+									Open repository root
 								</Link>
 							</Button>
 							<TemplateApiUrlButton
@@ -230,19 +294,19 @@ export default function TemplateDetailsPage({
 
 					<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 						<MetaItem
-							label="Version"
+							label="Package Name"
 							icon={PackageIcon}
+							value={<span className="font-mono text-base">{templateName}</span>}
+						/>
+						<MetaItem
+							label="Version"
+							icon={BadgeInfoIcon}
 							value={<span className="font-mono text-base">{template.version}</span>}
 						/>
 						<MetaItem
 							label="Published"
 							icon={CalendarDaysIcon}
 							value={publishedAt}
-						/>
-						<MetaItem
-							label="Updated"
-							icon={CalendarDaysIcon}
-							value={updatedAt}
 						/>
 						<MetaItem
 							label="README"
@@ -254,54 +318,90 @@ export default function TemplateDetailsPage({
 			</section>
 
 			<div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
-				<TemplateReadme
-					content={readme}
-					fileName={fileName}
-					isLoading={isReadmeLoading}
-					isError={isReadmeError}
-				/>
-
 				<div className="flex flex-col gap-6">
 					<Card className="rounded-3xl">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 text-base">
-								<BarChart3Icon className="size-4 text-muted-foreground" />
-								Template Analytics
+								<TerminalSquareIcon className="size-4 text-muted-foreground" />
+								Quick Start
 							</CardTitle>
 						</CardHeader>
-						<CardContent className="space-y-5">
-							<div className="rounded-2xl border border-dashed bg-muted/20 p-4">
-								<div className="flex items-start gap-3">
-									<ActivityIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-									<div>
-										<p className="font-medium text-foreground">
-											Analytics are in progress
-										</p>
-										<p className="mt-1 text-sm text-muted-foreground">
-											Install counts, usage trends, and activity charts will
-											appear here after tracking is added.
-										</p>
-									</div>
-								</div>
-							</div>
+						<CardContent className="space-y-4">
+							<CommandCard
+								label="Generate a new project"
+								command={createCommand}
+								helper="If you already know the template name, this is the shortest path to a new project."
+							/>
+							<CommandCard
+								label="Install template locally"
+								command={installCommand}
+								helper="Cache the template first if you want it available in local CLI flows."
+							/>
+						</CardContent>
+					</Card>
 
-							<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-								<AnalyticsMetric
-									label="Weekly Installs"
-									helper="Will show recent scaffold activity."
-								/>
-								<AnalyticsMetric
-									label="30 Day Trend"
-									helper="Will compare current usage with the previous period."
-								/>
-								<AnalyticsMetric
-									label="Conversion"
-									helper="Will track visits to template details versus actual usage."
-								/>
-								<AnalyticsMetric
-									label="Last Activity"
-									helper="Will show the most recent generation event."
-								/>
+					<TemplateReadme
+						content={readme}
+						fileName={fileName}
+						isLoading={isReadmeLoading}
+						isError={isReadmeError}
+					/>
+				</div>
+
+				<div className="flex flex-col gap-6 xl:sticky xl:top-24 xl:self-start">
+					<Card className="rounded-3xl">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2 text-base">
+								<PackageIcon className="size-4 text-muted-foreground" />
+								Package Details
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="space-y-5 text-sm text-muted-foreground">
+							<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Registry Ref
+									</p>
+									<p className="mt-2 break-all font-mono text-foreground">
+										{canonicalRef}
+									</p>
+								</div>
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Template Name
+									</p>
+									<p className="mt-2 break-all font-mono text-foreground">
+										{templateName}
+									</p>
+								</div>
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Oxide Version
+									</p>
+									<p className="mt-2 text-foreground">
+										{template.config.oxideVersion}
+									</p>
+								</div>
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Last Updated
+									</p>
+									<p className="mt-2 text-foreground">{updatedAt}</p>
+								</div>
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Scope
+									</p>
+									<p className="mt-2 text-foreground">{template.config.scope}</p>
+								</div>
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Release
+									</p>
+									<p className="mt-2 break-all text-foreground">
+										{template.config.repository.release}
+									</p>
+								</div>
 							</div>
 						</CardContent>
 					</Card>
@@ -327,12 +427,30 @@ export default function TemplateDetailsPage({
 							</div>
 							<div>
 								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-									Source URL
+									Repository Root
 								</p>
 								<p className="mt-2 break-all rounded-2xl border bg-muted/25 p-3 font-mono text-xs text-foreground">
-									{template.url}
+									{source.repositoryUrl}
 								</p>
 							</div>
+							<div>
+								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+									Template Folder
+								</p>
+								<p className="mt-2 break-all rounded-2xl border bg-muted/25 p-3 font-mono text-xs text-foreground">
+									{source.path ?? "/"}
+								</p>
+							</div>
+							{source.branch ? (
+								<div>
+									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+										Branch
+									</p>
+									<p className="mt-2 rounded-2xl border bg-muted/25 p-3 font-mono text-xs text-foreground">
+										{source.branch}
+									</p>
+								</div>
+							) : null}
 							<div>
 								<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
 									Commit SHA
@@ -347,43 +465,8 @@ export default function TemplateDetailsPage({
 					<Card className="rounded-3xl">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 text-base">
-								<PackageIcon className="size-4 text-muted-foreground" />
-								Classification
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-5 text-sm text-muted-foreground">
-							<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-								<div>
-									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Type
-									</p>
-									<p className="mt-2 text-foreground">{template.config.type}</p>
-								</div>
-								<div>
-									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Repository type
-									</p>
-									<p className="mt-2 text-foreground">
-										{template.config.repository.type}
-									</p>
-								</div>
-								<div>
-									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Release
-									</p>
-									<p className="mt-2 text-foreground">
-										{template.config.repository.release}
-									</p>
-								</div>
-							</div>
-						</CardContent>
-					</Card>
-
-					<Card className="rounded-3xl">
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2 text-base">
-								<GitBranchIcon className="size-4 text-muted-foreground" />
-								Stack
+								<LinkIcon className="size-4 text-muted-foreground" />
+								Stack and Tags
 							</CardTitle>
 						</CardHeader>
 						<CardContent className="space-y-5">
@@ -443,33 +526,25 @@ export default function TemplateDetailsPage({
 					<Card className="rounded-3xl">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 text-base">
-								<LinkIcon className="size-4 text-muted-foreground" />
-								Quick links
+								<ActivityIcon className="size-4 text-muted-foreground" />
+								Analytics
 							</CardTitle>
 						</CardHeader>
-						<CardContent className="flex flex-col gap-3">
-							<Button asChild variant="outline" className="justify-between">
-								<Link
-									href={template.config.repository.url}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									<span className="inline-flex items-center gap-2">
-										<ExternalLinkIcon className="size-4" />
-										Open GitHub folder
-									</span>
-									<ArrowUpRightIcon className="size-4" />
-								</Link>
-							</Button>
-							<Button asChild variant="outline" className="justify-between">
-								<Link href={`/user/${template.config.author.github}`}>
-									<span className="inline-flex items-center gap-2">
-										<GlobeIcon className="size-4" />
-										Author page
-									</span>
-									<ArrowUpRightIcon className="size-4" />
-								</Link>
-							</Button>
+						<CardContent>
+							<div className="rounded-2xl border border-dashed bg-muted/20 p-4">
+								<div className="flex items-start gap-3">
+									<ActivityIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+									<div>
+										<p className="font-medium text-foreground">
+											In development
+										</p>
+										<p className="mt-1 text-sm text-muted-foreground">
+											Install counts, trend charts, and last activity will land
+											here once tracking is wired in.
+										</p>
+									</div>
+								</div>
+							</div>
 						</CardContent>
 					</Card>
 				</div>

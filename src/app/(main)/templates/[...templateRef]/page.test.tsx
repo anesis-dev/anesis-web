@@ -65,7 +65,7 @@ describe("TemplateDetailsPage", () => {
 		expect(useTemplate).toHaveBeenCalledWith("demo-owner/missing-repo@0.1.0");
 	});
 
-	it("renders template metadata, analytics placeholder and readme content", async () => {
+	it("renders a package-style template page with quick start and readme content", async () => {
 		vi.mocked(useTemplate).mockReturnValue({
 			template: mockTemplate,
 			isLoading: false,
@@ -95,14 +95,19 @@ describe("TemplateDetailsPage", () => {
 		expect(
 			await screen.findByRole("heading", { name: "Demo Next Template" }),
 		).toBeInTheDocument();
-		expect(screen.getByText("Template Analytics")).toBeInTheDocument();
+		expect(screen.getByText("Quick Start")).toBeInTheDocument();
 		expect(
-			screen.getByText(/install counts, usage trends, and activity charts/i),
+			screen.getByText("oxide new my-app demo-repo", { exact: false }),
 		).toBeInTheDocument();
+		expect(
+			screen.getByText("oxide install-template demo-repo", { exact: false }),
+		).toBeInTheDocument();
+		expect(screen.getByText("Package Details")).toBeInTheDocument();
+		expect(screen.getByText("In development")).toBeInTheDocument();
 		expect(screen.getByText("README.md:# Demo")).toBeInTheDocument();
 		expect(
-			screen.getByText(mockTemplate.url, { exact: false }),
-		).toBeInTheDocument();
+			screen.getAllByText("demo-owner/demo-repo@0.1.0", { exact: false }).length,
+		).toBeGreaterThan(0);
 		expect(screen.getByRole("button", { name: /copy demo-owner\/demo-repo@0.1.0/i })).toBeInTheDocument();
 
 		await waitFor(() =>

@@ -7,6 +7,12 @@ import {
 } from "@/lib/api-contracts";
 import { ITemplate } from "@/types/template";
 
+function hasExplicitTemplateVersion(templateRef: string): boolean {
+	const [name, version] = templateRef.split("@");
+
+	return Boolean(name?.trim() && version?.trim());
+}
+
 export async function fetchTemplates(): Promise<ITemplate[]> {
 	return parseTemplatesResponse(await api.get<unknown>("/template/all"));
 }
@@ -46,5 +52,18 @@ export async function updateTemplate(url: string): Promise<void> {
 }
 
 export async function deleteTemplate(templateRef: string): Promise<void> {
+	if (!hasExplicitTemplateVersion(templateRef)) {
+		throw new Error("Deleting a template requires an explicit version.");
+	}
+
 	await api.delete<void>(`/template/${encodeURIComponent(templateRef)}`);
+}
+
+export async function updateTemplateOfficialStatus(
+	templateId: string,
+	official: boolean,
+): Promise<void> {
+	await api.patch<void>(
+		`/template/${encodeURIComponent(templateId)}/official?official=${official}`,
+	);
 }

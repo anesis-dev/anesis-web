@@ -29,6 +29,7 @@ import {
 	fetchTemplates,
 	publishTemplate,
 	updateTemplate,
+	updateTemplateOfficialStatus,
 } from "@/services/template";
 
 describe("template services", () => {
@@ -59,6 +60,16 @@ describe("template services", () => {
 		expect(api.get).toHaveBeenCalledWith("/template/demo-repo%400.1.0");
 	});
 
+	it("fetches the latest template when only the slug is provided", async () => {
+		vi.mocked(api.get).mockResolvedValueOnce({ data: { id: "4" } });
+		vi.mocked(parseTemplateResponse).mockReturnValueOnce({ id: "4" } as never);
+
+		await expect(fetchTemplate("demo-repo")).resolves.toEqual({
+			id: "4",
+		});
+		expect(api.get).toHaveBeenCalledWith("/template/demo-repo");
+	});
+
 	it("fetches the template api url with an encoded ref", async () => {
 		vi.mocked(api.get).mockResolvedValueOnce({ data: { url: "https://api.example.test/template/demo" } });
 		vi.mocked(parseTemplateUrlResponse).mockReturnValueOnce({
@@ -69,6 +80,18 @@ describe("template services", () => {
 			url: "https://api.example.test/template/demo",
 		});
 		expect(api.get).toHaveBeenCalledWith("/template/demo-repo%400.1.0/url");
+	});
+
+	it("fetches the latest template api url when only the slug is provided", async () => {
+		vi.mocked(api.get).mockResolvedValueOnce({ data: { url: "https://api.example.test/template/latest" } });
+		vi.mocked(parseTemplateUrlResponse).mockReturnValueOnce({
+			url: "https://api.example.test/template/latest",
+		});
+
+		await expect(fetchTemplateUrl("demo-repo")).resolves.toEqual({
+			url: "https://api.example.test/template/latest",
+		});
+		expect(api.get).toHaveBeenCalledWith("/template/demo-repo/url");
 	});
 
 	it("publishes template urls through the publish endpoint", async () => {
@@ -105,5 +128,23 @@ describe("template services", () => {
 
 		await expect(deleteTemplate("demo-repo@0.1.0")).resolves.toBeUndefined();
 		expect(api.delete).toHaveBeenCalledWith("/template/demo-repo%400.1.0");
+	});
+
+	it("rejects deleting templates without an explicit version", async () => {
+		await expect(deleteTemplate("demo-repo")).rejects.toThrow(
+			"Deleting a template requires an explicit version.",
+		);
+		expect(api.delete).not.toHaveBeenCalled();
+	});
+
+	it("updates template official status through the admin endpoint", async () => {
+		vi.mocked(api.patch).mockResolvedValueOnce(undefined);
+
+		await expect(
+			updateTemplateOfficialStatus("template-id", true),
+		).resolves.toBeUndefined();
+		expect(api.patch).toHaveBeenCalledWith(
+			"/template/template-id/official?official=true",
+		);
 	});
 });

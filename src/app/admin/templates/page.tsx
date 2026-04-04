@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { PaginationControls } from "@/components/PaginationControls";
 import {
 	Card,
@@ -14,14 +15,27 @@ import {
 	ShieldOffIcon,
 	Trash2Icon,
 	ExternalLinkIcon,
+	LoaderIcon,
 	PackageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date";
+import { ITemplate } from "@/types/template";
+import { deleteTemplate, updateTemplateOfficialStatus } from "@/services/template";
+import { getTemplateHref, getTemplateRef } from "@/lib/template-ref";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 
 function SkeletonRow() {
 	return (
@@ -70,10 +84,19 @@ function OfficialBadge({ official }: { official: boolean }) {
 
 const PAGE_SIZE = 10;
 
+type Notice =
+	| { type: "success"; message: string }
+	| { type: "error"; message: string }
+	| null;
+
 export default function AdminTemplatesPage() {
 	const { templates, isLoading, isError } = useTemplates();
+	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const [notice, setNotice] = useState<Notice>(null);
+	const [busyAction, setBusyAction] = useState<string | null>(null);
+	const [pendingDelete, setPendingDelete] = useState<ITemplate | null>(null);
 
 	const filtered = useMemo(() => {
 		const q = search.trim().toLowerCase();
@@ -93,6 +116,70 @@ export default function AdminTemplatesPage() {
 		(currentPage - 1) * PAGE_SIZE,
 		currentPage * PAGE_SIZE,
 	);
+
+	async function refreshTemplateQueries() {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ["templates"] }),
+			queryClient.invalidateQueries({ queryKey: ["my-templates"] }),
+			queryClient.invalidateQueries({ queryKey: ["template"] }),
+		]);
+	}
+
+	async function handleToggleOfficial(template: ITemplate) {
+		const nextOfficial = !template.official;
+		setBusyAction(`official:${template.id}`);
+		setNotice(null);
+
+		try {
+			await updateTemplateOfficialStatus(template.id, nextOfficial);
+			await refreshTemplateQueries();
+			setNotice({
+				type: "success",
+				message: nextOfficial
+					? `${template.config.metadata.displayName} is now marked as official.`
+					: `${template.config.metadata.displayName} was moved back to community.`,
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message:
+					error instanceof Error
+						? error.message
+						: "Failed to update template official status.",
+			});
+		} finally {
+			setBusyAction(null);
+		}
+	}
+
+	async function handleDeleteTemplate() {
+		if (!pendingDelete) {
+			return;
+		}
+
+		const template = pendingDelete;
+		const templateRef = getTemplateRef(template);
+		setBusyAction(`delete:${template.id}`);
+		setNotice(null);
+
+		try {
+			await deleteTemplate(templateRef);
+			await refreshTemplateQueries();
+			setPendingDelete(null);
+			setNotice({
+				type: "success",
+				message: `${template.config.metadata.displayName} was deleted from the registry.`,
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message:
+					error instanceof Error ? error.message : "Failed to delete template.",
+			});
+		} finally {
+			setBusyAction(null);
+		}
+	}
 
 	return (
 		<div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
@@ -128,11 +215,21 @@ export default function AdminTemplatesPage() {
 				<CardHeader>
 					<CardTitle className="text-sm">Template moderation actions</CardTitle>
 					<CardDescription>
-						Official toggling and deletion stay disabled until the backend
-						exposes mutation endpoints for admin template management.
+						Use the controls below to promote community templates to official
+						or remove broken entries from the registry.
 					</CardDescription>
 				</CardHeader>
 			</Card>
+
+			{notice ? (
+				<Alert variant={notice.type === "error" ? "destructive" : "default"}>
+					<AlertCircleIcon />
+					<AlertTitle>
+						{notice.type === "error" ? "Action failed" : "Action completed"}
+					</AlertTitle>
+					<AlertDescription>{notice.message}</AlertDescription>
+				</Alert>
+			) : null}
 
 			{isError && (
 				<div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
@@ -188,7 +285,14 @@ export default function AdminTemplatesPage() {
 										key={t.id}
 										className="border-b transition-colors last:border-0 hover:bg-muted/30"
 									>
-										<td className="py-3 px-4 font-mono text-xs">{t.name}</td>
+										<td className="py-3 px-4 font-mono text-xs">
+											<Link
+												href={getTemplateHref(t)}
+												className="transition-colors hover:text-foreground"
+											>
+												{t.name}
+											</Link>
+										</td>
 										<td className="py-3 px-4 font-medium">
 											{t.config.metadata.displayName}
 										</td>
@@ -231,27 +335,47 @@ export default function AdminTemplatesPage() {
 												<Button
 													size="icon-xs"
 													variant="ghost"
-													title="Admin API required to change official status"
-													aria-label={`Official status management for ${t.config.metadata.displayName} is unavailable`}
-													disabled
+													title={
+														t.official
+															? "Mark as community template"
+															: "Mark as official template"
+													}
+													aria-label={
+														t.official
+															? `Mark ${t.config.metadata.displayName} as community`
+															: `Mark ${t.config.metadata.displayName} as official`
+													}
+													disabled={busyAction !== null}
+													onClick={() => handleToggleOfficial(t)}
 													className={cn(
 														t.official
 															? "text-primary hover:text-muted-foreground"
 															: "text-muted-foreground hover:text-primary",
 													)}
 												>
-													{t.official ? <ShieldOffIcon /> : <ShieldCheckIcon />}
+													{busyAction === `official:${t.id}` ? (
+														<LoaderIcon className="animate-spin" />
+													) : t.official ? (
+														<ShieldOffIcon />
+													) : (
+														<ShieldCheckIcon />
+													)}
 												</Button>
 
 												<Button
 													size="icon-xs"
 													variant="ghost"
-													title="Admin API required to delete templates"
-													aria-label={`Delete for ${t.config.metadata.displayName} is unavailable`}
-													disabled
+													title="Delete template"
+													aria-label={`Delete ${t.config.metadata.displayName}`}
+													disabled={busyAction !== null}
+													onClick={() => setPendingDelete(t)}
 													className="text-muted-foreground hover:text-destructive"
 												>
-													<Trash2Icon />
+													{busyAction === `delete:${t.id}` ? (
+														<LoaderIcon className="animate-spin" />
+													) : (
+														<Trash2Icon />
+													)}
 												</Button>
 											</div>
 										</td>
@@ -269,6 +393,64 @@ export default function AdminTemplatesPage() {
 					onPageChange={setPage}
 				/>
 			)}
+
+			<Dialog
+				open={pendingDelete !== null}
+				onOpenChange={(open) => {
+					if (!open && busyAction?.startsWith("delete:")) {
+						return;
+					}
+
+					setPendingDelete(open ? pendingDelete : null);
+				}}
+			>
+				<DialogContent className="sm:max-w-md">
+					<DialogHeader>
+						<DialogTitle>Delete template</DialogTitle>
+						<DialogDescription>
+							{pendingDelete ? (
+								<>
+									This removes{" "}
+									<span className="font-mono text-foreground">
+										{getTemplateRef(pendingDelete)}
+									</span>{" "}
+									from the registry.
+								</>
+							) : (
+								"No template selected."
+							)}
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setPendingDelete(null)}
+							disabled={busyAction?.startsWith("delete:")}
+						>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							variant="destructive"
+							onClick={handleDeleteTemplate}
+							disabled={!pendingDelete || busyAction?.startsWith("delete:")}
+						>
+							{busyAction?.startsWith("delete:") ? (
+								<>
+									<LoaderIcon className="size-3.5 animate-spin" />
+									Deleting...
+								</>
+							) : (
+								<>
+									<Trash2Icon className="size-3.5" />
+									Delete template
+								</>
+							)}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

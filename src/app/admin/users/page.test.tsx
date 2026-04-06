@@ -1,12 +1,25 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import AdminUsersPage from "@/app/admin/users/page";
+import { renderWithQueryClient } from "@/test/render";
 import { createUser } from "@/test/fixtures";
 
 vi.mock("@/hooks/useUsers", () => ({
 	useUsers: vi.fn(),
 }));
 
+vi.mock("@/services/user", async () => {
+	const actual = await vi.importActual<typeof import("@/services/user")>(
+		"@/services/user",
+	);
+
+	return {
+		...actual,
+		deleteUser: vi.fn(),
+	};
+});
+
 import { useUsers } from "@/hooks/useUsers";
+import { deleteUser } from "@/services/user";
 
 describe("AdminUsersPage", () => {
 	it("renders user totals and filters by role", async () => {
@@ -23,7 +36,7 @@ describe("AdminUsersPage", () => {
 			isLoading: false,
 			isError: false,
 		});
-		render(<AdminUsersPage />);
+		renderWithQueryClient(<AdminUsersPage />);
 
 		expect(screen.getByText("11 total / 3 admins")).toBeInTheDocument();
 
@@ -37,5 +50,45 @@ describe("AdminUsersPage", () => {
 		);
 		expect(screen.getByText("@user-1")).toBeInTheDocument();
 		expect(screen.queryByText("@user-11")).not.toBeInTheDocument();
+	});
+
+	it("deletes a user through the admin dialog", async () => {
+		const user = createUser({
+			id: "user-2",
+			login: "builder",
+		});
+		vi.mocked(useUsers).mockReturnValue({
+			users: [user],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(deleteUser).mockResolvedValueOnce(undefined);
+
+		const { queryClient } = renderWithQueryClient(<AdminUsersPage />);
+		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: /delete builder/i,
+			}),
+		);
+
+		expect(
+			screen.getByRole("dialog"),
+		).toHaveTextContent("@builder");
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: /delete user/i,
+			}),
+		);
+
+		await waitFor(() =>
+			expect(deleteUser).toHaveBeenCalledWith("user-2"),
+		);
+		expect(invalidateSpy).toHaveBeenCalledWith({
+			queryKey: ["admin", "users"],
+		});
+		expect(screen.getByText(/was deleted from the platform/i)).toBeInTheDocument();
 	});
 });

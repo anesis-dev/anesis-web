@@ -5,6 +5,7 @@
 /.pnp
 .pnp.*
 .yarn/*
+/yarn.lock
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
@@ -21,6 +22,7 @@
 /build
 
 # misc
+.codex
 .DS_Store
 *.pem
 

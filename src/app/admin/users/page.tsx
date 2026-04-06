@@ -2,25 +2,39 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { PaginationControls } from "@/components/PaginationControls";
 import {
 	AlertCircleIcon,
 	ExternalLinkIcon,
+	LoaderIcon,
 	ShieldCheckIcon,
+	Trash2Icon,
 	UsersIcon,
 } from "lucide-react";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { useUsers } from "@/hooks/useUsers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/date";
+import { deleteUser } from "@/services/user";
+import { IUser } from "@/types/user";
 import {
 	Card,
 	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 
 function SkeletonRow() {
 	return (
@@ -65,10 +79,19 @@ function RoleBadge({ role }: { role: "admin" | "user" }) {
 
 const PAGE_SIZE = 10;
 
+type Notice =
+	| { type: "success"; message: string }
+	| { type: "error"; message: string }
+	| null;
+
 export default function AdminUsersPage() {
 	const { users, isLoading, isError } = useUsers();
+	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const [notice, setNotice] = useState<Notice>(null);
+	const [busyAction, setBusyAction] = useState<string | null>(null);
+	const [pendingDelete, setPendingDelete] = useState<IUser | null>(null);
 
 	const filtered = useMemo(() => {
 		const q = search.trim().toLowerCase();
@@ -89,6 +112,33 @@ export default function AdminUsersPage() {
 		(currentPage - 1) * PAGE_SIZE,
 		currentPage * PAGE_SIZE,
 	);
+
+	async function handleDeleteUser() {
+		if (!pendingDelete) {
+			return;
+		}
+
+		const user = pendingDelete;
+		setBusyAction(`delete:${user.id}`);
+		setNotice(null);
+
+		try {
+			await deleteUser(user.id);
+			await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+			setPendingDelete(null);
+			setNotice({
+				type: "success",
+				message: `@${user.login} was deleted from the platform.`,
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message: error instanceof Error ? error.message : "Failed to delete user.",
+			});
+		} finally {
+			setBusyAction(null);
+		}
+	}
 
 	return (
 		<div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
@@ -118,6 +168,16 @@ export default function AdminUsersPage() {
 				}}
 				className="w-full sm:max-w-sm"
 			/>
+
+			{notice ? (
+				<Alert variant={notice.type === "error" ? "destructive" : "default"}>
+					<AlertCircleIcon />
+					<AlertTitle>
+						{notice.type === "error" ? "Action failed" : "Action completed"}
+					</AlertTitle>
+					<AlertDescription>{notice.message}</AlertDescription>
+				</Alert>
+			) : null}
 
 			{isError && (
 				<Card className="border-dashed">
@@ -229,14 +289,29 @@ export default function AdminUsersPage() {
 													title="Open GitHub profile"
 													aria-label={`Open GitHub profile for ${user.login}`}
 												>
-													<Link
-														href={`https://github.com/${user.login}`}
-														target="_blank"
-														rel="noopener noreferrer"
-													>
-														<GitHubIcon className="size-3.5" />
-													</Link>
-												</Button>
+												<Link
+													href={`https://github.com/${user.login}`}
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													<GitHubIcon className="size-3.5" />
+												</Link>
+											</Button>
+											<Button
+												type="button"
+												size="icon-xs"
+												variant="ghost"
+												title="Delete user"
+												aria-label={`Delete ${user.login}`}
+												onClick={() => setPendingDelete(user)}
+												disabled={busyAction === `delete:${user.id}`}
+											>
+												{busyAction === `delete:${user.id}` ? (
+													<LoaderIcon className="size-3.5 animate-spin" />
+												) : (
+													<Trash2Icon className="size-3.5" />
+												)}
+											</Button>
 											</div>
 										</td>
 									</tr>
@@ -253,6 +328,62 @@ export default function AdminUsersPage() {
 					onPageChange={setPage}
 				/>
 			)}
+
+			<Dialog
+				open={pendingDelete !== null}
+				onOpenChange={(open) => {
+					if (!open && busyAction === null) {
+						setPendingDelete(null);
+					}
+				}}
+			>
+				<DialogContent className="sm:max-w-md">
+					<DialogHeader>
+						<DialogTitle>Delete user</DialogTitle>
+						<DialogDescription>
+							{pendingDelete ? (
+								<>
+									This removes{" "}
+									<span className="font-mono text-foreground">
+										@{pendingDelete.login}
+									</span>{" "}
+									from the platform.
+								</>
+							) : (
+								"No user selected."
+							)}
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setPendingDelete(null)}
+							disabled={busyAction !== null}
+						>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							variant="destructive"
+							onClick={handleDeleteUser}
+							disabled={pendingDelete === null || busyAction !== null}
+						>
+							{busyAction !== null ? (
+								<>
+									<LoaderIcon className="size-3.5 animate-spin" />
+									Deleting...
+								</>
+							) : (
+								<>
+									<Trash2Icon className="size-3.5" />
+									Delete user
+								</>
+							)}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

@@ -1,6 +1,7 @@
 vi.mock("@/api/client", () => ({
 	api: {
 		get: vi.fn(),
+		delete: vi.fn(),
 	},
 }));
 
@@ -11,7 +12,7 @@ vi.mock("@/lib/api-contracts", () => ({
 
 import { api } from "@/api/client";
 import { parseMeResponse, parseUsersResponse } from "@/lib/api-contracts";
-import { fetchAllUsers, fetchMe } from "@/services/user";
+import { deleteUser, fetchAllUsers, fetchMe } from "@/services/user";
 
 describe("user services", () => {
 	it("fetches the current user", async () => {
@@ -30,5 +31,12 @@ describe("user services", () => {
 		await expect(fetchAllUsers()).resolves.toEqual([{ id: "u1" }]);
 		expect(api.get).toHaveBeenCalledWith("/user/all");
 		expect(parseUsersResponse).toHaveBeenCalledWith({ data: [] });
+	});
+
+	it("deletes a user for admin pages", async () => {
+		vi.mocked(api.delete).mockResolvedValueOnce(undefined);
+
+		await expect(deleteUser("user-1")).resolves.toBeUndefined();
+		expect(api.delete).toHaveBeenCalledWith("/user/user-1");
 	});
 });

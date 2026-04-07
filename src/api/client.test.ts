@@ -11,13 +11,14 @@ describe("api client", () => {
 		localStorage.clear();
 	});
 
-	it("sends auth headers for authenticated get requests", async () => {
-		localStorage.setItem("token", "secret-token");
+	it("sends credentialed get requests with json headers", async () => {
 		const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(
 			new Response(JSON.stringify({ id: "1" }), { status: 200 }),
 		);
 
 		await expect(api.get("/user/info")).resolves.toEqual({ id: "1" });
+
+		const init = fetchSpy.mock.calls[0]?.[1];
 
 		expect(fetchSpy).toHaveBeenCalledWith(
 			"http://api.example.test/user/info",
@@ -26,10 +27,10 @@ describe("api client", () => {
 				credentials: "include",
 				headers: expect.objectContaining({
 					"Content-Type": "application/json",
-					Authorization: "Bearer secret-token",
 				}),
 			}),
 		);
+		expect((init?.headers as Record<string, string>).Authorization).toBeUndefined();
 	});
 
 	it("serializes bodies for post requests and merges headers", async () => {

@@ -48,10 +48,10 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 npm run dev
 ```
 
-For an explicit Turbopack session, run:
+If you need the legacy webpack dev server for comparison or debugging, run:
 
 ```bash
-npm run dev:turbo
+npm run dev:webpack
 ```
 
 4. Open:
@@ -66,7 +66,7 @@ To get full functionality, run `oxide-server` locally on port `4000`.
 
 ```bash
 npm run dev
-npm run dev:turbo
+npm run dev:webpack
 npm run build
 npm run start
 npm run typecheck
@@ -110,4 +110,4 @@ src/
 
 - GitHub login/logout depends on `oxide-server`.
 - Admin moderation UI is present, but some destructive admin actions still require backend mutation endpoints.
-- `npm run dev` uses webpack for predictable local development in this workspace layout; `npm run dev:turbo` is available when you explicitly want Turbopack.
+- `npm run dev` uses Turbopack by default. `npm run dev:webpack` remains available as a fallback if you need to compare dev-server behavior.

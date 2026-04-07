@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ShieldCheckIcon, SearchIcon, XIcon } from "lucide-react";
@@ -98,9 +99,9 @@ export function TemplateFilters({
 	filters,
 	onChange,
 }: TemplateFiltersProps) {
-	const specializations = deriveSpecializations(templates);
-	const allLanguages = deriveUnique(templates, "languages");
-	const allTechnologies = deriveUnique(templates, "technologies");
+	const specializations = useMemo(() => deriveSpecializations(templates), [templates]);
+	const allLanguages = useMemo(() => deriveUnique(templates, "languages"), [templates]);
+	const allTechnologies = useMemo(() => deriveUnique(templates, "technologies"), [templates]);
 
 	function set<K extends keyof TemplateFiltersState>(
 		key: K,

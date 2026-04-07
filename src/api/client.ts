@@ -36,7 +36,12 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
 	// Handle empty responses (e.g. 204 No Content)
 	const text = await res.text();
-	return text ? (JSON.parse(text) as T) : (undefined as T);
+	if (!text) return undefined as T;
+	try {
+		return JSON.parse(text) as T;
+	} catch {
+		throw new ApiError(res.status, "Server returned an unexpected non-JSON response.");
+	}
 }
 
 export const api = {

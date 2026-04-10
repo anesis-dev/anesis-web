@@ -1,6 +1,6 @@
 const GITHUB_HOSTS = new Set(["github.com", "www.github.com"]);
 
-export function validateTemplatePublishUrl(input: string): string | null {
+function validateGitHubTreeUrl(input: string, target: string): string | null {
 	const value = input.trim();
 
 	if (!value) {
@@ -22,12 +22,20 @@ export function validateTemplatePublishUrl(input: string): string | null {
 	const parts = url.pathname.split("/").filter(Boolean);
 
 	if (parts.length < 5 || parts[2] !== "tree") {
-		return "Use a GitHub /tree/ URL that points to the template directory.";
+		return `Use a GitHub /tree/ URL that points to the ${target} directory.`;
 	}
 
 	if (!parts[0] || !parts[1] || !parts[3] || !parts.slice(4).join("/")) {
-		return "The URL must include owner, repo, branch and template directory.";
+		return `The URL must include owner, repo, branch and ${target} directory.`;
 	}
 
 	return null;
+}
+
+export function validateTemplatePublishUrl(input: string): string | null {
+	return validateGitHubTreeUrl(input, "template");
+}
+
+export function validateAddonPublishUrl(input: string): string | null {
+	return validateGitHubTreeUrl(input, "addon");
 }

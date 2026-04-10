@@ -12,6 +12,10 @@ const installUnix = `curl -sSL https://raw.githubusercontent.com/oxide-cli/oxide
 
 const installWindows = `irm https://raw.githubusercontent.com/oxide-cli/oxide/main/install.ps1 | iex`;
 
+const installNpm = `npm install -g @maksym-zhuk/oxide-cli`;
+
+const installCargo = `cargo install oxide-cli`;
+
 const pathBash = `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc`;
 
@@ -38,8 +42,8 @@ export default function DocsInstallationPage() {
 					Install the Oxide CLI
 				</h1>
 				<p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-					The recommended setup path is the release installer. It downloads the
-					latest binary for your platform and places it in a local bin directory.
+					The recommended setup path is the release installer, but Oxide is also
+					available through npm and crates.io if that fits your workflow better.
 				</p>
 			</section>
 
@@ -65,6 +69,45 @@ export default function DocsInstallationPage() {
 					</CardHeader>
 					<CardContent>
 						<CodeBlock code={installWindows} />
+					</CardContent>
+				</Card>
+			</div>
+
+			<div className="grid gap-6 lg:grid-cols-2">
+				<Card>
+					<CardHeader>
+						<CardTitle>Install with npm</CardTitle>
+						<CardDescription>
+							Use the published npm wrapper package if you prefer JavaScript
+							tooling.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<CodeBlock code={installNpm} />
+						<p className="text-sm text-muted-foreground">
+							The npm package downloads the matching Oxide binary during
+							`postinstall`.
+						</p>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Install with cargo</CardTitle>
+						<CardDescription>
+							Install the CLI directly from crates.io when you already use the
+							Rust toolchain.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<CodeBlock code={installCargo} />
+						<p className="text-sm text-muted-foreground">
+							Cargo places the binary into{" "}
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								~/.cargo/bin
+							</code>
+							, so make sure that directory is on your `PATH`.
+						</p>
 					</CardContent>
 				</Card>
 			</div>

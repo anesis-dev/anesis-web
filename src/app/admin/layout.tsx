@@ -8,7 +8,7 @@ export default function AdminLayout({
 }>) {
 	return (
 		<AdminGuard>
-			<div className="flex min-h-dvh w-full flex-col lg:flex-row">
+			<div className="flex min-h-dvh w-full flex-col lg:flex-row lg:items-stretch">
 				<AdminSidebar />
 				<main className="min-w-0 flex-1">{children}</main>
 			</div>

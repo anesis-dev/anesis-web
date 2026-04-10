@@ -26,6 +26,7 @@ describe("AdminSidebar", () => {
 		render(<AdminSidebar />);
 
 		expect(screen.getByRole("link", { name: /dashboard/i })).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: /addons/i })).toBeInTheDocument();
 		expect(screen.getByRole("link", { name: /templates/i })).toHaveClass(
 			"bg-primary",
 		);

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import AccountPage from "@/app/account/page";
 import {
+	createAddon,
 	createGitHubUser,
 	createTemplate,
 	createUser,
@@ -18,6 +19,16 @@ vi.mock("@/hooks/useMyTemplates", () => ({
 	useMyTemplates: vi.fn(),
 }));
 
+vi.mock("@/hooks/useMyAddons", () => ({
+	useMyAddons: vi.fn(),
+}));
+
+vi.mock("@/components/addons/AddonCard", () => ({
+	AddonCard: ({ addon }: { addon: { name: string } }) => (
+		<div data-testid="addon-card">{addon.name}</div>
+	),
+}));
+
 vi.mock("@/components/templates/TemplateCard", () => ({
 	TemplateCard: ({ template }: { template: { name: string } }) => (
 		<div data-testid="template-card">{template.name}</div>
@@ -26,6 +37,7 @@ vi.mock("@/components/templates/TemplateCard", () => ({
 
 import { useAuth } from "@/hooks/useAuth";
 import { useGitHubUser } from "@/hooks/useGitHubUser";
+import { useMyAddons } from "@/hooks/useMyAddons";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
 
 describe("AccountPage", () => {
@@ -43,6 +55,11 @@ describe("AccountPage", () => {
 		});
 		vi.mocked(useMyTemplates).mockReturnValue({
 			templates: [],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(useMyAddons).mockReturnValue({
+			addons: [],
 			isLoading: false,
 			isError: false,
 		});
@@ -70,6 +87,11 @@ describe("AccountPage", () => {
 			isLoading: false,
 			isError: false,
 		});
+		vi.mocked(useMyAddons).mockReturnValue({
+			addons: [createAddon()],
+			isLoading: false,
+			isError: false,
+		});
 		render(<AccountPage />);
 
 		expect(screen.getByRole("heading", { name: "The Octocat" })).toBeInTheDocument();
@@ -78,7 +100,9 @@ describe("AccountPage", () => {
 			"/admin",
 		);
 		expect(screen.getByText("My Templates")).toBeInTheDocument();
+		expect(screen.getByText("My Addons")).toBeInTheDocument();
 		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
+		expect(screen.getAllByTestId("addon-card")).toHaveLength(1);
 
 		fireEvent.click(screen.getByRole("button", { name: /log out/i }));
 		expect(logout).toHaveBeenCalledTimes(1);

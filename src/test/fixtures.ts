@@ -1,3 +1,4 @@
+import { IAddon } from "@/types/addon";
 import { IGitHubUser } from "@/types/github";
 import { ITemplate } from "@/types/template";
 import { IUser } from "@/types/user";
@@ -49,6 +50,27 @@ export const mockUser: IUser = {
 	created_at: "2026-03-20T08:30:00Z",
 };
 
+export const mockAddon: IAddon = {
+	id: "33333333-3333-3333-3333-333333333333",
+	owner_id: "22222222-2222-2222-2222-222222222222",
+	url: "https://github.com/oxide-addons/drizzle/tree/main",
+	addon_id: "drizzle",
+	name: "Drizzle ORM",
+	version: "1.0.0",
+	commit_sha: "fedcba0987654321fedcba0987654321fedcba09",
+	official: false,
+	config: {
+		schema_version: "1.0",
+		id: "drizzle",
+		name: "Drizzle ORM",
+		version: "1.0.0",
+		description: "Adds Drizzle ORM scaffolding helpers.",
+		author: "oxide-addons",
+	},
+	created_at: "2026-04-05T10:00:00Z",
+	updated_at: "2026-04-06T10:00:00Z",
+};
+
 export const mockGitHubUser: IGitHubUser = {
 	login: "octocat",
 	id: 583231,
@@ -68,6 +90,10 @@ type TemplateOverrides = Partial<ITemplate> & {
 		repository?: Partial<ITemplate["config"]["repository"]>;
 		metadata?: Partial<ITemplate["config"]["metadata"]>;
 	};
+};
+
+type AddonOverrides = Partial<IAddon> & {
+	config?: Partial<IAddon["config"]>;
 };
 
 export function createTemplate(overrides: TemplateOverrides = {}): ITemplate {
@@ -110,6 +136,29 @@ export function createTemplate(overrides: TemplateOverrides = {}): ITemplate {
 			technologies:
 				overrides.config?.technologies ?? mockTemplate.config.technologies,
 			languages: overrides.config?.languages ?? mockTemplate.config.languages,
+		},
+	};
+}
+
+export function createAddon(overrides: AddonOverrides = {}): IAddon {
+	const addonId =
+		overrides.addon_id ?? overrides.config?.id ?? mockAddon.addon_id;
+	const name = overrides.name ?? overrides.config?.name ?? mockAddon.name;
+	const version =
+		overrides.version ?? overrides.config?.version ?? mockAddon.version;
+
+	return {
+		...mockAddon,
+		...overrides,
+		addon_id: addonId,
+		name,
+		version,
+		config: {
+			...mockAddon.config,
+			...overrides.config,
+			id: addonId,
+			name,
+			version,
 		},
 	};
 }

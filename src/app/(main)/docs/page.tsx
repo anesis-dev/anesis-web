@@ -29,13 +29,13 @@ const capabilities = [
 	{
 		title: "Scaffold projects",
 		description:
-			"Generate starters through the interactive flow or from known template names.",
+			"Generate starters from known template names and reuse cached downloads between runs.",
 		icon: WandSparklesIcon,
 	},
 	{
 		title: "Authenticate with GitHub",
 		description:
-			"Connect your account when you need authenticated flows like publishing your own template.",
+			"Authenticate before registry-backed template download, project scaffolding, publishing, and account actions.",
 		icon: KeyRoundIcon,
 	},
 	{
@@ -67,9 +67,9 @@ export default function DocsOverviewPage() {
 					<p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
 						Oxide is a CLI for generating project starters, working with
 						reusable templates, and extending generated projects through
-						declarative addon manifests. Day-to-day scaffolding should feel
-						lightweight, while authenticated flows stay out of the way until you
-						actually need them.
+						declarative addon manifests. In the current CLI and backend,
+						registry-backed template resolution is authenticated, so sign in
+						before running install or scaffold flows against published templates.
 					</p>
 				</div>
 				<div className="mt-6 flex flex-wrap gap-3">

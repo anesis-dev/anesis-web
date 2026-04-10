@@ -1,9 +1,11 @@
 "use client";
 
+import { useAddons } from "@/hooks/useAddons";
 import { useUsers } from "@/hooks/useUsers";
 import { useTemplates } from "@/hooks/useTemplates";
 import { formatDate, getDateTimestamp } from "@/lib/date";
 import {
+	BoxesIcon,
 	PackageIcon,
 	ShieldCheckIcon,
 	UsersIcon,
@@ -76,6 +78,7 @@ function RecentTemplateSkeleton() {
 
 export default function AdminDashboard() {
 	const { templates, isLoading } = useTemplates();
+	const { addons, isLoading: addonsLoading } = useAddons();
 	const { users, isLoading: usersLoading, isError: usersError } = useUsers();
 
 	const totalTemplates = templates.length;
@@ -97,7 +100,7 @@ export default function AdminDashboard() {
 			</div>
 
 			{/* Stats */}
-			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
 				<StatCard
 					title="Total Templates"
 					value={totalTemplates}
@@ -118,6 +121,13 @@ export default function AdminDashboard() {
 					description="Published by users"
 					icon={TrendingUpIcon}
 					loading={isLoading}
+				/>
+				<StatCard
+					title="Published Addons"
+					value={addons.length}
+					description="Registered in the addon registry"
+					icon={BoxesIcon}
+					loading={addonsLoading}
 				/>
 				<StatCard
 					title="Total Users"

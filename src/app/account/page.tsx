@@ -2,14 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { AddonCard } from "@/components/addons/AddonCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useGitHubUser } from "@/hooks/useGitHubUser";
+import { useMyAddons } from "@/hooks/useMyAddons";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { Button } from "@/components/ui/button";
 import {
 	BookOpenIcon,
+	BoxesIcon,
 	LogOutIcon,
 	PackageIcon,
 	ShieldIcon,
@@ -91,6 +94,10 @@ export default function AccountPage() {
 	const { user, isLoading: authLoading, login, logout } = useAuth();
 	const { githubUser, isLoading: githubLoading } = useGitHubUser(
 		user?.login ?? "",
+	);
+	const { addons: myAddons, isLoading: addonsLoading } = useMyAddons(
+		user?.id,
+		!!user,
 	);
 	const { templates: myTemplates, isLoading: templatesLoading } = useMyTemplates(
 		!!user,
@@ -238,6 +245,57 @@ export default function AccountPage() {
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{myTemplates.map((template) => (
 							<TemplateCard key={template.id} template={template} />
+						))}
+					</div>
+				)}
+			</div>
+
+			<div className="h-px w-full bg-border" />
+
+			<div className="flex flex-col gap-5">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+					<div className="flex items-center gap-2">
+						<BoxesIcon className="size-4 text-muted-foreground" />
+						<h2 className="font-semibold">
+							My Addons
+							{!addonsLoading && (
+								<span className="ml-2 font-mono text-sm font-normal text-muted-foreground">
+									{myAddons.length}
+								</span>
+							)}
+						</h2>
+					</div>
+					<Link href="/account/addons" className="w-full sm:w-auto">
+						<Button variant="outline" size="sm" className="w-full sm:w-auto">
+							Manage addons
+						</Button>
+					</Link>
+				</div>
+
+				{addonsLoading && (
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{Array.from({ length: 3 }).map((_, index) => (
+							<TemplateSkeleton key={index} />
+						))}
+					</div>
+				)}
+
+				{!addonsLoading && myAddons.length === 0 && (
+					<div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-14 text-center">
+						<BoxesIcon className="size-7 text-muted-foreground" />
+						<div>
+							<p className="text-sm font-medium">No addons yet</p>
+							<p className="mt-1 text-xs text-muted-foreground">
+								You haven&apos;t published any addons.
+							</p>
+						</div>
+					</div>
+				)}
+
+				{!addonsLoading && myAddons.length > 0 && (
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{myAddons.slice(0, 3).map((addon) => (
+							<AddonCard key={addon.id} addon={addon} />
 						))}
 					</div>
 				)}

@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { CodeBlock } from "@/components/docs/CodeBlock";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -556,6 +558,26 @@ export default function DocsAddonsPage() {
 					resolved into deterministic file operations.
 				</p>
 			</section>
+
+			<Card className="border-dashed">
+				<CardHeader>
+					<CardTitle className="text-base">Current status</CardTitle>
+					<CardDescription>
+						The live backend surface for addons is registry publishing,
+						discovery, archive resolution, and deletion. The public CLI addon
+						command surface is still evolving, so use the web registry for real
+						registry entries today.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="flex flex-wrap gap-3">
+					<Button variant="outline" asChild>
+						<Link href="/addons">Open addon registry</Link>
+					</Button>
+					<Button variant="outline" asChild>
+						<Link href="/account/addons">Manage your addons</Link>
+					</Button>
+				</CardContent>
+			</Card>
 
 			<div className="grid gap-6 lg:grid-cols-2">
 				<Card>

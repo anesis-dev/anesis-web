@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import {
 	LayoutDashboardIcon,
+	BoxesIcon,
 	PackageIcon,
 	UsersIcon,
 	ArrowLeftIcon,
@@ -27,6 +28,12 @@ const navItems = [
 		exact: false,
 	},
 	{
+		title: "Addons",
+		href: "/admin/addons",
+		icon: BoxesIcon,
+		exact: false,
+	},
+	{
 		title: "Users",
 		href: "/admin/users",
 		icon: UsersIcon,
@@ -43,7 +50,7 @@ export function AdminSidebar() {
 	}
 
 	return (
-		<aside className="w-full border-b bg-card lg:h-dvh lg:w-60 lg:shrink-0 lg:border-r lg:border-b-0">
+		<aside className="w-full border-b bg-card lg:flex lg:w-60 lg:shrink-0 lg:self-stretch lg:flex-col lg:border-r lg:border-b-0 lg:min-h-dvh">
 			{/* Header */}
 			<div className="flex items-center gap-2.5 border-b px-4 py-4 lg:px-5">
 				<div className="flex size-7 items-center justify-center rounded-md bg-primary">
@@ -58,7 +65,7 @@ export function AdminSidebar() {
 			</div>
 
 			{/* Nav */}
-			<nav className="flex gap-2 overflow-x-auto p-3 lg:flex-1 lg:flex-col lg:overflow-y-auto lg:overflow-x-hidden">
+			<nav className="flex gap-2 overflow-x-auto p-3 lg:flex-1 lg:flex-col lg:overflow-visible">
 				{navItems.map((item) => {
 					const active = isActive(item.href, item.exact);
 					return (

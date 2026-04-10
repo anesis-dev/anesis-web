@@ -1,0 +1,27 @@
+export interface IAddonConfig {
+	schema_version: string;
+	id: string;
+	name: string;
+	version: string;
+	description: string;
+	author: string;
+}
+
+export interface IAddon {
+	id: string;
+	owner_id: string;
+	url: string;
+	addon_id: string;
+	name: string;
+	version: string;
+	commit_sha: string;
+	official: boolean;
+	config: IAddonConfig;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface IAddonUrlResponse {
+	archive_url: string;
+	commit_sha: string;
+}

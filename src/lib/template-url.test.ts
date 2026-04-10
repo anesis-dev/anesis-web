@@ -1,4 +1,7 @@
-import { validateTemplatePublishUrl } from "@/lib/template-url";
+import {
+	validateAddonPublishUrl,
+	validateTemplatePublishUrl,
+} from "@/lib/template-url";
 
 describe("validateTemplatePublishUrl", () => {
 	it("requires a url", () => {
@@ -29,5 +32,13 @@ describe("validateTemplatePublishUrl", () => {
 				"https://github.com/owner/repo/tree/main/templates/web",
 			),
 		).toBeNull();
+	});
+});
+
+describe("validateAddonPublishUrl", () => {
+	it("uses addon-specific guidance for invalid tree urls", () => {
+		expect(validateAddonPublishUrl("https://github.com/owner/repo")).toBe(
+			"Use a GitHub /tree/ URL that points to the addon directory.",
+		);
 	});
 });

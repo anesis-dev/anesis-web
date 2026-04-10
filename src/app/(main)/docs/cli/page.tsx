@@ -8,16 +8,16 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-const quickStart = `oxide new my-app
+const quickStart = `oxide new my-app react-vite-ts
 cd my-app`;
 
 const directTemplate = `oxide new my-app react-swc-vite-ts`;
 
 const commands = [
 	{
-		command: "oxide new [name] [template_name]",
+		command: "oxide new <name> <template_name>",
 		description:
-			"Create a new project. Without a template name, Oxide runs the interactive setup flow.",
+			"Create a new project from a specific published template name.",
 	},
 	{
 		command: "oxide install-template <template_name>",
@@ -58,9 +58,10 @@ export default function DocsCliPage() {
 					Use the Oxide CLI effectively
 				</h1>
 				<p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-					Oxide can run fully interactively or straight from a known template
-					name. For normal project generation users should not have to think
-					about auth first.
+					The current public CLI takes an explicit template name for generation.
+					Template downloads stay cached locally, but the archive lookup goes
+					through authenticated backend endpoints, so log in before install/new
+					flows.
 				</p>
 			</section>
 
@@ -81,7 +82,7 @@ export default function DocsCliPage() {
 					<CardHeader>
 						<CardTitle>Generate from a known template</CardTitle>
 						<CardDescription>
-							If you already know the template name, skip the interactive flow.
+							Use the published template slug directly from the terminal.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -117,24 +118,20 @@ export default function DocsCliPage() {
 					<CardHeader>
 						<CardTitle>What happens during `oxide new`</CardTitle>
 						<CardDescription>
-							Interactive creation is a guided decision tree.
+							Project generation is explicit and cache-aware.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3 text-sm text-muted-foreground">
+						<p>1. Validate the project name and the requested template slug.</p>
 						<p>
-							1. Choose a project layer like Frontend, Backend, Meta, Desktop,
-							or Mobile.
+							2. Resolve the latest template archive, reusing the local cache
+							when the commit SHA is unchanged.
 						</p>
-						<p>2. Select the framework or runtime.</p>
 						<p>
-							3. If relevant, choose the build tool, language, and platform
-							variant.
+							3. Extract the template into a new directory and render templated
+							files.
 						</p>
-						<p>4. Choose the package manager.</p>
-						<p>
-							5. Oxide resolves the matching template and installs dependencies
-							for you.
-						</p>
+						<p>4. Print the next steps so you can enter the new project.</p>
 					</CardContent>
 				</Card>
 
@@ -142,8 +139,8 @@ export default function DocsCliPage() {
 					<CardHeader>
 						<CardTitle>Auth and cache commands</CardTitle>
 						<CardDescription>
-							Authentication exists, but it should stay out of the way for
-							normal CLI usage.
+							Right now authentication is required for registry-backed template
+							download and publishing flows.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3 text-sm text-muted-foreground">
@@ -154,12 +151,12 @@ export default function DocsCliPage() {
 							opens browser auth and saves the returned session locally.
 						</p>
 						<p>
-							For ordinary scaffolding, users should be able to work without
-							logging in first.
+							`oxide new` and `oxide install-template` both resolve template
+							archives through authenticated backend endpoints in the current
+							implementation.
 						</p>
 						<p>
-							Publishing your own template from the terminal is the flow that
-							should require authentication.
+							Publishing your own template also requires the same saved session.
 						</p>
 					</CardContent>
 				</Card>

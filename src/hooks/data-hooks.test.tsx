@@ -3,12 +3,21 @@ import {
 	createQueryClientWrapper,
 	createTestQueryClient,
 } from "@/test/render";
-import { mockGitHubUser, mockTemplate, mockUser } from "@/test/fixtures";
+import {
+	createAddon,
+	mockGitHubUser,
+	mockTemplate,
+	mockUser,
+} from "@/test/fixtures";
 
 vi.mock("@/services/template", () => ({
 	fetchTemplates: vi.fn(),
 	fetchMyTemplates: vi.fn(),
 	fetchTemplate: vi.fn(),
+}));
+
+vi.mock("@/services/addon", () => ({
+	fetchAddons: vi.fn(),
 }));
 
 vi.mock("@/services/user", () => ({
@@ -21,13 +30,16 @@ vi.mock("@/services/github", () => ({
 }));
 
 import { fetchGitHubUser, fetchTemplateReadme } from "@/services/github";
+import { fetchAddons } from "@/services/addon";
 import {
 	fetchMyTemplates,
 	fetchTemplate,
 	fetchTemplates,
 } from "@/services/template";
 import { fetchAllUsers } from "@/services/user";
+import { useAddons } from "@/hooks/useAddons";
 import { useGitHubUser } from "@/hooks/useGitHubUser";
+import { useMyAddons } from "@/hooks/useMyAddons";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
 import { useTemplate } from "@/hooks/useTemplate";
 import { useTemplateReadme } from "@/hooks/useTemplateReadme";
@@ -51,6 +63,19 @@ describe("data hooks", () => {
 		expect(fetchTemplates).toHaveBeenCalledTimes(1);
 	});
 
+	it("loads addons", async () => {
+		const addon = createAddon();
+		vi.mocked(fetchAddons).mockResolvedValueOnce([addon]);
+
+		const { result } = renderHook(() => useAddons(), {
+			wrapper: getWrapper(),
+		});
+
+		await waitFor(() => expect(result.current.isLoading).toBe(false));
+		expect(result.current.addons).toEqual([addon]);
+		expect(fetchAddons).toHaveBeenCalledTimes(1);
+	});
+
 	it("surfaces user loading failures", async () => {
 		vi.mocked(fetchAllUsers).mockRejectedValueOnce(new Error("boom"));
 
@@ -70,6 +95,28 @@ describe("data hooks", () => {
 		await waitFor(() => expect(result.current.isLoading).toBe(false));
 		expect(result.current.templates).toEqual([]);
 		expect(fetchMyTemplates).not.toHaveBeenCalled();
+	});
+
+	it("filters addons for the current owner", async () => {
+		const owned = createAddon();
+		const foreign = createAddon({
+			id: "addon-2",
+			owner_id: "99999999-9999-9999-9999-999999999999",
+			addon_id: "eslint",
+			name: "ESLint Rules",
+			config: {
+				id: "eslint",
+				name: "ESLint Rules",
+			},
+		});
+		vi.mocked(fetchAddons).mockResolvedValueOnce([owned, foreign]);
+
+		const { result } = renderHook(() => useMyAddons(mockUser.id, true), {
+			wrapper: getWrapper(),
+		});
+
+		await waitFor(() => expect(result.current.isLoading).toBe(false));
+		expect(result.current.addons).toEqual([owned]);
 	});
 
 	it("loads a template by ref when a ref is provided", async () => {

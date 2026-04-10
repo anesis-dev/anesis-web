@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { useMyAddons } from "@/hooks/useMyAddons";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,8 +14,8 @@ import {
 } from "@/components/ui/card";
 import {
 	BookOpenIcon,
+	BoxesIcon,
 	PackageIcon,
-	PlusIcon,
 	ShieldIcon,
 	StarIcon,
 } from "lucide-react";
@@ -49,6 +50,10 @@ function DashboardCard({
 export default function DashboardPage() {
 	const { user } = useAuth();
 	const { templates: myTemplates, isLoading } = useMyTemplates(!!user);
+	const { addons: myAddons, isLoading: addonsLoading } = useMyAddons(
+		user?.id,
+		!!user,
+	);
 	const officialTemplates = myTemplates.filter((template) => template.official);
 
 	if (!user) {
@@ -104,10 +109,10 @@ export default function DashboardPage() {
 					icon={StarIcon}
 				/>
 				<DashboardCard
-					title="Publishing access"
-					description="Template publishing is available"
-					value="Enabled"
-					icon={PlusIcon}
+					title="Published addons"
+					description="Addon registry entries linked to your account"
+					value={addonsLoading ? "..." : myAddons.length}
+					icon={BoxesIcon}
 				/>
 			</div>
 
@@ -132,6 +137,12 @@ export default function DashboardPage() {
 								Browse registry
 							</Button>
 						</Link>
+						<Link href="/account/addons" className="w-full sm:w-auto">
+							<Button variant="outline" className="w-full gap-2 sm:w-auto">
+								<BoxesIcon className="size-4" />
+								Manage addons
+							</Button>
+						</Link>
 						{user.role === "admin" && (
 							<Link href="/admin" className="w-full sm:w-auto">
 								<Button variant="outline" className="w-full gap-2 sm:w-auto">
@@ -147,8 +158,9 @@ export default function DashboardPage() {
 					<CardHeader>
 						<CardTitle>Publishing reminder</CardTitle>
 						<CardDescription>
-							Oxide itself does not require login for scaffolding. Sign-in is
-							only required when you want to publish your own template.
+							The current CLI uses authenticated template-download endpoints, so
+							sign-in matters for install/new flows as well as publishing and
+							registry management.
 						</CardDescription>
 					</CardHeader>
 				</Card>

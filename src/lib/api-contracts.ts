@@ -1,3 +1,4 @@
+import { IAddon, IAddonConfig, IAddonUrlResponse } from "@/types/addon";
 import { IGitHubUser } from "@/types/github";
 import { ITemplate, ITemplateConfig } from "@/types/template";
 import { IUser } from "@/types/user";
@@ -72,6 +73,22 @@ function parseUser(value: unknown, path: string): IUser {
 	};
 }
 
+function parseAddonConfig(value: unknown, path: string): IAddonConfig {
+	const config = expectRecord(value, path);
+
+	return {
+		schema_version: expectString(
+			config.schema_version,
+			`${path}.schema_version`,
+		),
+		id: expectString(config.id, `${path}.id`),
+		name: expectString(config.name, `${path}.name`),
+		version: expectString(config.version, `${path}.version`),
+		description: expectString(config.description, `${path}.description`),
+		author: expectString(config.author, `${path}.author`),
+	};
+}
+
 function parseTemplateConfig(value: unknown, path: string): ITemplateConfig {
 	const config = expectRecord(value, path);
 	const author = expectRecord(config.author, `${path}.author`);
@@ -126,6 +143,24 @@ function parseTemplate(value: unknown, path: string): ITemplate {
 	};
 }
 
+function parseAddon(value: unknown, path: string): IAddon {
+	const addon = expectRecord(value, path);
+
+	return {
+		id: expectString(addon.id, `${path}.id`),
+		owner_id: expectString(addon.owner_id, `${path}.owner_id`),
+		url: expectString(addon.url, `${path}.url`),
+		addon_id: expectString(addon.addon_id, `${path}.addon_id`),
+		name: expectString(addon.name, `${path}.name`),
+		version: expectString(addon.version, `${path}.version`),
+		commit_sha: expectString(addon.commit_sha, `${path}.commit_sha`),
+		official: expectBoolean(addon.official, `${path}.official`),
+		config: parseAddonConfig(addon.config, `${path}.config`),
+		created_at: expectString(addon.created_at, `${path}.created_at`),
+		updated_at: expectString(addon.updated_at, `${path}.updated_at`),
+	};
+}
+
 export function parseMeResponse(value: unknown): IUser {
 	return parseUser(value, "user");
 }
@@ -152,6 +187,14 @@ export function parseTemplateResponse(value: unknown): ITemplate {
 	return parseTemplate(value, "template");
 }
 
+export function parseAddonsResponse(value: unknown): IAddon[] {
+	if (!Array.isArray(value)) {
+		throw new Error("Invalid API response: addons payload must be an array.");
+	}
+
+	return value.map((addon, index) => parseAddon(addon, `addons[${index}]`));
+}
+
 export function parsePublishTemplateResponse(
 	value: unknown,
 ): { message: string; name: string } {
@@ -163,11 +206,31 @@ export function parsePublishTemplateResponse(
 	};
 }
 
+export function parsePublishAddonResponse(
+	value: unknown,
+): { message: string; addon_id: string } {
+	const payload = expectRecord(value, "publishAddon");
+
+	return {
+		message: expectString(payload.message, "publishAddon.message"),
+		addon_id: expectString(payload.addon_id, "publishAddon.addon_id"),
+	};
+}
+
 export function parseTemplateUrlResponse(value: unknown): { url: string } {
 	const payload = expectRecord(value, "templateUrl");
 
 	return {
 		url: expectString(payload.url, "templateUrl.url"),
+	};
+}
+
+export function parseAddonUrlResponse(value: unknown): IAddonUrlResponse {
+	const payload = expectRecord(value, "addonUrl");
+
+	return {
+		archive_url: expectString(payload.archive_url, "addonUrl.archive_url"),
+		commit_sha: expectString(payload.commit_sha, "addonUrl.commit_sha"),
 	};
 }
 

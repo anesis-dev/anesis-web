@@ -98,6 +98,18 @@ export default async function DocsReferencePage() {
 							</code>{" "}
 							contains installed templates and local registry cache files.
 						</p>
+						<p>
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								~/.oxide/cache/addons
+							</code>{" "}
+							stores downloaded addon archives and extracted addon folders.
+						</p>
+						<p>
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								~/.oxide/cache/addons/oxide-addons.json
+							</code>{" "}
+							tracks cached addon ids, versions, and commit SHAs.
+						</p>
 					</CardContent>
 				</Card>
 
@@ -113,6 +125,12 @@ export default async function DocsReferencePage() {
 							<Link href="/templates">
 								<BoxIcon className="size-4" />
 								Browse Templates
+							</Link>
+						</Button>
+						<Button variant="outline" asChild>
+							<Link href="/addons">
+								<BoxIcon className="size-4" />
+								Browse Addons
 							</Link>
 						</Button>
 						<Button variant="outline" asChild>

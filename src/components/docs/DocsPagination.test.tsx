@@ -5,13 +5,13 @@ describe("DocsPagination", () => {
 	it("renders adjacent docs links for known pages", () => {
 		render(<DocsPagination currentHref="/docs/templates" />);
 
-		expect(screen.getByRole("link", { name: /cli/i })).toHaveAttribute(
+		expect(screen.getByRole("link", { name: /authentication/i })).toHaveAttribute(
 			"href",
-			"/docs/cli",
+			"/docs/authentication",
 		);
-		expect(screen.getByRole("link", { name: /addons/i })).toHaveAttribute(
+		expect(screen.getByRole("link", { name: /creating templates/i })).toHaveAttribute(
 			"href",
-			"/docs/addons",
+			"/docs/templates/creating",
 		);
 	});
 

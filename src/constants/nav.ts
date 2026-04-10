@@ -11,6 +11,6 @@ export const nav: INav[] = [
   },
   {
     title: "Addons",
-    url: "addons",
+    url: "addons/registry",
   },
 ];

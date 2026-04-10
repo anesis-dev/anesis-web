@@ -7,6 +7,7 @@ import {
 	AlertCircleIcon,
 	ExternalLinkIcon,
 	LoaderIcon,
+	RefreshCcwIcon,
 	Trash2Icon,
 } from "lucide-react";
 import { AddonCard } from "@/components/addons/AddonCard";
@@ -23,7 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/date";
 import { getAddonRef } from "@/lib/addon-ref";
-import { deleteAddon } from "@/services/addon";
+import { deleteAddon, updateAddon } from "@/services/addon";
 import { IAddon } from "@/types/addon";
 
 type Notice =
@@ -35,8 +36,31 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 	const queryClient = useQueryClient();
 	const addonRef = getAddonRef(addon);
 	const [notice, setNotice] = useState<Notice>(null);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+	async function refreshAddon() {
+		setIsRefreshing(true);
+		setNotice(null);
+
+		try {
+			await updateAddon(addon.url);
+			await queryClient.invalidateQueries({ queryKey: ["addons"] });
+			setNotice({
+				type: "success",
+				message: "Addon metadata refreshed from GitHub.",
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message:
+					error instanceof Error ? error.message : "Failed to refresh addon.",
+			});
+		} finally {
+			setIsRefreshing(false);
+		}
+	}
 
 	async function removeAddon() {
 		setIsDeleting(true);
@@ -73,7 +97,8 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 						</p>
 						<p className="break-all font-mono text-sm text-foreground">{addonRef}</p>
 						<p className="text-sm text-muted-foreground">
-							Published {formatDate(addon.created_at)} and synced to commit{" "}
+							Last synced {formatDate(addon.updated_at)} from GitHub. Published{" "}
+							{formatDate(addon.created_at)} at commit{" "}
 							<span className="font-mono text-foreground">
 								{addon.commit_sha.slice(0, 7)}
 							</span>
@@ -97,6 +122,27 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 								<ExternalLinkIcon className="size-3.5" />
 								Open source repository
 							</Link>
+						</Button>
+
+						<Button
+							type="button"
+							size="sm"
+							variant="outline"
+							onClick={refreshAddon}
+							disabled={isRefreshing}
+							className="h-auto min-h-11 w-full justify-start whitespace-normal px-3 py-2 text-left leading-5"
+						>
+							{isRefreshing ? (
+								<>
+									<LoaderIcon className="size-3.5 animate-spin" />
+									Refreshing...
+								</>
+							) : (
+								<>
+									<RefreshCcwIcon className="size-3.5" />
+									Refresh metadata
+								</>
+							)}
 						</Button>
 
 						<Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>

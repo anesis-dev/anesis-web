@@ -63,7 +63,7 @@ export default function AccountAddonsPage() {
 					<div className="flex flex-wrap gap-3">
 						<Button onClick={login}>Login with GitHub</Button>
 						<Link href="/addons">
-							<Button variant="outline">Browse addon registry</Button>
+							<Button variant="outline">Browse addon catalog</Button>
 						</Link>
 					</div>
 				</div>
@@ -77,10 +77,10 @@ export default function AccountAddonsPage() {
 				<div className="space-y-1">
 					<h1 className="text-3xl font-semibold tracking-tight">Your addons</h1>
 					<p className="max-w-3xl text-sm text-muted-foreground">
-						Addon registry publishing and ownership controls are live in the web
-						app now. The current public CLI release still focuses on templates,
-						so this page is the main place to publish and curate your addon
-						entries.
+						Use this page to publish, refresh, and remove addon entries that
+						belong to your account. The backend and CLI now support addon
+						publishing and metadata updates, while the web keeps ownership
+						controls in one place.
 					</p>
 				</div>
 				<PublishAddonDialog className="w-full gap-1.5 sm:w-auto" />
@@ -98,9 +98,9 @@ export default function AccountAddonsPage() {
 				/>
 				<div className="flex flex-wrap gap-2">
 					<Button variant="outline" asChild>
-						<Link href="/addons">
+						<Link href="/addons/registry">
 							<BoxesIcon className="size-4" />
-							Public registry
+							Registry explorer
 						</Link>
 					</Button>
 					<Button variant="outline" asChild>

@@ -1,99 +1,88 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+
+vi.mock("@/services/addon-catalog", () => ({
+	getLocalAddonCatalog: vi.fn(),
+}));
+
 import AddonsPage from "@/app/(main)/addons/page";
-import { createAddon, createUser } from "@/test/fixtures";
-
-vi.mock("@/hooks/useAddons", () => ({
-	useAddons: vi.fn(),
-}));
-
-vi.mock("@/hooks/useAuth", () => ({
-	useAuth: vi.fn(),
-}));
-
-vi.mock("@/components/addons/AddonCard", () => ({
-	AddonCard: ({ addon }: { addon: { name: string } }) => (
-		<div data-testid="addon-card">{addon.name}</div>
-	),
-}));
-
-vi.mock("@/components/addons/PublishAddonDialog", () => ({
-	PublishAddonDialog: () => <div>Publish Addon</div>,
-}));
-
-import { useAddons } from "@/hooks/useAddons";
-import { useAuth } from "@/hooks/useAuth";
-
-const addons = Array.from({ length: 10 }, (_, index) =>
-	createAddon({
-		id: `addon-${index + 1}`,
-		addon_id: `addon-${index + 1}`,
-		name: index === 9 ? "Special Addon" : `Addon ${index + 1}`,
-		config: {
-			id: `addon-${index + 1}`,
-			name: index === 9 ? "Special Addon" : `Addon ${index + 1}`,
-			description:
-				index === 9 ? "Contains a unique search term." : `Description ${index + 1}`,
-			author: index < 5 ? "oxide-core" : "community",
-		},
-	}),
-);
+import { getLocalAddonCatalog } from "@/services/addon-catalog";
 
 describe("AddonsPage", () => {
-	it("shows an error state when addons fail to load", () => {
-		vi.mocked(useAddons).mockReturnValue({
-			addons: [],
-			isLoading: false,
-			isError: true,
-		});
-		vi.mocked(useAuth).mockReturnValue({
-			user: null,
-			isLoading: false,
-			login: vi.fn(),
-			logout: vi.fn(),
-		});
+	it("renders the manifest-driven addon catalog", async () => {
+		vi.mocked(getLocalAddonCatalog).mockResolvedValueOnce([
+			{
+				$schema: "https://api.example.test/schema/oxide.addon.schema.json",
+				schema_version: "1",
+				id: "nest-drizzle",
+				name: "Nest Drizzle",
+				version: "0.1.0",
+				description: "Adds Drizzle ORM to a NestJS project.",
+				author: "oxide-cli",
+				requires: [],
+				inputs: [],
+				detect: [
+					{
+						id: "fastify",
+						match: "all",
+						rules: [
+							{
+								type: "json_contains",
+								file: "package.json",
+								key_path: "dependencies.@nestjs/platform-fastify",
+								negate: false,
+							},
+						],
+					},
+				],
+				variants: [
+					{
+						when: "fastify",
+						commands: [
+							{
+								name: "install",
+								description: "Installs Drizzle",
+								once: true,
+								requires_commands: [],
+								inputs: [],
+								steps: [{ type: "create" }, { type: "inject" }],
+							},
+						],
+					},
+					{
+						when: null,
+						commands: [
+							{
+								name: "generate",
+								description: "Generates a resource",
+								once: false,
+								requires_commands: ["install"],
+								inputs: [],
+								steps: [{ type: "replace" }],
+							},
+						],
+					},
+				],
+				manifestPath: "addons/nest-drizzle/oxide.addon.json",
+				rawManifest: "{\n  \"id\": \"nest-drizzle\"\n}",
+				commandNames: ["generate", "install"],
+				stepTypes: ["create", "inject", "replace"],
+				inputNames: [],
+			},
+		]);
 
-		render(<AddonsPage />);
+		render(await AddonsPage());
 
-		expect(screen.getByText("Failed to load addons")).toBeInTheDocument();
-	});
-
-	it("renders addons with filtering and pagination", async () => {
-		vi.mocked(useAddons).mockReturnValue({
-			addons,
-			isLoading: false,
-			isError: false,
-		});
-		vi.mocked(useAuth).mockReturnValue({
-			user: createUser(),
-			isLoading: false,
-			login: vi.fn(),
-			logout: vi.fn(),
-		});
-
-		render(<AddonsPage />);
-
-		expect(screen.getByText("Publish Addon")).toBeInTheDocument();
 		expect(
-			screen.getByText((_, element) => element?.textContent === "Showing 10 addons"),
+			screen.getByRole("heading", {
+				name: /official addons generated from live oxide\.addon\.json/i,
+			}),
 		).toBeInTheDocument();
-		expect(screen.getAllByTestId("addon-card")).toHaveLength(9);
-
-		fireEvent.click(screen.getByRole("button", { name: "Next" }));
-		expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
-		expect(screen.getAllByTestId("addon-card")).toHaveLength(1);
-		expect(screen.getByText("Special Addon")).toBeInTheDocument();
-
-		fireEvent.change(
-			screen.getByPlaceholderText(/search by addon id, name, description or author/i),
-			{ target: { value: "special" } },
+		expect(screen.getByText("Nest Drizzle")).toBeInTheDocument();
+		expect(screen.getByText(/dependencies\.\@nestjs\/platform-fastify/i)).toBeInTheDocument();
+		expect(screen.getByText("Fallback variant")).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: /open registry explorer/i })).toHaveAttribute(
+			"href",
+			"/addons/registry",
 		);
-
-		await waitFor(() =>
-			expect(
-				screen.getByText((_, element) => element?.textContent === "Showing 1 of 10 addons"),
-			).toBeInTheDocument(),
-		);
-		expect(screen.getAllByTestId("addon-card")).toHaveLength(1);
-		expect(screen.getByText("Special Addon")).toBeInTheDocument();
 	});
 });

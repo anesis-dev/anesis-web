@@ -3,32 +3,41 @@ import { fileURLToPath } from "node:url";
 import type { NextConfig } from "next";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const workspaceRoot = path.resolve(projectRoot, "..");
+const PHASE_DEVELOPMENT_SERVER = "phase-development-server";
 
-const nextConfig: NextConfig = {
-	reactStrictMode: true,
-	turbopack: {
-		root: projectRoot,
-	},
-	webpack: (config) => {
-		config.resolve ??= {};
-		const existingModules = config.resolve.modules ?? [];
-		const projectNodeModules = path.join(projectRoot, "node_modules");
+function createNextConfig(
+	phase: string,
+): NextConfig {
+	const isDev = phase === PHASE_DEVELOPMENT_SERVER;
 
-		config.resolve.modules = [
-			projectNodeModules,
-			...(Array.isArray(existingModules) ? existingModules : []),
-		];
+	return {
+		reactStrictMode: true,
+		...(isDev ? {} : { outputFileTracingRoot: workspaceRoot }),
+		turbopack: {
+			root: isDev ? projectRoot : workspaceRoot,
+		},
+		webpack: (config) => {
+			config.resolve ??= {};
+			const existingModules = config.resolve.modules ?? [];
+			const projectNodeModules = path.join(projectRoot, "node_modules");
 
-		return config;
-	},
-	images: {
-		remotePatterns: [
-			{
-				protocol: "https",
-				hostname: "avatars.githubusercontent.com",
-			},
-		],
-	},
-};
+			config.resolve.modules = [
+				projectNodeModules,
+				...(Array.isArray(existingModules) ? existingModules : []),
+			];
 
-export default nextConfig;
+			return config;
+		},
+		images: {
+			remotePatterns: [
+				{
+					protocol: "https",
+					hostname: "avatars.githubusercontent.com",
+				},
+			],
+		},
+	};
+}
+
+export default createNextConfig;

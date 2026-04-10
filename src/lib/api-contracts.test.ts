@@ -34,11 +34,17 @@ describe("api-contracts", () => {
 	it("parses valid template payloads", () => {
 		expect(parseTemplateResponse(mockTemplate)).toEqual(mockTemplate);
 		expect(parseTemplatesResponse([mockTemplate])).toEqual([mockTemplate]);
-		expect(parseTemplateUrlResponse({ url: "https://api.github.com/demo" })).toEqual(
-			{
-				url: "https://api.github.com/demo",
-			},
-		);
+		expect(
+			parseTemplateUrlResponse({
+				archive_url: "https://api.github.com/demo.tar.gz",
+				commit_sha: "abc123",
+				subdir: "template",
+			}),
+		).toEqual({
+			archive_url: "https://api.github.com/demo.tar.gz",
+			commit_sha: "abc123",
+			subdir: "template",
+		});
 	});
 
 	it("parses valid addon payloads", () => {
@@ -71,6 +77,9 @@ describe("api-contracts", () => {
 				commit_sha: undefined,
 			}),
 		).toThrow(/commit_sha must be a string/);
+		expect(() => parseTemplateUrlResponse({ url: "https://old.example.test" })).toThrow(
+			/archive_url must be a string/,
+		);
 	});
 
 	it("rejects invalid addon payloads", () => {

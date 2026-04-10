@@ -25,7 +25,6 @@ export default function AuthCallbackPage() {
 		async function finishSignIn() {
 			try {
 				await exchangeAuthCode(authCode);
-				localStorage.removeItem("token");
 				queryClient.removeQueries({ queryKey: ["me"] });
 
 				if (!cancelled) {

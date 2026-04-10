@@ -1,6 +1,6 @@
 import { IAddon, IAddonConfig, IAddonUrlResponse } from "@/types/addon";
 import { IGitHubUser } from "@/types/github";
-import { ITemplate, ITemplateConfig } from "@/types/template";
+import { ITemplate, ITemplateConfig, ITemplateUrlResponse } from "@/types/template";
 import { IUser } from "@/types/user";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -217,11 +217,13 @@ export function parsePublishAddonResponse(
 	};
 }
 
-export function parseTemplateUrlResponse(value: unknown): { url: string } {
+export function parseTemplateUrlResponse(value: unknown): ITemplateUrlResponse {
 	const payload = expectRecord(value, "templateUrl");
 
 	return {
-		url: expectString(payload.url, "templateUrl.url"),
+		archive_url: expectString(payload.archive_url, "templateUrl.archive_url"),
+		commit_sha: expectString(payload.commit_sha, "templateUrl.commit_sha"),
+		subdir: expectOptionalString(payload.subdir, "templateUrl.subdir"),
 	};
 }
 

@@ -50,10 +50,7 @@ function DashboardCard({
 export default function DashboardPage() {
 	const { user } = useAuth();
 	const { templates: myTemplates, isLoading } = useMyTemplates(!!user);
-	const { addons: myAddons, isLoading: addonsLoading } = useMyAddons(
-		user?.id,
-		!!user,
-	);
+	const { addons: myAddons, isLoading: addonsLoading } = useMyAddons(!!user);
 	const officialTemplates = myTemplates.filter((template) => template.official);
 
 	if (!user) {

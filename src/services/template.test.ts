@@ -70,26 +70,46 @@ describe("template services", () => {
 		expect(api.get).toHaveBeenCalledWith("/template/demo-repo");
 	});
 
-	it("fetches the template api url with an encoded ref", async () => {
-		vi.mocked(api.get).mockResolvedValueOnce({ data: { url: "https://api.example.test/template/demo" } });
-		vi.mocked(parseTemplateUrlResponse).mockReturnValueOnce({
-			url: "https://api.example.test/template/demo",
+	it("fetches the template archive metadata with an encoded ref", async () => {
+		vi.mocked(api.get).mockResolvedValueOnce({
+			data: {
+				archive_url: "https://api.example.test/template/demo.tar.gz",
+				commit_sha: "abc123",
+				subdir: "template",
+			},
 		});
+		vi.mocked(parseTemplateUrlResponse).mockReturnValueOnce({
+			archive_url: "https://api.example.test/template/demo.tar.gz",
+			commit_sha: "abc123",
+			subdir: "template",
+		} as never);
 
 		await expect(fetchTemplateUrl("demo-repo@0.1.0")).resolves.toEqual({
-			url: "https://api.example.test/template/demo",
+			archive_url: "https://api.example.test/template/demo.tar.gz",
+			commit_sha: "abc123",
+			subdir: "template",
 		});
 		expect(api.get).toHaveBeenCalledWith("/template/demo-repo%400.1.0/url");
 	});
 
-	it("fetches the latest template api url when only the slug is provided", async () => {
-		vi.mocked(api.get).mockResolvedValueOnce({ data: { url: "https://api.example.test/template/latest" } });
-		vi.mocked(parseTemplateUrlResponse).mockReturnValueOnce({
-			url: "https://api.example.test/template/latest",
+	it("fetches the latest template archive metadata when only the slug is provided", async () => {
+		vi.mocked(api.get).mockResolvedValueOnce({
+			data: {
+				archive_url: "https://api.example.test/template/latest.tar.gz",
+				commit_sha: "def456",
+				subdir: undefined,
+			},
 		});
+		vi.mocked(parseTemplateUrlResponse).mockReturnValueOnce({
+			archive_url: "https://api.example.test/template/latest.tar.gz",
+			commit_sha: "def456",
+			subdir: undefined,
+		} as never);
 
 		await expect(fetchTemplateUrl("demo-repo")).resolves.toEqual({
-			url: "https://api.example.test/template/latest",
+			archive_url: "https://api.example.test/template/latest.tar.gz",
+			commit_sha: "def456",
+			subdir: undefined,
 		});
 		expect(api.get).toHaveBeenCalledWith("/template/demo-repo/url");
 	});

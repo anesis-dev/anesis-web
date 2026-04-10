@@ -1,16 +1,13 @@
-import { useMemo } from "react";
-import { useAddons } from "@/hooks/useAddons";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMyAddons } from "@/services/addon";
+import { IAddon } from "@/types/addon";
 
-export function useMyAddons(ownerId: string | undefined, enabled = true) {
-	const { addons, isLoading, isError } = useAddons(enabled);
+export function useMyAddons(enabled = true) {
+	const { data: addons = [], isLoading, isError } = useQuery<IAddon[]>({
+		queryKey: ["addons", "my"],
+		queryFn: fetchMyAddons,
+		enabled,
+	});
 
-	const myAddons = useMemo(() => {
-		if (!ownerId) {
-			return [];
-		}
-
-		return addons.filter((addon) => addon.owner_id === ownerId);
-	}, [addons, ownerId]);
-
-	return { addons: myAddons, isLoading, isError };
+	return { addons, isLoading, isError };
 }

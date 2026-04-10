@@ -25,8 +25,11 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 		let message = `${res.status} ${res.statusText}`;
 		try {
 			const json = JSON.parse(text);
-			if (json.message) message = json.message;
-		} catch {}
+			if (typeof json.message === "string") message = json.message;
+			else if (typeof json.error === "string") message = json.error;
+		} catch {
+			// body is not JSON — keep the default `{status} {statusText}` message
+		}
 		throw new ApiError(res.status, message);
 	}
 

@@ -43,3 +43,9 @@ export interface ITemplate {
   config: ITemplateConfig;
   name: string;
 }
+
+export interface ITemplateUrlResponse {
+  archive_url: string;
+  commit_sha: string;
+  subdir?: string;
+}

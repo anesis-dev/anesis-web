@@ -22,7 +22,6 @@ describe("AuthCallbackPage", () => {
 			replace,
 		} as never);
 		vi.mocked(exchangeAuthCode).mockResolvedValueOnce(undefined);
-		localStorage.setItem("token", "legacy-token");
 		const queryClient = createTestQueryClient();
 		queryClient.setQueryData(["me"], { id: "user-1" });
 		window.history.pushState({}, "", "/auth/callback?code=code-123");
@@ -32,7 +31,6 @@ describe("AuthCallbackPage", () => {
 		});
 
 		await waitFor(() => expect(exchangeAuthCode).toHaveBeenCalledWith("code-123"));
-		expect(localStorage.getItem("token")).toBeNull();
 		expect(queryClient.getQueryData(["me"])).toBeUndefined();
 		expect(replace).toHaveBeenCalledWith("/");
 	});

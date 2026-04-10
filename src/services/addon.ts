@@ -10,6 +10,10 @@ export async function fetchAddons(): Promise<IAddon[]> {
 	return parseAddonsResponse(await api.get<unknown>("/addon/all"));
 }
 
+export async function fetchMyAddons(): Promise<IAddon[]> {
+	return parseAddonsResponse(await api.get<unknown>("/addon/my"));
+}
+
 export async function fetchAddonUrl(
 	addonId: string,
 ): Promise<IAddonUrlResponse> {

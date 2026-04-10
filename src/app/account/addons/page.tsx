@@ -16,7 +16,7 @@ const PAGE_SIZE = 6;
 
 export default function AccountAddonsPage() {
 	const { user, login } = useAuth();
-	const { addons, isLoading, isError } = useMyAddons(user?.id, !!user);
+	const { addons, isLoading, isError } = useMyAddons(!!user);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
 

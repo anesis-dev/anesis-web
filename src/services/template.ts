@@ -5,7 +5,7 @@ import {
 	parseTemplateUrlResponse,
 	parseTemplatesResponse,
 } from "@/lib/api-contracts";
-import { ITemplate } from "@/types/template";
+import { ITemplate, ITemplateUrlResponse } from "@/types/template";
 
 function hasExplicitTemplateVersion(templateRef: string): boolean {
 	const [name, version] = templateRef.split("@");
@@ -29,7 +29,7 @@ export async function fetchTemplate(templateRef: string): Promise<ITemplate> {
 
 export async function fetchTemplateUrl(
 	templateRef: string,
-): Promise<{ url: string }> {
+): Promise<ITemplateUrlResponse> {
 	return parseTemplateUrlResponse(
 		await api.get<unknown>(
 			`/template/${encodeURIComponent(templateRef)}/url`,

@@ -95,10 +95,7 @@ export default function AccountPage() {
 	const { githubUser, isLoading: githubLoading } = useGitHubUser(
 		user?.login ?? "",
 	);
-	const { addons: myAddons, isLoading: addonsLoading } = useMyAddons(
-		user?.id,
-		!!user,
-	);
+	const { addons: myAddons, isLoading: addonsLoading } = useMyAddons(!!user);
 	const { templates: myTemplates, isLoading: templatesLoading } = useMyTemplates(
 		!!user,
 	);

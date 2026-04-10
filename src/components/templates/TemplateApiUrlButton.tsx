@@ -11,7 +11,7 @@ type ButtonState = "idle" | "loading" | "success";
 
 export function TemplateApiUrlButton({
 	templateRef,
-	label = "Copy API URL",
+	label = "Copy Download URL",
 	size = "sm",
 	variant = "outline",
 	className,
@@ -43,18 +43,18 @@ export function TemplateApiUrlButton({
 			const result = await fetchTemplateUrl(templateRef);
 
 			if (navigator.clipboard?.writeText) {
-				await navigator.clipboard.writeText(result.url);
-				onMessage?.("Template API URL copied to clipboard.", "success");
+				await navigator.clipboard.writeText(result.archive_url);
+				onMessage?.("Template download URL copied to clipboard.", "success");
 			} else {
-				window.open(result.url, "_blank", "noopener,noreferrer");
-				onMessage?.("Template API URL opened in a new tab.", "success");
+				window.open(result.archive_url, "_blank", "noopener,noreferrer");
+				onMessage?.("Template download URL opened in a new tab.", "success");
 			}
 
 			setState("success");
 			window.setTimeout(() => setState("idle"), 2000);
 		} catch (error) {
 			const message =
-				error instanceof Error ? error.message : "Failed to load template API URL.";
+				error instanceof Error ? error.message : "Failed to load template download URL.";
 			onMessage?.(message, "error");
 			setState("idle");
 		}

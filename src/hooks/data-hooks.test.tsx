@@ -18,6 +18,7 @@ vi.mock("@/services/template", () => ({
 
 vi.mock("@/services/addon", () => ({
 	fetchAddons: vi.fn(),
+	fetchMyAddons: vi.fn(),
 }));
 
 vi.mock("@/services/user", () => ({
@@ -30,7 +31,7 @@ vi.mock("@/services/github", () => ({
 }));
 
 import { fetchGitHubUser, fetchTemplateReadme } from "@/services/github";
-import { fetchAddons } from "@/services/addon";
+import { fetchAddons, fetchMyAddons } from "@/services/addon";
 import {
 	fetchMyTemplates,
 	fetchTemplate,
@@ -97,26 +98,17 @@ describe("data hooks", () => {
 		expect(fetchMyTemplates).not.toHaveBeenCalled();
 	});
 
-	it("filters addons for the current owner", async () => {
+	it("loads addons for the current user from the server", async () => {
 		const owned = createAddon();
-		const foreign = createAddon({
-			id: "addon-2",
-			owner_id: "99999999-9999-9999-9999-999999999999",
-			addon_id: "eslint",
-			name: "ESLint Rules",
-			config: {
-				id: "eslint",
-				name: "ESLint Rules",
-			},
-		});
-		vi.mocked(fetchAddons).mockResolvedValueOnce([owned, foreign]);
+		vi.mocked(fetchMyAddons).mockResolvedValueOnce([owned]);
 
-		const { result } = renderHook(() => useMyAddons(mockUser.id, true), {
+		const { result } = renderHook(() => useMyAddons(true), {
 			wrapper: getWrapper(),
 		});
 
 		await waitFor(() => expect(result.current.isLoading).toBe(false));
 		expect(result.current.addons).toEqual([owned]);
+		expect(fetchMyAddons).toHaveBeenCalledTimes(1);
 	});
 
 	it("loads a template by ref when a ref is provided", async () => {

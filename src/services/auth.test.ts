@@ -36,15 +36,13 @@ describe("auth services", () => {
 		);
 	});
 
-	it("logs out through the backend and removes the local token", async () => {
-		localStorage.setItem("token", "secret-token");
+	it("logs out through the backend", async () => {
 		const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(
 			new Response(null, { status: 200 }),
 		);
 
 		await logoutRequest();
 
-		expect(localStorage.getItem("token")).toBeNull();
 		expect(fetchSpy).toHaveBeenCalledWith(
 			"http://api.example.test/auth/logout",
 			{

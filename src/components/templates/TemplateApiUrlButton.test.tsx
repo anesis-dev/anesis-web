@@ -27,13 +27,13 @@ describe("TemplateApiUrlButton", () => {
 			<TemplateApiUrlButton templateRef="demo-repo@0.1.0" />,
 		);
 
-		fireEvent.click(screen.getByRole("button", { name: /copy api url/i }));
+		fireEvent.click(screen.getByRole("button", { name: /copy download url/i }));
 
 		expect(login).toHaveBeenCalledTimes(1);
 		expect(fetchTemplateUrl).not.toHaveBeenCalled();
 	});
 
-	it("copies the template api url for authenticated users", async () => {
+	it("copies the template download url for authenticated users", async () => {
 		vi.mocked(useAuth).mockReturnValue({
 			user: createUser(),
 			isLoading: false,
@@ -41,7 +41,9 @@ describe("TemplateApiUrlButton", () => {
 			logout: vi.fn(),
 		});
 		vi.mocked(fetchTemplateUrl).mockResolvedValueOnce({
-			url: "https://api.example.test/template/demo-repo@0.1.0",
+			archive_url: "https://api.example.test/template/demo-repo@0.1.0.tar.gz",
+			commit_sha: "abc123",
+			subdir: "template",
 		});
 		const onMessage = vi.fn();
 
@@ -52,7 +54,7 @@ describe("TemplateApiUrlButton", () => {
 			/>,
 		);
 
-		fireEvent.click(screen.getByRole("button", { name: /copy api url/i }));
+		fireEvent.click(screen.getByRole("button", { name: /copy download url/i }));
 
 		await waitFor(() =>
 			expect(fetchTemplateUrl).toHaveBeenCalledWith(
@@ -60,10 +62,10 @@ describe("TemplateApiUrlButton", () => {
 			),
 		);
 		expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-			"https://api.example.test/template/demo-repo@0.1.0",
+			"https://api.example.test/template/demo-repo@0.1.0.tar.gz",
 		);
 		expect(onMessage).toHaveBeenCalledWith(
-			"Template API URL copied to clipboard.",
+			"Template download URL copied to clipboard.",
 			"success",
 		);
 		expect(screen.getByRole("button", { name: /copied url/i })).toBeInTheDocument();
@@ -77,7 +79,9 @@ describe("TemplateApiUrlButton", () => {
 			logout: vi.fn(),
 		});
 		vi.mocked(fetchTemplateUrl).mockResolvedValueOnce({
-			url: "https://api.example.test/template/demo-repo@0.1.0",
+			archive_url: "https://api.example.test/template/demo-repo@0.1.0.tar.gz",
+			commit_sha: "abc123",
+			subdir: "template",
 		});
 		const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
 		const originalWriteText = navigator.clipboard.writeText;
@@ -91,17 +95,17 @@ describe("TemplateApiUrlButton", () => {
 			/>,
 		);
 
-		fireEvent.click(screen.getByRole("button", { name: /copy api url/i }));
+		fireEvent.click(screen.getByRole("button", { name: /copy download url/i }));
 
 		await waitFor(() =>
 			expect(openSpy).toHaveBeenCalledWith(
-				"https://api.example.test/template/demo-repo@0.1.0",
+				"https://api.example.test/template/demo-repo@0.1.0.tar.gz",
 				"_blank",
 				"noopener,noreferrer",
 			),
 		);
 		expect(onMessage).toHaveBeenCalledWith(
-			"Template API URL opened in a new tab.",
+			"Template download URL opened in a new tab.",
 			"success",
 		);
 
@@ -116,7 +120,7 @@ describe("TemplateApiUrlButton", () => {
 			logout: vi.fn(),
 		});
 		vi.mocked(fetchTemplateUrl).mockRejectedValueOnce(
-			new Error("Failed to load template API URL."),
+			new Error("Failed to load template download URL."),
 		);
 		const onMessage = vi.fn();
 
@@ -127,11 +131,11 @@ describe("TemplateApiUrlButton", () => {
 			/>,
 		);
 
-		fireEvent.click(screen.getByRole("button", { name: /copy api url/i }));
+		fireEvent.click(screen.getByRole("button", { name: /copy download url/i }));
 
 		await waitFor(() =>
 			expect(onMessage).toHaveBeenCalledWith(
-				"Failed to load template API URL.",
+				"Failed to load template download URL.",
 				"error",
 			),
 		);

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GitBranchIcon, BoxIcon } from "lucide-react";
+import { DatabaseIcon, GitBranchIcon, Settings2Icon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { CodeBlock } from "@/components/docs/CodeBlock";
 import { env } from "@/config/env";
@@ -13,27 +13,59 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const supportedStacks = [
+const endpointDefaults = `OXIDE_BACKEND_URL=https://oxide-server.onrender.com
+OXIDE_FRONTEND_URL=https://oxide-cli.vercel.app`;
+
+const nameRules = `Project name:
+- "." is allowed
+- other names may use letters, numbers, -, _, .
+- must not start with "."
+- must not end with "." or space
+- must not already exist on disk
+
+Template name:
+- may use letters, numbers, -, _
+- spaces, dots, slashes, and other punctuation are rejected
+
+GitHub URL:
+- host must be github.com
+- path must contain at least owner/repo`;
+
+const localState = [
 	{
-		title: "Frontend",
-		items: "React, Preact, Vue, Svelte, Solid, Lit, Qwik, Angular.",
+		path: "~/.oxide",
+		description: "Root home directory created by the CLI at startup.",
 	},
 	{
-		title: "Meta",
-		items: "Next.js and Nuxt.",
+		path: "~/.oxide/cache/templates",
+		description: "Extracted template cache directories.",
 	},
 	{
-		title: "Backend",
-		items: "Nest with Express or Fastify.",
+		path: "~/.oxide/cache/templates/oxide-templates.json",
+		description: "Template cache index with metadata and commit SHAs.",
 	},
 	{
-		title: "Desktop",
-		items: "Tauri and Electron.",
+		path: "~/.oxide/cache/addons",
+		description: "Extracted addon cache directories.",
 	},
 	{
-		title: "Mobile",
-		items: "React Native.",
+		path: "~/.oxide/cache/addons/oxide-addons.json",
+		description: "Addon cache index with id, name, version, path, and commit SHA.",
 	},
+	{
+		path: "~/.oxide/auth.json",
+		description: "Local auth session returned by the browser login flow.",
+	},
+	{
+		path: "oxide.lock",
+		description: "Per-project addon execution state written in the project root.",
+	},
+];
+
+const cacheFields = [
+	"`oxide-templates.json` tracks template `name`, `version`, `source`, `path`, `official`, and `commit_sha`.",
+	"`oxide-addons.json` tracks addon `id`, `name`, `version`, `path`, `commit_sha`, and `repo_url`.",
+	"`oxide.lock` stores `id`, `version`, `variant`, and `commands_executed` for each addon used in a project.",
 ];
 
 export default async function DocsReferencePage() {
@@ -46,84 +78,111 @@ export default async function DocsReferencePage() {
 	}
 
 	return (
-		<div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-5 py-10 lg:px-8">
-			<section className="space-y-3">
-				<p className="text-sm font-medium text-primary">Reference</p>
-				<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-					Supported stacks and local paths
-				</h1>
-				<p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-					Use this page as a compact reference for what Oxide currently supports
-					and where it stores state locally. Templates are not limited to the
-					JavaScript ecosystem; the important part is the metadata contract and
-					the actual files in the published folder.
-				</p>
+		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-10 lg:px-8">
+			<section className="relative overflow-hidden rounded-[2rem] border bg-card px-6 py-8 shadow-sm sm:px-8">
+				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(181,111,43,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(112,73,35,0.12),transparent_30%)]" />
+				<div className="relative space-y-5">
+					<div className="flex items-center gap-2 text-sm text-muted-foreground">
+						<DatabaseIcon className="size-4" />
+						Reference
+					</div>
+					<div className="max-w-4xl space-y-3">
+						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+							Local state, endpoint defaults, validation rules, and schema links
+						</h1>
+						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
+							Use this page as a compact operational reference for where Oxide
+							stores files, which environment variables it reads, how it validates
+							user input, and where the backend exposes the current template schema.
+						</p>
+					</div>
+					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+						<span className="rounded-full border bg-background/80 px-3 py-1">
+							`~/.oxide` home
+						</span>
+						<span className="rounded-full border bg-background/80 px-3 py-1">
+							Default backend + frontend URLs
+						</span>
+						<span className="rounded-full border bg-background/80 px-3 py-1">
+							Schema endpoint preview
+						</span>
+					</div>
+				</div>
 			</section>
 
-			<div className="grid gap-4 md:grid-cols-2">
-				{supportedStacks.map((stack) => (
-					<Card key={stack.title}>
-						<CardHeader>
-							<CardTitle>{stack.title}</CardTitle>
-							<CardDescription>{stack.items}</CardDescription>
-						</CardHeader>
-					</Card>
-				))}
-			</div>
-
-			<div className="grid gap-6 lg:grid-cols-2">
+			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
 				<Card>
 					<CardHeader>
-						<CardTitle>Local Oxide paths and project files</CardTitle>
+						<CardTitle>Local Oxide state</CardTitle>
 						<CardDescription>
-							Oxide keeps auth and cache state under its home directory, and addon
-							execution state inside generated projects.
+							These directories and files are created or updated by the current
+							CLI implementation.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="space-y-3 text-sm text-muted-foreground">
-						<p>
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.oxide
-							</code>{" "}
-							is the main home directory for Oxide.
-						</p>
-						<p>
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.oxide/auth.json
-							</code>{" "}
-							stores the local auth session when the user logs in.
-						</p>
-						<p>
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.oxide/cache/templates
-							</code>{" "}
-							contains installed templates and extracted template folders.
-						</p>
-						<p>
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.oxide/cache/templates/oxide-templates.json
-							</code>{" "}
-							tracks cached template names, versions, and commit SHAs.
-						</p>
-						<p>
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.oxide/cache/addons
-							</code>{" "}
-							stores downloaded addon archives and extracted addon folders.
-						</p>
-						<p>
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.oxide/cache/addons/oxide-addons.json
-							</code>{" "}
-							tracks cached addon ids, versions, and commit SHAs.
-						</p>
-						<p>
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide.lock
-							</code>{" "}
-							is written into the generated project root and records addon ids,
-							selected variants, versions, and commands already executed there.
-						</p>
+					<CardContent className="space-y-4">
+						{localState.map((item) => (
+							<div key={item.path} className="rounded-2xl border bg-muted/20 p-4">
+								<p className="font-mono text-sm font-medium">{item.path}</p>
+								<p className="mt-2 text-sm text-muted-foreground">
+									{item.description}
+								</p>
+							</div>
+						))}
+					</CardContent>
+				</Card>
+
+				<div className="grid gap-6">
+					<Card>
+						<CardHeader className="gap-3">
+							<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+								<Settings2Icon className="size-5" />
+							</div>
+							<div>
+								<CardTitle>Endpoint defaults</CardTitle>
+								<CardDescription>
+									These values are read at startup unless you override them through
+									the environment.
+								</CardDescription>
+							</div>
+						</CardHeader>
+						<CardContent>
+							<CodeBlock code={endpointDefaults} />
+						</CardContent>
+					</Card>
+
+					<Card>
+						<CardHeader>
+							<CardTitle>Cache and lock file fields</CardTitle>
+							<CardDescription>
+								The CLI stores more than raw extracted files; it also writes index
+								metadata for cache and execution state.
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<ul className="space-y-3 text-sm text-muted-foreground">
+								{cacheFields.map((item) => (
+									<li key={item} className="flex gap-2">
+										<span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
+										<span>{item}</span>
+									</li>
+								))}
+							</ul>
+						</CardContent>
+					</Card>
+				</div>
+			</div>
+
+			<div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+				<Card>
+					<CardHeader>
+						<CardTitle>Validation rules at a glance</CardTitle>
+						<CardDescription>
+							These are the local checks performed before project creation,
+							template installation, and publish/update requests.
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<CodeBlock code={nameRules} />
 					</CardContent>
 				</Card>
 
@@ -131,30 +190,24 @@ export default async function DocsReferencePage() {
 					<CardHeader>
 						<CardTitle>Related surfaces</CardTitle>
 						<CardDescription>
-							These pages pair naturally with the docs while using Oxide.
+							These pages pair naturally with the docs while working with Oxide.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="flex flex-wrap gap-3">
 						<Button variant="outline" asChild>
-							<Link href="/templates">
-								<BoxIcon className="size-4" />
-								Browse Templates
-							</Link>
+							<Link href="/templates">Browse templates</Link>
 						</Button>
 						<Button variant="outline" asChild>
-							<Link href="/addons">
-								<BoxIcon className="size-4" />
-								Browse Addons
-							</Link>
+							<Link href="/addons">Browse addons</Link>
 						</Button>
 						<Button variant="outline" asChild>
 							<Link
-								href="https://github.com/oxide-cli/templates"
+								href="https://github.com/oxide-cli/oxide"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
 								<GitBranchIcon className="size-4" />
-								Template Repository
+								CLI repository
 							</Link>
 						</Button>
 					</CardContent>
@@ -163,13 +216,10 @@ export default async function DocsReferencePage() {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Template schema</CardTitle>
+					<CardTitle>Template schema endpoint</CardTitle>
 					<CardDescription>
-						The backend exposes the current JSON Schema used to validate
-						<code className="ml-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							oxide.template.json
-						</code>
-						.
+						The backend still exposes the current JSON Schema used by the web app
+						and registry validation layer.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">

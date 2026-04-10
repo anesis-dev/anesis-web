@@ -1,4 +1,15 @@
 import Link from "next/link";
+import {
+	ArrowRightIcon,
+	BoxesIcon,
+	DownloadIcon,
+	FileTextIcon,
+	ListIcon,
+	PencilRulerIcon,
+	PlayIcon,
+	RefreshCwIcon,
+	Trash2Icon,
+} from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { CodeBlock } from "@/components/docs/CodeBlock";
 import { Button } from "@/components/ui/button";
@@ -10,670 +21,354 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-const addonFlow = `oxide login
+const installExample = `# Install an addon by its registry ID
+oxide addon install nest-drizzle
+
+# Oxide downloads the addon and caches it at:
+# ~/.oxide/cache/addons/nest-drizzle/`;
+
+const runCommandExample = `# Run an addon command from your project root
+oxide nest-drizzle install
+
+# The general form is:
+oxide <addon-id> <command>`;
+
+const autoInstallNote = `# If the addon isn't cached yet, Oxide installs it automatically:
+oxide nest-drizzle install
+# → addon not found locally, installing...
+# → prompting for inputs...
+# → applying steps...`;
+
+const typicalFlow = `# 1. Log in (required for registry access)
+oxide login
+
+# 2. Install an addon (optional — running a command auto-installs)
+oxide addon install nest-drizzle
+
+# 3. Create a new project
 oxide new my-project nestjs
 cd my-project
-oxide addon install drizzle
-oxide drizzle install
-oxide drizzle connect`;
 
-const addonCliSurface = `oxide addon install <addon_id>
+# 4. Run addon commands from inside the project
+oxide nest-drizzle install
+oxide nest-drizzle generate`;
+
+const listRemoveExample = `# See which addons are cached locally
 oxide addon list
-oxide addon remove <addon_id>
-oxide <addon_id> <command>`;
 
-const markerExample = `// @oxide:imports
-import { Module } from '@nestjs/common';
+# Remove an addon from the local cache
+oxide addon remove nest-drizzle`;
 
-@Module({
-  imports: [
-    // @oxide:modules
-  ],
-  providers: [
-    // @oxide:providers
-  ],
-})
-export class AppModule {}`;
+const updateExample = `# Re-fetch an addon from its source URL
+oxide addon update https://github.com/owner/repo`;
 
-const lockExample = `{
-  "addons": [
-    {
-      "id": "drizzle",
-      "version": "1.0.0",
-      "variant": "nestjs",
-      "commands_executed": ["install", "connect"]
-    }
-  ]
-}`;
-
-const topLevelExample = `{
-  "schemaVersion": "1.0",
-  "id": "drizzle",
-  "name": "Drizzle ORM",
-  "version": "1.0.0",
-  "description": "Adds Drizzle ORM to a project",
-  "author": {
-    "name": "oxide-addons",
-    "repo": "https://github.com/oxide-addons/drizzle"
-  },
-  "requires": ["config"]
-}`;
-
-const inputsExample = `"inputs": [
-  {
-    "name": "db_url",
-    "type": "text",
-    "description": "Database connection URL",
-    "default": "postgresql://user:password@localhost:5432/mydb",
-    "required": true
-  },
-  {
-    "name": "driver",
-    "type": "select",
-    "description": "Database driver",
-    "options": ["postgres", "mysql", "sqlite"],
-    "default": "postgres",
-    "required": true
-  }
-]`;
-
-const detectExample = `"detect": [
-  {
-    "id": "nestjs",
-    "rules": [
-      {
-        "type": "json_contains",
-        "path": "package.json",
-        "key_path": ["dependencies", "@nestjs/core"]
-      }
-    ]
-  },
-  {
-    "id": "express",
-    "rules": [
-      {
-        "type": "json_contains",
-        "path": "package.json",
-        "key_path": ["dependencies", "express"]
-      },
-      {
-        "type": "json_contains",
-        "path": "package.json",
-        "key_path": ["dependencies", "@nestjs/core"],
-        "negate": true
-      }
-    ],
-    "match": "all"
-  }
-]`;
-
-const variantsExample = `"variants": [
-  {
-    "when": "nestjs",
-    "commands": []
-  },
-  {
-    "when": "express",
-    "commands": []
-  },
-  {
-    "when": null,
-    "commands": []
-  }
-]`;
-
-const commandsExample = `"commands": [
-  {
-    "name": "install",
-    "description": "Copies Drizzle files into the project",
-    "once": true,
-    "requires_commands": [],
-    "steps": []
-  },
-  {
-    "name": "connect",
-    "description": "Wires Drizzle into the generated modules",
-    "once": false,
-    "requires_commands": ["install"],
-    "steps": []
-  }
-]`;
-
-const rollbackExample = `Error: marker "@oxide:modules" not found in src/app.module.ts
-
-[k] keep changes made so far
-[r] rollback all changes`;
-
-const fullAddonExample = `{
-  "schemaVersion": "1.0",
-  "id": "drizzle",
-  "name": "Drizzle ORM",
-  "version": "1.0.0",
-  "description": "Adds Drizzle ORM to a project",
-  "author": {
-    "name": "oxide-addons",
-    "repo": "https://github.com/oxide-addons/drizzle"
-  },
-  "requires": ["config"],
-  "inputs": [
-    {
-      "name": "db_url",
-      "type": "text",
-      "description": "Database connection URL",
-      "default": "postgresql://user:password@localhost:5432/mydb",
-      "required": true
-    },
-    {
-      "name": "driver",
-      "type": "select",
-      "description": "Database driver",
-      "options": ["postgres", "mysql", "sqlite"],
-      "default": "postgres",
-      "required": true
-    }
-  ],
-  "detect": [
-    {
-      "id": "nestjs",
-      "rules": [
-        {
-          "type": "json_contains",
-          "path": "package.json",
-          "key_path": ["dependencies", "@nestjs/core"]
-        }
-      ]
-    },
-    {
-      "id": "express",
-      "rules": [
-        {
-          "type": "json_contains",
-          "path": "package.json",
-          "key_path": ["dependencies", "express"]
-        },
-        {
-          "type": "json_contains",
-          "path": "package.json",
-          "key_path": ["dependencies", "@nestjs/core"],
-          "negate": true
-        }
-      ],
-      "match": "all"
-    }
-  ],
-  "variants": [
-    {
-      "when": "nestjs",
-      "commands": [
-        {
-          "name": "install",
-          "description": "Copies Drizzle files into the project",
-          "once": true,
-          "requires_commands": [],
-          "steps": [
-            {
-              "type": "copy",
-              "from": {
-                "repo": "https://github.com/oxide-addons/drizzle",
-                "ref": "main",
-                "files": [
-                  "templates/drizzle.config.ts",
-                  "templates/src/database/drizzle.module.ts"
-                ]
-              },
-              "to": {
-                "templates/drizzle.config.ts": "drizzle.config.ts",
-                "templates/src/database/drizzle.module.ts": "src/database/drizzle.module.ts"
-              },
-              "ifExists": "ask"
-            },
-            {
-              "type": "append",
-              "target": { "file": ".env.example" },
-              "content": [
-                "",
-                "# Drizzle",
-                "DATABASE_URL={{ db_url }}"
-              ],
-              "deduplicate": true
-            }
-          ]
-        },
-        {
-          "name": "connect",
-          "description": "Wires Drizzle into the generated modules",
-          "once": false,
-          "requires_commands": ["install"],
-          "steps": [
-            {
-              "type": "inject",
-              "target": { "glob": "src/**/*.module.ts" },
-              "operations": [
-                {
-                  "marker": "@oxide:imports",
-                  "position": "after",
-                  "content": [
-                    "import { DrizzleModule } from '../database/drizzle.module';"
-                  ],
-                  "deduplicate": true,
-                  "ifNotFound": "warn_and_ask"
-                },
-                {
-                  "marker": "@oxide:modules",
-                  "position": "after",
-                  "content": [
-                    "DrizzleModule,"
-                  ],
-                  "deduplicate": true,
-                  "ifNotFound": "warn_and_ask"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}`;
-
-const rustTypesExample = `// DetectRule
-#[derive(Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum DetectRule {
-    FileExists   { path: String },
-    FileContains { path: String, value: String },
-    JsonContains { path: String, key_path: Vec<String> },
-    TomlContains { path: String, key_path: Vec<String> },
-    YamlContains { path: String, key_path: Vec<String> },
-    XmlContains  { path: String, xpath: String },
-}
-
-// Step
-#[derive(Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum Step {
-    Copy(CopyStep),
-    Create(CreateStep),
-    Inject(InjectStep),
-    Replace(ReplaceStep),
-    Append(AppendStep),
-    Delete(DeleteStep),
-    Rename(RenameStep),
-    Move(MoveStep),
-}
-
-#[derive(Deserialize, Default)]
-#[serde(rename_all = "snake_case")]
-pub enum MatchStrategy {
-    #[default]
-    Any,
-    All,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum InputType {
-    Text,
-    Select,
-}`;
-
-const cratesExample = `[dependencies]
-serde        = { version = "1", features = ["derive"] }
-serde_json   = "1"
-toml         = "0.8"
-serde_yaml   = "0.9"
-roxmltree    = "0.19"`;
-
-const addonPrinciples = [
-	"Oxide is a declarative Rust CLI for scaffolding and code transformation.",
-	"Addons are described entirely in JSON manifests instead of executable user scripts.",
-	"Users scaffold a project first, then run named addon commands that perform file operations.",
+const lockFacts = [
+	"`oxide.lock` is created in the project root the first time an addon command runs successfully.",
+	"It records the addon id, version, chosen variant, and the names of all commands executed.",
+	'Commands marked with `"once": true` in the manifest will not run again if their name already appears in `oxide.lock`.',
+	"The lock file is project-specific — one per project directory. It is safe to commit to version control.",
 ];
 
-const authoringSteps = [
-	"Start from an official Oxide-generated project so the marker contract already exists.",
-	"Create an `oxide.addon.json` manifest with metadata, dependencies, inputs, and variants.",
-	"Define named commands such as `install` or `connect`, then break each command into file-operation steps.",
-	"Test the addon against real generated projects for each detected variant and verify `oxide.lock` records the expected state.",
-];
-
-const lockUses = [
-	"Tracks which addons are already installed in the current project.",
-	"Stores the resolved variant and executed commands for each addon.",
-	"Prevents `once: true` commands from running a second time.",
-	"Validates addon dependencies and `requires_commands` before command execution starts.",
-];
-
-const manifestSections = [
+const inputTypes = [
 	{
-		title: "Top-level metadata",
+		type: "text",
 		description:
-			"`id`, `name`, `version`, `description`, and `author` identify the addon. `requires` lists other addon ids that must exist in `oxide.lock` before this addon can run.",
-		code: topLevelExample,
+			"Free-form string input with an optional default value. Used for names, paths, and identifiers.",
 	},
 	{
-		title: "Inputs and interpolation",
+		type: "boolean",
 		description:
-			"Oxide collects input values before any step executes. Use `text` or `select`, provide defaults when possible, and reference values anywhere in the manifest through `{{ name }}` placeholders.",
-		code: inputsExample,
+			"Yes/no prompt with an optional default. Used for enabling optional features.",
 	},
 	{
-		title: "Detect and variants",
+		type: "select",
 		description:
-			"Detection decides which variant to use for the current project. Oxide resolves the first matching `id`, supports `match: \"any\" | \"all\"`, and lets you invert a rule with `negate: true`.",
-		code: detectExample,
-	},
-	{
-		title: "Variants and commands",
-		description:
-			"`when: null` is the fallback variant. Commands are explicit entry points, can be gated by `requires_commands`, and may be marked with `once: true`.",
-		code: `${variantsExample}\n\n${commandsExample}`,
-	},
-];
-
-const detectRules = [
-	{
-		name: "file_exists",
-		description: "Checks whether a file is present.",
-		example: `{ "type": "file_exists", "path": "nest-cli.json" }`,
-	},
-	{
-		name: "file_contains",
-		description:
-			"Performs a direct substring check in plain text files such as `requirements.txt` or `go.mod`.",
-		example:
-			`{ "type": "file_contains", "path": "requirements.txt", "value": "django" }`,
-	},
-	{
-		name: "json_contains",
-		description:
-			"Navigates through JSON keys, which is useful for files like `package.json` or `composer.json`.",
-		example:
-			`{ "type": "json_contains", "path": "package.json", "key_path": ["dependencies", "@nestjs/core"] }`,
-	},
-	{
-		name: "toml_contains",
-		description:
-			"Navigates TOML key paths for files such as `Cargo.toml` or `pyproject.toml`.",
-		example:
-			`{ "type": "toml_contains", "path": "Cargo.toml", "key_path": ["dependencies", "actix-web"] }`,
-	},
-	{
-		name: "yaml_contains",
-		description:
-			"Navigates YAML key paths for manifests like `pubspec.yaml` or `package.yaml`.",
-		example:
-			`{ "type": "yaml_contains", "path": "pubspec.yaml", "key_path": ["dependencies", "flutter"] }`,
-	},
-	{
-		name: "xml_contains",
-		description:
-			"Searches XML via XPath, which covers files like `pom.xml` or `*.csproj`.",
-		example:
-			`{ "type": "xml_contains", "path": "pom.xml", "xpath": "//dependencies/dependency/artifactId" }`,
-	},
-];
-
-const stepTypes = [
-	{
-		name: "copy",
-		description:
-			"Copies files from an external repository into the project. `ifExists: \"ask\"` lets the user decide whether to skip or overwrite.",
-		code: `{
-  "type": "copy",
-  "from": {
-    "repo": "https://github.com/oxide-addons/drizzle",
-    "ref": "main",
-    "files": [
-      "templates/drizzle.config.ts",
-      "templates/src/database/drizzle.module.ts"
-    ]
-  },
-  "to": {
-    "templates/drizzle.config.ts": "drizzle.config.ts",
-    "templates/src/database/drizzle.module.ts": "src/database/drizzle.module.ts"
-  },
-  "ifExists": "ask"
-}`,
-	},
-	{
-		name: "create",
-		description:
-			"Creates a new file directly from manifest content and supports input interpolation.",
-		code: `{
-  "type": "create",
-  "target": { "file": "src/config/database.ts" },
-  "content": [
-    "export const config = {",
-    "  url: '{{ db_url }}',",
-    "  driver: '{{ driver }}'",
-    "}"
-  ],
-  "ifExists": "ask"
-}`,
-	},
-	{
-		name: "inject",
-		description:
-			"Finds files by glob and inserts content relative to markers. `deduplicate: true` checks each inserted line independently.",
-		code: `{
-  "type": "inject",
-  "target": { "glob": "src/**/*.module.ts" },
-  "operations": [
-    {
-      "marker": "@oxide:imports",
-      "position": "after",
-      "content": [
-        "import { DrizzleModule } from '../database/drizzle.module';"
-      ],
-      "deduplicate": true,
-      "ifNotFound": "warn_and_ask"
-    },
-    {
-      "marker": "@oxide:modules",
-      "position": "after",
-      "content": [
-        "DrizzleModule,"
-      ],
-      "deduplicate": true,
-      "ifNotFound": "warn_and_ask"
-    }
-  ]
-}`,
-	},
-	{
-		name: "replace",
-		description:
-			"Replaces content relative to a marker instead of relying on fragile global search and replace.",
-		code: `{
-  "type": "replace",
-  "target": { "file": "drizzle.config.ts" },
-  "marker": "@oxide:driver",
-  "content": [
-    "driver: '{{ driver }}'"
-  ]
-}`,
-	},
-	{
-		name: "append",
-		description:
-			"Adds content to the end of a file. `deduplicate: true` avoids appending duplicate lines.",
-		code: `{
-  "type": "append",
-  "target": { "file": ".env.example" },
-  "content": [
-    "",
-    "# Drizzle",
-    "DATABASE_URL={{ db_url }}"
-  ],
-  "deduplicate": true
-}`,
-	},
-	{
-		name: "delete",
-		description:
-			"Supports deleting an entire file or deleting the region between two markers. `include_markers: true` removes the marker lines themselves.",
-		code: `{
-  "type": "delete",
-  "mode": "file",
-  "target": { "file": "prisma/schema.prisma" }
-}
-
-{
-  "type": "delete",
-  "mode": "between_markers",
-  "target": { "glob": "src/**/*.ts" },
-  "marker_start": "@oxide:delete_start",
-  "marker_end": "@oxide:delete_end",
-  "include_markers": true
-}`,
-	},
-	{
-		name: "rename",
-		description:
-			"Renames a file in place. Oxide errors if the destination name already exists.",
-		code: `{
-  "type": "rename",
-  "from": "src/app.module.ts",
-  "to": "src/core.module.ts"
-}`,
-	},
-	{
-		name: "move",
-		description:
-			"Moves a file to another directory. Oxide errors if the destination path already exists.",
-		code: `{
-  "type": "move",
-  "from": "src/database.ts",
-  "to": "src/database/index.ts"
-}`,
+			"Multiple-choice prompt with a list of options. Used when there are a fixed set of valid choices (e.g. a database driver).",
 	},
 ];
 
 export default function DocsAddonsPage() {
 	return (
-		<div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-5 py-10 lg:px-8">
-			<section className="space-y-3">
-				<p className="text-sm font-medium text-primary">Addons</p>
-				<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-					Build safe Oxide addons with JSON manifests
-				</h1>
-				<p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-					Oxide addons are declarative extension packages for generated projects.
-					The core design constraint is strict: no user-supplied executable code
-					runs inside the CLI. Everything is expressed through a JSON manifest and
-					resolved into deterministic file operations.
-				</p>
-			</section>
-
-			<Card className="border-dashed">
-				<CardHeader>
-					<CardTitle className="text-base">Current CLI and backend status</CardTitle>
-					<CardDescription>
-						The live backend surface for addons now includes publishing,
-						discovery, archive resolution, and deletion. The public CLI can
-						cache addons with `oxide addon ...`, list and remove cached entries,
-						and run named addon commands inside a project through
-						<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">oxide &lt;addon_id&gt; &lt;command&gt;</code>.
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					<CodeBlock code={addonCliSurface} />
-					<p className="text-sm text-muted-foreground">
-						Addon archive resolution is authenticated, so log in before
-						<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							oxide addon install
-						</code>
-						or the first
-						<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							oxide &lt;addon_id&gt; &lt;command&gt;
-						</code>
-						run.
-					</p>
+		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-10 lg:px-8">
+			<section className="relative overflow-hidden rounded-[2rem] border bg-card px-6 py-8 shadow-sm sm:px-8">
+				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(181,111,43,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(112,73,35,0.12),transparent_30%)]" />
+				<div className="relative space-y-5">
+					<div className="flex items-center gap-2 text-sm text-muted-foreground">
+						<BoxesIcon className="size-4" />
+						Addons
+					</div>
+					<div className="max-w-4xl space-y-3">
+						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+							Extend existing projects with addons
+						</h1>
+						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
+							An addon is a declarative package that modifies an existing project.
+							You run it from inside your project directory, and Oxide reads the
+							addon's manifest, detects your project setup, asks for any needed
+							inputs, and applies file operations — creating, injecting, replacing, or
+							appending content. The result is recorded in{" "}
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								oxide.lock
+							</code>
+							.
+						</p>
+					</div>
+					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+						<span className="rounded-full border bg-background/80 px-3 py-1">
+							oxide &lt;addon-id&gt; &lt;command&gt;
+						</span>
+						<span className="rounded-full border bg-background/80 px-3 py-1">
+							Variant detection
+						</span>
+						<span className="rounded-full border bg-background/80 px-3 py-1">
+							oxide.lock tracking
+						</span>
+					</div>
 					<div className="flex flex-wrap gap-3">
-						<Button variant="outline" asChild>
-							<Link href="/addons">Open addon registry</Link>
+						<Button asChild>
+							<Link href="/addons">
+								Browse addons
+								<ArrowRightIcon className="size-4" />
+							</Link>
 						</Button>
 						<Button variant="outline" asChild>
-							<Link href="/account/addons">Manage your addons</Link>
+							<Link href="/docs/addons/creating">
+								<PencilRulerIcon className="size-4" />
+								Create an addon
+							</Link>
 						</Button>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</section>
 
-			<div className="grid gap-6 lg:grid-cols-2">
+			{/* Install */}
+			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
 				<Card>
-					<CardHeader>
-						<CardTitle>What an addon flow looks like</CardTitle>
-						<CardDescription>
-							Users authenticate, scaffold first, warm the addon cache when it helps, then run named addon commands explicitly inside the project.
-						</CardDescription>
+					<CardHeader className="gap-3">
+						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+							<DownloadIcon className="size-5" />
+						</div>
+						<div>
+							<CardTitle>Installing an addon</CardTitle>
+							<CardDescription>
+								<code>oxide addon install</code> pre-downloads the addon and saves it
+								to the local cache. You can skip this step — running an addon command
+								will auto-install if the addon isn't cached yet.
+							</CardDescription>
+						</div>
 					</CardHeader>
 					<CardContent className="space-y-4">
-						<CodeBlock code={addonFlow} />
+						<CodeBlock code={installExample} />
 						<p className="text-sm text-muted-foreground">
-							Explicit <code>oxide addon install</code> keeps the global addon cache
-							warm. If you skip it, the first <code>oxide &lt;addon_id&gt; &lt;command&gt;</code>
-							run downloads the addon before execution.
+							Explicit installation is useful in CI environments or when you want to
+							ensure an addon is available before moving into a project directory.
 						</p>
-						<ul className="space-y-3 text-sm text-muted-foreground">
-							{addonPrinciples.map((item) => (
-								<li key={item} className="flex gap-2">
-									<span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
-									<span>{item}</span>
-								</li>
-							))}
-						</ul>
 					</CardContent>
 				</Card>
 
 				<Card>
 					<CardHeader>
-						<CardTitle>How to create an addon</CardTitle>
+						<CardTitle>Finding addons</CardTitle>
 						<CardDescription>
-							Authoring is mostly about defining a reliable contract, not writing
-							custom logic.
+							Browse the addon registry to see what's available.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3 text-sm text-muted-foreground">
-						{authoringSteps.map((item, index) => (
-							<p key={item}>
-								{index + 1}. {item}
-							</p>
-						))}
+						<p>
+							The addon ID is what you pass to{" "}
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								oxide addon install
+							</code>{" "}
+							and use directly as the command prefix:{" "}
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								oxide &lt;addon-id&gt; &lt;command&gt;
+							</code>
+							.
+						</p>
+						<p>
+							Each addon also lists the commands it exposes and which project types
+							it supports.
+						</p>
+						<Button variant="outline" asChild>
+							<Link href="/addons">
+								Open addon catalog
+								<ArrowRightIcon className="size-4" />
+							</Link>
+						</Button>
 					</CardContent>
 				</Card>
 			</div>
 
+			{/* Running commands */}
+			<Card>
+				<CardHeader className="gap-3">
+					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+						<PlayIcon className="size-5" />
+					</div>
+					<div>
+						<CardTitle>Running addon commands</CardTitle>
+						<CardDescription>
+							This is the primary way to use an addon. Run it from your project root —
+							Oxide handles detection, inputs, and file operations automatically.
+						</CardDescription>
+					</div>
+				</CardHeader>
+				<CardContent className="space-y-6">
+					<div className="grid gap-6 lg:grid-cols-2">
+						<div className="space-y-2">
+							<p className="text-sm font-medium">The command form</p>
+							<CodeBlock code={runCommandExample} />
+						</div>
+						<div className="space-y-2">
+							<p className="text-sm font-medium">Auto-install on first run</p>
+							<CodeBlock code={autoInstallNote} />
+						</div>
+					</div>
+					<div className="space-y-3 text-sm text-muted-foreground">
+						<p>
+							When you run{" "}
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								oxide &lt;addon-id&gt; &lt;command&gt;
+							</code>
+							, Oxide:
+						</p>
+						<ol className="space-y-1.5 list-none">
+							{[
+								"Loads the addon manifest (auto-installs if missing).",
+								"Detects your project variant by checking for files, packages, or config values defined in the manifest.",
+								"Prompts for any manifest-level inputs (asked once per run).",
+								"Prompts for any command-level inputs (specific to the command you ran).",
+								"Applies each step in order — creating files, injecting code, replacing strings, etc.",
+								"Records the result in oxide.lock.",
+							].map((text, i) => (
+								<li key={i} className="flex gap-2">
+									<span className="mt-0.5 text-primary font-medium">{i + 1}.</span>
+									<span>{text}</span>
+								</li>
+							))}
+						</ol>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Typical flow */}
 			<Card>
 				<CardHeader>
-					<CardTitle>Markers are the integration contract</CardTitle>
+					<CardTitle>Typical workflow</CardTitle>
 					<CardDescription>
-						Markers are normal code comments placed by the template author so
-						addons know exactly where to edit files.
+						Addons are designed to run after your project is scaffolded. Install the
+						template first, then apply addons.
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="space-y-4">
-					<CodeBlock code={markerExample} />
-					<p className="text-sm text-muted-foreground">
-						Oxide works only with projects created through Oxide templates. That
-						is a deliberate reliability tradeoff: official templates guarantee
-						that required markers exist, so addon operations stay deterministic.
+				<CardContent>
+					<CodeBlock code={typicalFlow} />
+				</CardContent>
+			</Card>
+
+			{/* List + Remove */}
+			<div className="grid gap-6 lg:grid-cols-2">
+				<Card>
+					<CardHeader className="gap-3">
+						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+							<ListIcon className="size-5" />
+						</div>
+						<div>
+							<CardTitle>Listing and removing addons</CardTitle>
+							<CardDescription>
+								Both commands operate on local cache files only — no network call
+								required.
+							</CardDescription>
+						</div>
+					</CardHeader>
+					<CardContent>
+						<CodeBlock code={listRemoveExample} />
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader className="gap-3">
+						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+							<RefreshCwIcon className="size-5" />
+						</div>
+						<div>
+							<CardTitle>Updating an addon</CardTitle>
+							<CardDescription>
+								Re-fetch the addon from its source URL when the addon author has
+								pushed new changes.
+							</CardDescription>
+						</div>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<CodeBlock code={updateExample} />
+						<p className="text-sm text-muted-foreground">
+							Updating the cache does not affect any{" "}
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								oxide.lock
+							</code>{" "}
+							files in your projects. Those track what was applied, not the current
+							addon version.
+						</p>
+					</CardContent>
+				</Card>
+			</div>
+
+			{/* Input prompts */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Input prompts</CardTitle>
+					<CardDescription>
+						Addons ask questions before applying changes. Answers are used throughout
+						the file operations as template variables.
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-3">
+					{inputTypes.map((item) => (
+						<div key={item.type} className="flex gap-3 rounded-xl border bg-muted/10 p-3">
+							<code className="mt-0.5 shrink-0 rounded bg-muted px-2 py-0.5 font-mono text-xs text-foreground">
+								{item.type}
+							</code>
+							<p className="text-sm text-muted-foreground">{item.description}</p>
+						</div>
+					))}
+					<p className="text-sm text-muted-foreground pt-1">
+						Every input value is available in steps in multiple casing forms:{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							_pascal
+						</code>
+						,{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							_camel
+						</code>
+						,{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							_kebab
+						</code>
+						, and{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							_snake
+						</code>
+						.
 					</p>
 				</CardContent>
 			</Card>
 
+			{/* Lock file */}
 			<Card>
-				<CardHeader>
-					<CardTitle>`oxide.lock` records addon state</CardTitle>
-					<CardDescription>
-						Each generated project keeps addon installation state at the root.
-					</CardDescription>
+				<CardHeader className="gap-3">
+					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+						<FileTextIcon className="size-5" />
+					</div>
+					<div>
+						<CardTitle>The oxide.lock file</CardTitle>
+						<CardDescription>
+							A file in your project root that tracks which addons have been applied
+							and which commands have run.
+						</CardDescription>
+					</div>
 				</CardHeader>
-				<CardContent className="space-y-4">
-					<CodeBlock code={lockExample} />
+				<CardContent>
 					<ul className="space-y-3 text-sm text-muted-foreground">
-						{lockUses.map((item) => (
+						{lockFacts.map((item) => (
 							<li key={item} className="flex gap-2">
 								<span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
 								<span>{item}</span>
@@ -683,126 +378,44 @@ export default function DocsAddonsPage() {
 				</CardContent>
 			</Card>
 
-			<section className="space-y-4">
-				<div className="space-y-2">
-					<h2 className="text-2xl font-bold tracking-tight">
-						Anatomy of `oxide.addon.json`
-					</h2>
-					<p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-						The manifest defines metadata, user prompts, project detection,
-						variant selection, command boundaries, and the exact file operations
-						Oxide will execute.
-					</p>
-				</div>
-
-				<div className="grid gap-6 lg:grid-cols-2">
-					{manifestSections.map((section) => (
-						<Card key={section.title}>
-							<CardHeader>
-								<CardTitle>{section.title}</CardTitle>
-								<CardDescription>{section.description}</CardDescription>
-							</CardHeader>
-							<CardContent>
-								<CodeBlock code={section.code} />
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</section>
-
-			<section className="space-y-4">
-				<div className="space-y-2">
-					<h2 className="text-2xl font-bold tracking-tight">Detect rule types</h2>
-					<p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-						Detection rules let one addon support several project shapes without
-						embedding imperative logic in the addon itself.
-					</p>
-				</div>
-
-				<div className="grid gap-4 lg:grid-cols-2">
-					{detectRules.map((rule) => (
-						<Card key={rule.name}>
-							<CardHeader>
-								<CardTitle className="font-mono text-base">{rule.name}</CardTitle>
-								<CardDescription>{rule.description}</CardDescription>
-							</CardHeader>
-							<CardContent>
-								<CodeBlock code={rule.example} />
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</section>
-
-			<section className="space-y-4">
-				<div className="space-y-2">
-					<h2 className="text-2xl font-bold tracking-tight">Step types</h2>
-					<p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-						Commands are composed from file-system focused steps. Each step is
-						declarative and bounded by the manifest schema.
-					</p>
-				</div>
-
-				<div className="grid gap-4 lg:grid-cols-2">
-					{stepTypes.map((step) => (
-						<Card key={step.name}>
-							<CardHeader>
-								<CardTitle className="font-mono text-base">{step.name}</CardTitle>
-								<CardDescription>{step.description}</CardDescription>
-							</CardHeader>
-							<CardContent>
-								<CodeBlock code={step.code} />
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</section>
-
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
+			{/* Sub-page links */}
+			<div className="grid gap-4 sm:grid-cols-2">
+				<Card className="border-dashed">
 					<CardHeader>
-						<CardTitle>Rollback behavior</CardTitle>
+						<CardTitle className="text-base">Creating your own addon</CardTitle>
 						<CardDescription>
-							If a step fails halfway through, Oxide should explain what failed
-							and let the user decide whether to keep or rollback prior changes.
+							Learn how to write an `oxide.addon.json` manifest with detection rules,
+							variants, input prompts, and declarative file operation steps.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="space-y-4">
-						<CodeBlock code={rollbackExample} />
-						<p className="text-sm text-muted-foreground">
-							This keeps partial edits explicit instead of silently leaving the
-							project in an unclear state.
-						</p>
+					<CardContent>
+						<Button variant="outline" asChild>
+							<Link href="/docs/addons/creating">
+								Creating Addons
+								<ArrowRightIcon className="size-4" />
+							</Link>
+						</Button>
 					</CardContent>
 				</Card>
 
-				<Card>
+				<Card className="border-dashed">
 					<CardHeader>
-						<CardTitle>Rust types and crates</CardTitle>
+						<CardTitle className="text-base">Publishing to the registry</CardTitle>
 						<CardDescription>
-							The manifest format maps naturally to tagged serde enums and a
-							small parsing dependency set.
+							Learn how to publish and update an addon in the Oxide registry using a
+							GitHub URL.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="space-y-4">
-						<CodeBlock code={rustTypesExample} />
-						<CodeBlock code={cratesExample} />
+					<CardContent>
+						<Button variant="outline" asChild>
+							<Link href="/docs/addons/publishing">
+								Publishing Addons
+								<ArrowRightIcon className="size-4" />
+							</Link>
+						</Button>
 					</CardContent>
 				</Card>
 			</div>
-
-			<Card>
-				<CardHeader>
-					<CardTitle>Complete example</CardTitle>
-					<CardDescription>
-						A full addon manifest tying together metadata, detection, inputs,
-						variants, commands, and steps.
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<CodeBlock code={fullAddonExample} />
-				</CardContent>
-			</Card>
 
 			<DocsPagination currentHref="/docs/addons" />
 		</div>

@@ -2,16 +2,16 @@ import { render, screen } from "@testing-library/react";
 import DocsInstallationPage from "@/app/(main)/docs/installation/page";
 
 describe("DocsInstallationPage", () => {
-	it("includes installer, npm, cargo, and ARM64 release paths", () => {
+	it("documents the current npm package, cargo install, and endpoint overrides", () => {
 		render(<DocsInstallationPage />);
 
 		expect(
-			screen.getByRole("heading", { name: /install the oxide cli/i }),
+			screen.getByRole("heading", {
+				name: /install oxide from scripts, npm, cargo, or release artifacts/i,
+			}),
 		).toBeInTheDocument();
-		expect(screen.getByText(/install with npm/i)).toBeInTheDocument();
-		expect(screen.getByText(/install with cargo/i)).toBeInTheDocument();
 		expect(
-			screen.getByText("npm install -g @maksym-zhuk/oxide-cli", {
+			screen.getByText("npm install -g @oxide-cli/oxide", {
 				exact: false,
 			}),
 		).toBeInTheDocument();
@@ -19,6 +19,9 @@ describe("DocsInstallationPage", () => {
 			screen.getByText("cargo install oxide-cli", {
 				exact: false,
 			}),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText(/OXIDE_BACKEND_URL=http:\/\/localhost:3001/i),
 		).toBeInTheDocument();
 		expect(screen.getByText(/oxide-linux-aarch64\.tar\.gz/i)).toBeInTheDocument();
 	});

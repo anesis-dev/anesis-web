@@ -2,16 +2,40 @@ import { render, screen } from "@testing-library/react";
 import DocsTemplatesPage from "@/app/(main)/docs/templates/page";
 
 describe("DocsTemplatesPage", () => {
-	it("uses the current template publish command and URL guidance", () => {
+	it("focuses on using templates rather than authoring", () => {
 		render(<DocsTemplatesPage />);
 
 		expect(
-			screen.getByRole("heading", { name: /create and publish oxide templates/i }),
+			screen.getByRole("heading", {
+				name: /scaffold new projects from templates/i,
+			}),
 		).toBeInTheDocument();
-		expect(
-			screen.getByText(/oxide template publish https:\/\/github\.com\/owner\/repo\/tree\/main\/my-template/i),
-		).toBeInTheDocument();
-		expect(screen.getByText(/directory containing the template manifest/i)).toBeInTheDocument();
-		expect(screen.getByText(/paste a github repository url or a/i)).toBeInTheDocument();
+
+		expect(screen.getAllByText(/oxide template install/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/oxide new/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/oxide template list/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/oxide template remove/i).length).toBeGreaterThan(0);
+	});
+
+	it("links to creating and publishing sub-pages", () => {
+		render(<DocsTemplatesPage />);
+
+		expect(screen.getAllByText(/creating templates/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/publishing templates/i).length).toBeGreaterThan(0);
+	});
+
+	it("explains the oxide new flow step by step", () => {
+		render(<DocsTemplatesPage />);
+
+		expect(screen.getByText(/validate the project name/i)).toBeInTheDocument();
+		expect(screen.getByText(/ensure the template is available/i)).toBeInTheDocument();
+		expect(screen.getByText(/render and copy files/i)).toBeInTheDocument();
+	});
+
+	it("documents cache behavior", () => {
+		render(<DocsTemplatesPage />);
+
+		expect(screen.getAllByText(/commit sha/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/oxide-templates\.json/i).length).toBeGreaterThan(0);
 	});
 });

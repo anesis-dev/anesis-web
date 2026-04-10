@@ -209,7 +209,7 @@ export default function TemplateDetailsPage({
 	const source = getSourceInfo(template.config.repository.url);
 	const templateName = template.name;
 	const createCommand = `oxide new my-app ${templateName}`;
-	const installCommand = `oxide install-template ${templateName}`;
+	const installCommand = `oxide template install ${templateName}`;
 	const keywordCount = String(template.config.metadata.tags.length);
 	const technologyCount = String(template.config.technologies.length);
 	const languageCount = String(template.config.languages.length);

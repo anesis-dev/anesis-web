@@ -43,7 +43,7 @@ const minimalTemplateConfig = `{
   }
 }`;
 
-const publishCommand = `oxide publish-template https://github.com/owner/repo/tree/main/my-template`;
+const publishCommand = `oxide template publish https://github.com/owner/repo/tree/main/my-template`;
 
 const checklist = [
 	"`oxide.template.json` is at the root of the published folder",
@@ -105,10 +105,10 @@ export default function DocsTemplatesPage() {
 					Create and publish Oxide templates
 				</h1>
 				<p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-					Templates are normal starter folders plus an{" "}
-					<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+					Templates are normal starter folders plus an
+					<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
 						oxide.template.json
-					</code>{" "}
+					</code>
 					file that tells Oxide how to index and present them. The stack itself
 					can be anything: Rust, Python, Go, JavaScript, TypeScript, or another
 					ecosystem. The key contract is that the template folder contains a
@@ -152,10 +152,9 @@ export default function DocsTemplatesPage() {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Minimal `oxide.template.json`</CardTitle>
+					<CardTitle>Minimal <code>oxide.template.json</code></CardTitle>
 					<CardDescription>
-						This file is the contract between your folder and the Oxide
-						registry.
+						This file is the contract between your folder and the Oxide registry.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -165,7 +164,7 @@ export default function DocsTemplatesPage() {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>How to think about `oxide.template.json`</CardTitle>
+					<CardTitle>How to think about <code>oxide.template.json</code></CardTitle>
 					<CardDescription>
 						This file is both registry metadata and the main discovery contract
 						for users browsing templates.
@@ -173,10 +172,7 @@ export default function DocsTemplatesPage() {
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{fieldGuide.map((field) => (
-						<div
-							key={field.name}
-							className="rounded-2xl border bg-muted/20 p-4"
-						>
+						<div key={field.name} className="rounded-2xl border bg-muted/20 p-4">
 							<p className="font-mono text-sm font-medium">{field.name}</p>
 							<p className="mt-2 text-sm text-muted-foreground">
 								{field.description}
@@ -191,23 +187,23 @@ export default function DocsTemplatesPage() {
 					<CardHeader>
 						<CardTitle>Publish from the CLI</CardTitle>
 						<CardDescription>
-							Use a GitHub folder URL that points directly to the template
-							directory. This is the flow where terminal publishing should
-							require login.
+							Use a GitHub repository URL or a <code>/tree/&lt;branch&gt;/&lt;path&gt;</code>
+							 folder URL that points to the directory containing the template
+							manifest.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-4 text-sm text-muted-foreground">
 						<CodeBlock code={publishCommand} />
 						<p>
-							Before running this, authenticate with{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							Before running this, authenticate with
+							<code className="ml-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
 								oxide login
 							</code>
 							.
 						</p>
 						<p>
-							The target folder must contain{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							The target repository root or folder must contain
+							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
 								oxide.template.json
 							</code>
 							.
@@ -227,7 +223,10 @@ export default function DocsTemplatesPage() {
 						<p>
 							2. Click <strong>Publish Template</strong>.
 						</p>
-						<p>3. Paste a GitHub `/tree/` URL for the template folder.</p>
+						<p>
+							3. Paste a GitHub repository URL or a <code>/tree/</code> URL for the
+							template folder.
+						</p>
 						<p>4. Submit and wait for validation.</p>
 					</CardContent>
 				</Card>

@@ -10,10 +10,17 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-const addonFlow = `oxide new nestjs my-project
+const addonFlow = `oxide login
+oxide new my-project nestjs
 cd my-project
+oxide addon install drizzle
 oxide drizzle install
 oxide drizzle connect`;
+
+const addonCliSurface = `oxide addon install <addon_id>
+oxide addon list
+oxide addon remove <addon_id>
+oxide <addon_id> <command>`;
 
 const markerExample = `// @oxide:imports
 import { Module } from '@nestjs/common';
@@ -561,21 +568,36 @@ export default function DocsAddonsPage() {
 
 			<Card className="border-dashed">
 				<CardHeader>
-					<CardTitle className="text-base">Current status</CardTitle>
+					<CardTitle className="text-base">Current CLI and backend status</CardTitle>
 					<CardDescription>
-						The live backend surface for addons is registry publishing,
-						discovery, archive resolution, and deletion. The public CLI addon
-						command surface is still evolving, so use the web registry for real
-						registry entries today.
+						The live backend surface for addons now includes publishing,
+						discovery, archive resolution, and deletion. The public CLI can
+						cache addons with `oxide addon ...`, list and remove cached entries,
+						and run named addon commands inside a project through
+						<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">oxide &lt;addon_id&gt; &lt;command&gt;</code>.
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="flex flex-wrap gap-3">
-					<Button variant="outline" asChild>
-						<Link href="/addons">Open addon registry</Link>
-					</Button>
-					<Button variant="outline" asChild>
-						<Link href="/account/addons">Manage your addons</Link>
-					</Button>
+				<CardContent className="space-y-4">
+					<CodeBlock code={addonCliSurface} />
+					<p className="text-sm text-muted-foreground">
+						Addon archive resolution is authenticated, so log in before
+						<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							oxide addon install
+						</code>
+						or the first
+						<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							oxide &lt;addon_id&gt; &lt;command&gt;
+						</code>
+						run.
+					</p>
+					<div className="flex flex-wrap gap-3">
+						<Button variant="outline" asChild>
+							<Link href="/addons">Open addon registry</Link>
+						</Button>
+						<Button variant="outline" asChild>
+							<Link href="/account/addons">Manage your addons</Link>
+						</Button>
+					</div>
 				</CardContent>
 			</Card>
 
@@ -584,11 +606,16 @@ export default function DocsAddonsPage() {
 					<CardHeader>
 						<CardTitle>What an addon flow looks like</CardTitle>
 						<CardDescription>
-							Users scaffold first, then run named addon commands explicitly.
+							Users authenticate, scaffold first, warm the addon cache when it helps, then run named addon commands explicitly inside the project.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-4">
 						<CodeBlock code={addonFlow} />
+						<p className="text-sm text-muted-foreground">
+							Explicit <code>oxide addon install</code> keeps the global addon cache
+							warm. If you skip it, the first <code>oxide &lt;addon_id&gt; &lt;command&gt;</code>
+							run downloads the addon before execution.
+						</p>
 						<ul className="space-y-3 text-sm text-muted-foreground">
 							{addonPrinciples.map((item) => (
 								<li key={item} className="flex gap-2">

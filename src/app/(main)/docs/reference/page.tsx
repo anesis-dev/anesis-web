@@ -74,9 +74,10 @@ export default async function DocsReferencePage() {
 			<div className="grid gap-6 lg:grid-cols-2">
 				<Card>
 					<CardHeader>
-						<CardTitle>Local Oxide paths</CardTitle>
+						<CardTitle>Local Oxide paths and project files</CardTitle>
 						<CardDescription>
-							Oxide keeps auth and cache state under its home directory.
+							Oxide keeps auth and cache state under its home directory, and addon
+							execution state inside generated projects.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3 text-sm text-muted-foreground">
@@ -96,7 +97,13 @@ export default async function DocsReferencePage() {
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
 								~/.oxide/cache/templates
 							</code>{" "}
-							contains installed templates and local registry cache files.
+							contains installed templates and extracted template folders.
+						</p>
+						<p>
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								~/.oxide/cache/templates/oxide-templates.json
+							</code>{" "}
+							tracks cached template names, versions, and commit SHAs.
 						</p>
 						<p>
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
@@ -109,6 +116,13 @@ export default async function DocsReferencePage() {
 								~/.oxide/cache/addons/oxide-addons.json
 							</code>{" "}
 							tracks cached addon ids, versions, and commit SHAs.
+						</p>
+						<p>
+							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								oxide.lock
+							</code>{" "}
+							is written into the generated project root and records addon ids,
+							selected variants, versions, and commands already executed there.
 						</p>
 					</CardContent>
 				</Card>
@@ -152,7 +166,10 @@ export default async function DocsReferencePage() {
 					<CardTitle>Template schema</CardTitle>
 					<CardDescription>
 						The backend exposes the current JSON Schema used to validate
-						`oxide.template.json`.
+						<code className="ml-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							oxide.template.json
+						</code>
+						.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">

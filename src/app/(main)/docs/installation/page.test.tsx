@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import DocsInstallationPage from "@/app/(main)/docs/installation/page";
 
 describe("DocsInstallationPage", () => {
-	it("includes installer, npm and cargo installation paths", () => {
+	it("includes installer, npm, cargo, and ARM64 release paths", () => {
 		render(<DocsInstallationPage />);
 
 		expect(
@@ -20,5 +20,6 @@ describe("DocsInstallationPage", () => {
 				exact: false,
 			}),
 		).toBeInTheDocument();
+		expect(screen.getByText(/oxide-linux-aarch64\.tar\.gz/i)).toBeInTheDocument();
 	});
 });

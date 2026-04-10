@@ -25,10 +25,13 @@ source ~/.zshrc`;
 const manualInstall = `# Linux x86_64
 https://github.com/oxide-cli/oxide/releases/latest/download/oxide-linux-x86_64.tar.gz
 
+# Linux ARM64
+https://github.com/oxide-cli/oxide/releases/latest/download/oxide-linux-aarch64.tar.gz
+
 # macOS Apple Silicon
 https://github.com/oxide-cli/oxide/releases/latest/download/oxide-macos-aarch64.tar.gz
 
-# Windows
+# Windows x86_64
 https://github.com/oxide-cli/oxide/releases/latest/download/oxide-windows-x86_64.zip`;
 
 const verifyInstall = `oxide --version`;
@@ -86,7 +89,10 @@ export default function DocsInstallationPage() {
 						<CodeBlock code={installNpm} />
 						<p className="text-sm text-muted-foreground">
 							The npm package downloads the matching Oxide binary during
-							`postinstall`.
+							<code className="ml-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
+								postinstall
+							</code>
+							.
 						</p>
 					</CardContent>
 				</Card>
@@ -95,18 +101,18 @@ export default function DocsInstallationPage() {
 					<CardHeader>
 						<CardTitle>Install with cargo</CardTitle>
 						<CardDescription>
-							Install the CLI directly from crates.io when you already use the
-							Rust toolchain.
+							Install the CLI directly from crates.io when you already use the Rust
+							toolchain.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-4">
 						<CodeBlock code={installCargo} />
 						<p className="text-sm text-muted-foreground">
-							Cargo places the binary into{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							Cargo places the binary into
+							<code className="ml-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
 								~/.cargo/bin
 							</code>
-							, so make sure that directory is on your `PATH`.
+							, so make sure that directory is on your PATH.
 						</p>
 					</CardContent>
 				</Card>
@@ -117,8 +123,8 @@ export default function DocsInstallationPage() {
 					<CardHeader>
 						<CardTitle>Update your PATH</CardTitle>
 						<CardDescription>
-							On Unix-like systems the binary is installed into{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							On Unix-like systems the binary is installed into
+							<code className="ml-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
 								~/.local/bin
 							</code>
 							.

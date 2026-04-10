@@ -100,7 +100,7 @@ describe("TemplateDetailsPage", () => {
 			screen.getByText("oxide new my-app demo-repo", { exact: false }),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("oxide install-template demo-repo", { exact: false }),
+			screen.getByText("oxide template install demo-repo", { exact: false }),
 		).toBeInTheDocument();
 		expect(screen.getByText("Package Snapshot")).toBeInTheDocument();
 		expect(screen.getByText("Package Metadata")).toBeInTheDocument();

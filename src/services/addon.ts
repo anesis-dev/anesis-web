@@ -48,6 +48,15 @@ export async function updateAddon(url: string): Promise<void> {
   await api.patch<void>("/addon", { url });
 }
 
+export async function updateAddonOfficialStatus(
+  addonId: string,
+  official: boolean,
+): Promise<void> {
+  await api.patch<void>(
+    `/addon/${encodeURIComponent(addonId)}/official?official=${official}`,
+  );
+}
+
 export async function deleteAddon(
   addonId: string,
   version: string,

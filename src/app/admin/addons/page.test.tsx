@@ -9,10 +9,14 @@ vi.mock("@/hooks/useAddons", () => ({
 
 vi.mock("@/services/addon", () => ({
 	deleteAddon: vi.fn(),
+	updateAddonOfficialStatus: vi.fn(),
 }));
 
 import { useAddons } from "@/hooks/useAddons";
-import { deleteAddon } from "@/services/addon";
+import {
+	deleteAddon,
+	updateAddonOfficialStatus,
+} from "@/services/addon";
 
 describe("AdminAddonsPage", () => {
 	it("renders moderation controls and filters addons", async () => {
@@ -92,5 +96,38 @@ describe("AdminAddonsPage", () => {
 		);
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["addons"] });
 		expect(screen.getByText(/was deleted from the registry/i)).toBeInTheDocument();
+	});
+
+	it("updates addon official status through the admin action", async () => {
+		const addon = createAddon({
+			id: "addon-1",
+			official: false,
+			name: "Drizzle ORM",
+			config: {
+				id: "drizzle",
+				name: "Drizzle ORM",
+			},
+		});
+		vi.mocked(useAddons).mockReturnValue({
+			addons: [addon],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(updateAddonOfficialStatus).mockResolvedValueOnce(undefined);
+
+		const { queryClient } = renderWithQueryClient(<AdminAddonsPage />);
+		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: /mark drizzle orm as official/i,
+			}),
+		);
+
+		await waitFor(() =>
+			expect(updateAddonOfficialStatus).toHaveBeenCalledWith("addon-1", true),
+		);
+		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["addons"] });
+		expect(screen.getByText(/is now marked as official/i)).toBeInTheDocument();
 	});
 });

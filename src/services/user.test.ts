@@ -1,6 +1,7 @@
 vi.mock("@/api/client", () => ({
 	api: {
 		get: vi.fn(),
+		patch: vi.fn(),
 		delete: vi.fn(),
 	},
 }));
@@ -12,7 +13,12 @@ vi.mock("@/lib/api-contracts", () => ({
 
 import { api } from "@/api/client";
 import { parseMeResponse, parseUsersResponse } from "@/lib/api-contracts";
-import { deleteUser, fetchAllUsers, fetchMe } from "@/services/user";
+import {
+	deleteUser,
+	fetchAllUsers,
+	fetchMe,
+	updateUserRole,
+} from "@/services/user";
 
 describe("user services", () => {
 	it("fetches the current user", async () => {
@@ -38,5 +44,12 @@ describe("user services", () => {
 
 		await expect(deleteUser("user-1")).resolves.toBeUndefined();
 		expect(api.delete).toHaveBeenCalledWith("/user/user-1");
+	});
+
+	it("updates a user role for admin pages", async () => {
+		vi.mocked(api.patch).mockResolvedValueOnce(undefined);
+
+		await expect(updateUserRole("user-1", true)).resolves.toBeUndefined();
+		expect(api.patch).toHaveBeenCalledWith("/user/user-1/role?admin=true");
 	});
 });

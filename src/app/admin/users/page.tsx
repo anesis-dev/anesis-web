@@ -19,7 +19,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/date";
-import { deleteUser } from "@/services/user";
+import { cn } from "@/lib/utils";
+import { deleteUser, updateUserRole } from "@/services/user";
 import { IUser } from "@/types/user";
 import {
 	Card,
@@ -113,6 +114,38 @@ export default function AdminUsersPage() {
 		currentPage * PAGE_SIZE,
 	);
 
+	async function refreshUserQueries() {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
+			queryClient.invalidateQueries({ queryKey: ["me"] }),
+		]);
+	}
+
+	async function handleToggleRole(user: IUser) {
+		const nextAdmin = user.role !== "admin";
+		setBusyAction(`role:${user.id}`);
+		setNotice(null);
+
+		try {
+			await updateUserRole(user.id, nextAdmin);
+			await refreshUserQueries();
+			setNotice({
+				type: "success",
+				message: nextAdmin
+					? `@${user.login} is now an admin.`
+					: `@${user.login} was moved back to user access.`,
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message:
+					error instanceof Error ? error.message : "Failed to update user role.",
+			});
+		} finally {
+			setBusyAction(null);
+		}
+	}
+
 	async function handleDeleteUser() {
 		if (!pendingDelete) {
 			return;
@@ -124,7 +157,7 @@ export default function AdminUsersPage() {
 
 		try {
 			await deleteUser(user.id);
-			await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+			await refreshUserQueries();
 			setPendingDelete(null);
 			setNotice({
 				type: "success",
@@ -289,29 +322,58 @@ export default function AdminUsersPage() {
 													title="Open GitHub profile"
 													aria-label={`Open GitHub profile for ${user.login}`}
 												>
-												<Link
-													href={`https://github.com/${user.login}`}
-													target="_blank"
-													rel="noopener noreferrer"
+													<Link
+														href={`https://github.com/${user.login}`}
+														target="_blank"
+														rel="noopener noreferrer"
+													>
+														<GitHubIcon className="size-3.5" />
+													</Link>
+												</Button>
+												<Button
+													type="button"
+													size="icon-xs"
+													variant="ghost"
+													title={
+														user.role === "admin"
+															? "Revoke admin access"
+															: "Grant admin access"
+													}
+													aria-label={
+														user.role === "admin"
+															? `Revoke admin access for ${user.login}`
+															: `Grant admin access for ${user.login}`
+													}
+													onClick={() => handleToggleRole(user)}
+													disabled={busyAction !== null}
+													className={cn(
+														user.role === "admin"
+															? "text-primary hover:text-muted-foreground"
+															: "text-muted-foreground hover:text-primary",
+													)}
 												>
-													<GitHubIcon className="size-3.5" />
-												</Link>
-											</Button>
-											<Button
-												type="button"
-												size="icon-xs"
-												variant="ghost"
-												title="Delete user"
-												aria-label={`Delete ${user.login}`}
-												onClick={() => setPendingDelete(user)}
-												disabled={busyAction === `delete:${user.id}`}
-											>
-												{busyAction === `delete:${user.id}` ? (
-													<LoaderIcon className="size-3.5 animate-spin" />
-												) : (
-													<Trash2Icon className="size-3.5" />
-												)}
-											</Button>
+													{busyAction === `role:${user.id}` ? (
+														<LoaderIcon className="size-3.5 animate-spin" />
+													) : (
+														<ShieldCheckIcon className="size-3.5" />
+													)}
+												</Button>
+
+												<Button
+													type="button"
+													size="icon-xs"
+													variant="ghost"
+													title="Delete user"
+													aria-label={`Delete ${user.login}`}
+													onClick={() => setPendingDelete(user)}
+													disabled={busyAction === `delete:${user.id}`}
+												>
+													{busyAction === `delete:${user.id}` ? (
+														<LoaderIcon className="size-3.5 animate-spin" />
+													) : (
+														<Trash2Icon className="size-3.5" />
+													)}
+												</Button>
 											</div>
 										</td>
 									</tr>

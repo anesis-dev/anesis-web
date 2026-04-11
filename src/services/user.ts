@@ -10,6 +10,15 @@ export async function fetchAllUsers(): Promise<IUser[]> {
 	return parseUsersResponse(await api.get<unknown>("/user/all"));
 }
 
+export async function updateUserRole(
+	userId: string,
+	admin: boolean,
+): Promise<void> {
+	await api.patch<void>(
+		`/user/${encodeURIComponent(userId)}/role?admin=${admin}`,
+	);
+}
+
 export async function deleteUser(userId: string): Promise<void> {
 	await api.delete<void>(`/user/${encodeURIComponent(userId)}`);
 }

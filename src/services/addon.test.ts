@@ -26,6 +26,7 @@ import {
   fetchAddons,
   publishAddon,
   updateAddon,
+  updateAddonOfficialStatus,
 } from "@/services/addon";
 
 describe("addon services", () => {
@@ -106,6 +107,17 @@ describe("addon services", () => {
     expect(api.patch).toHaveBeenCalledWith("/addon", {
       url: "https://github.com/oxide-addons/nest-drizzle/tree/main",
     });
+  });
+
+  it("updates addon official status through the admin endpoint", async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce(undefined);
+
+    await expect(
+      updateAddonOfficialStatus("addon-uuid", true),
+    ).resolves.toBeUndefined();
+    expect(api.patch).toHaveBeenCalledWith(
+      "/addon/addon-uuid/official?official=true",
+    );
   });
 
   it("throws when an addon ref is not found in the public list", async () => {

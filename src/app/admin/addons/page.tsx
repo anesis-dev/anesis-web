@@ -23,14 +23,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useAddons } from "@/hooks/useAddons";
+import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date";
-import { deleteAddon } from "@/services/addon";
+import { deleteAddon, updateAddonOfficialStatus } from "@/services/addon";
 import { IAddon } from "@/types/addon";
 import {
 	AlertCircleIcon,
 	BoxesIcon,
 	ExternalLinkIcon,
 	LoaderIcon,
+	ShieldCheckIcon,
+	ShieldOffIcon,
 	Trash2Icon,
 } from "lucide-react";
 
@@ -108,6 +111,40 @@ export default function AdminAddonsPage() {
 		currentPage * PAGE_SIZE,
 	);
 
+	async function refreshAddonQueries() {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ["addons"] }),
+			queryClient.invalidateQueries({ queryKey: ["addon"] }),
+		]);
+	}
+
+	async function handleToggleOfficial(addon: IAddon) {
+		const nextOfficial = !addon.official;
+		setBusyAction(`official:${addon.id}`);
+		setNotice(null);
+
+		try {
+			await updateAddonOfficialStatus(addon.id, nextOfficial);
+			await refreshAddonQueries();
+			setNotice({
+				type: "success",
+				message: nextOfficial
+					? `${addon.name} is now marked as official.`
+					: `${addon.name} was moved back to community.`,
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message:
+					error instanceof Error
+						? error.message
+						: "Failed to update addon official status.",
+			});
+		} finally {
+			setBusyAction(null);
+		}
+	}
+
 	async function handleDeleteAddon() {
 		if (!pendingDelete) {
 			return;
@@ -119,7 +156,7 @@ export default function AdminAddonsPage() {
 
 		try {
 			await deleteAddon(addon.addon_id, addon.version);
-			await queryClient.invalidateQueries({ queryKey: ["addons"] });
+			await refreshAddonQueries();
 			setPendingDelete(null);
 			setNotice({
 				type: "success",
@@ -169,8 +206,8 @@ export default function AdminAddonsPage() {
 				<CardHeader>
 					<CardTitle className="text-sm">Addon moderation actions</CardTitle>
 					<CardDescription>
-						The backend currently exposes delete actions for registry entries.
-						Official-status management has not been added yet.
+						Use the controls below to promote community addons to official
+						or remove broken entries from the registry.
 					</CardDescription>
 				</CardHeader>
 			</Card>
@@ -266,6 +303,36 @@ export default function AdminAddonsPage() {
 													>
 														<ExternalLinkIcon />
 													</Link>
+												</Button>
+
+												<Button
+													size="icon-xs"
+													variant="ghost"
+													title={
+														addon.official
+															? "Mark as community addon"
+															: "Mark as official addon"
+													}
+													aria-label={
+														addon.official
+															? `Mark ${addon.name} as community`
+															: `Mark ${addon.name} as official`
+													}
+													disabled={busyAction !== null}
+													onClick={() => handleToggleOfficial(addon)}
+													className={cn(
+														addon.official
+															? "text-primary hover:text-muted-foreground"
+															: "text-muted-foreground hover:text-primary",
+													)}
+												>
+													{busyAction === `official:${addon.id}` ? (
+														<LoaderIcon className="animate-spin" />
+													) : addon.official ? (
+														<ShieldOffIcon />
+													) : (
+														<ShieldCheckIcon />
+													)}
 												</Button>
 
 												<Button

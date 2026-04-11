@@ -15,11 +15,12 @@ vi.mock("@/services/user", async () => {
 	return {
 		...actual,
 		deleteUser: vi.fn(),
+		updateUserRole: vi.fn(),
 	};
 });
 
 import { useUsers } from "@/hooks/useUsers";
-import { deleteUser } from "@/services/user";
+import { deleteUser, updateUserRole } from "@/services/user";
 
 describe("AdminUsersPage", () => {
 	it("renders user totals and filters by role", async () => {
@@ -90,5 +91,36 @@ describe("AdminUsersPage", () => {
 			queryKey: ["admin", "users"],
 		});
 		expect(screen.getByText(/was deleted from the platform/i)).toBeInTheDocument();
+	});
+
+	it("updates a user role through the admin action", async () => {
+		const user = createUser({
+			id: "user-3",
+			login: "builder",
+			role: "user",
+		});
+		vi.mocked(useUsers).mockReturnValue({
+			users: [user],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(updateUserRole).mockResolvedValueOnce(undefined);
+
+		const { queryClient } = renderWithQueryClient(<AdminUsersPage />);
+		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: /grant admin access for builder/i,
+			}),
+		);
+
+		await waitFor(() =>
+			expect(updateUserRole).toHaveBeenCalledWith("user-3", true),
+		);
+		expect(invalidateSpy).toHaveBeenCalledWith({
+			queryKey: ["admin", "users"],
+		});
+		expect(screen.getByText(/is now an admin/i)).toBeInTheDocument();
 	});
 });

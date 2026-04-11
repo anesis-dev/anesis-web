@@ -21,7 +21,7 @@ describe("DocsReferencePage", () => {
 
 		expect(
 			screen.getByRole("heading", {
-				name: /local state, endpoint defaults, validation rules, and schema links/i,
+				name: /local state, validation rules, and schema links/i,
 			}),
 		).toBeInTheDocument();
 		expect(screen.getByText('{ "title": "oxide" }', { exact: false })).toBeInTheDocument();

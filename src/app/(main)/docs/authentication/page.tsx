@@ -13,10 +13,6 @@ const authFlow = `oxide login
 oxide account
 oxide logout`;
 
-const overrideEndpoints = `export OXIDE_BACKEND_URL=http://localhost:3001
-export OXIDE_FRONTEND_URL=http://localhost:3000
-oxide login`;
-
 const authRequired = [
 	"`oxide template install` always talks to the backend registry.",
 	"`oxide template publish` and `oxide template update` send authenticated mutations.",
@@ -219,30 +215,6 @@ export default function DocsAuthenticationPage() {
 					</CardContent>
 				</Card>
 			</div>
-
-			<Card>
-				<CardHeader>
-					<CardTitle>Override backend and frontend endpoints</CardTitle>
-					<CardDescription>
-						The CLI reads two environment variables at startup when you want to
-						test against local services instead of the production defaults.
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					<CodeBlock code={overrideEndpoints} />
-					<p className="text-sm text-muted-foreground">
-						`OXIDE_BACKEND_URL` defaults to
-						<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							https://oxide-server.onrender.com
-						</code>
-						and `OXIDE_FRONTEND_URL` defaults to
-						<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							https://oxide-cli.vercel.app
-						</code>
-						.
-					</p>
-				</CardContent>
-			</Card>
 
 			<DocsPagination currentHref="/docs/authentication" />
 		</div>

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import DocsInstallationPage from "@/app/(main)/docs/installation/page";
 
 describe("DocsInstallationPage", () => {
-	it("documents the current npm package, cargo install, and endpoint overrides", () => {
+	it("documents the current npm package, cargo install, and release artifacts", () => {
 		render(<DocsInstallationPage />);
 
 		expect(
@@ -19,9 +19,6 @@ describe("DocsInstallationPage", () => {
 			screen.getByText("cargo install oxide-cli", {
 				exact: false,
 			}),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText(/OXIDE_BACKEND_URL=http:\/\/localhost:3001/i),
 		).toBeInTheDocument();
 		expect(screen.getByText(/oxide-linux-aarch64\.tar\.gz/i)).toBeInTheDocument();
 	});

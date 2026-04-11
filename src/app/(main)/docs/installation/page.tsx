@@ -37,12 +37,6 @@ https://github.com/oxide-cli/oxide/releases/latest/download/oxide-macos-aarch64.
 # Windows x86_64
 https://github.com/oxide-cli/oxide/releases/latest/download/oxide-windows-x86_64.zip`;
 
-const localDev = `cargo run -- --help
-cargo test`;
-
-const overrideEndpoints = `export OXIDE_BACKEND_URL=http://localhost:3001
-export OXIDE_FRONTEND_URL=http://localhost:3000`;
-
 export default function DocsInstallationPage() {
 	return (
 		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-10 lg:px-8">
@@ -197,44 +191,6 @@ export default function DocsInstallationPage() {
 					</CardHeader>
 					<CardContent>
 						<CodeBlock code={manualInstall} />
-					</CardContent>
-				</Card>
-			</div>
-
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
-					<CardHeader>
-						<CardTitle>Run the CLI from source</CardTitle>
-						<CardDescription>
-							For local development against the Rust project in `oxide/`.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={localDev} />
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader>
-						<CardTitle>Override backend endpoints</CardTitle>
-						<CardDescription>
-							The CLI reads two environment variables at startup before any login,
-							account, template, or addon request is made.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<CodeBlock code={overrideEndpoints} />
-						<p className="text-sm text-muted-foreground">
-							Without overrides, the CLI uses
-							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								https://oxide-server.onrender.com
-							</code>
-							for the backend and
-							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								https://oxide-cli.vercel.app
-							</code>
-							for the frontend callback destination.
-						</p>
 					</CardContent>
 				</Card>
 			</div>

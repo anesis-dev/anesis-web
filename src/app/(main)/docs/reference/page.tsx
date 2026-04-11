@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DatabaseIcon, GitBranchIcon, Settings2Icon } from "lucide-react";
+import { DatabaseIcon, GitBranchIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { CodeBlock } from "@/components/docs/CodeBlock";
 import { env } from "@/config/env";
@@ -12,9 +12,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-const endpointDefaults = `OXIDE_BACKEND_URL=https://oxide-server.onrender.com
-OXIDE_FRONTEND_URL=https://oxide-cli.vercel.app`;
 
 const nameRules = `Project name:
 - "." is allowed
@@ -88,20 +85,17 @@ export default async function DocsReferencePage() {
 					</div>
 					<div className="max-w-4xl space-y-3">
 						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-							Local state, endpoint defaults, validation rules, and schema links
+							Local state, validation rules, and schema links
 						</h1>
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
 							Use this page as a compact operational reference for where Oxide
-							stores files, which environment variables it reads, how it validates
-							user input, and where the backend exposes the current template schema.
+							stores files, how it validates user input, and where the backend
+							exposes the current template schema.
 						</p>
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							`~/.oxide` home
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Default backend + frontend URLs
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							Schema endpoint preview
@@ -132,24 +126,6 @@ export default async function DocsReferencePage() {
 				</Card>
 
 				<div className="grid gap-6">
-					<Card>
-						<CardHeader className="gap-3">
-							<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-								<Settings2Icon className="size-5" />
-							</div>
-							<div>
-								<CardTitle>Endpoint defaults</CardTitle>
-								<CardDescription>
-									These values are read at startup unless you override them through
-									the environment.
-								</CardDescription>
-							</div>
-						</CardHeader>
-						<CardContent>
-							<CodeBlock code={endpointDefaults} />
-						</CardContent>
-					</Card>
-
 					<Card>
 						<CardHeader>
 							<CardTitle>Cache and lock file fields</CardTitle>

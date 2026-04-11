@@ -75,6 +75,39 @@ describe("GET /api/template-readme", () => {
 		await expect(response.json()).resolves.toEqual({ content: null });
 	});
 
+	it("loads templated readmes when the template ships README.md.tera", async () => {
+		vi.spyOn(global, "fetch")
+			.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify([
+						{
+							name: "README.md.tera",
+							path: "template/README.md.tera",
+							download_url: "https://raw.githubusercontent.com/demo/readme.md.tera",
+							type: "file",
+						},
+					]),
+					{ status: 200 },
+				),
+			)
+			.mockResolvedValueOnce(
+				new Response("# {{ project_name }}", { status: 200 }),
+			);
+
+		const response = await GET(
+			new NextRequest(
+				"http://localhost/api/template-readme?url=https://github.com/demo-owner/demo-repo/tree/main/template",
+			),
+		);
+
+		expect(response.status).toBe(200);
+		await expect(response.json()).resolves.toEqual({
+			content: "# {{ project_name }}",
+			fileName: "README.md.tera",
+			path: "template/README.md.tera",
+		});
+	});
+
 	it("passes through github contents errors", async () => {
 		vi.spyOn(global, "fetch").mockResolvedValueOnce(
 			new Response(null, { status: 502 }),

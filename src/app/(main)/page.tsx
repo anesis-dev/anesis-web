@@ -3,19 +3,16 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { AddonCard } from "@/components/addons/AddonCard";
-import { useAuth } from "@/hooks/useAuth";
 import { useAddons } from "@/hooks/useAddons";
 import { useTemplates } from "@/hooks/useTemplates";
 import { getDateTimestamp } from "@/lib/date";
 import { TemplateCard } from "@/components/templates/TemplateCard";
-import { PublishTemplateDialog } from "@/components/templates/PublishTemplateDialog";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRightIcon,
   BookOpenIcon,
   BoxesIcon,
   CommandIcon,
-  GitBranchPlusIcon,
   LoaderIcon,
   ServerCogIcon,
   TerminalSquareIcon,
@@ -93,7 +90,6 @@ function AddonSkeleton() {
 }
 
 export default function Home() {
-  const { user, login } = useAuth();
   const { templates, isLoading: templatesLoading } = useTemplates();
   const { addons, isLoading: addonsLoading } = useAddons();
 
@@ -158,29 +154,11 @@ export default function Home() {
               className="w-full sm:w-auto"
               asChild
             >
-              <Link href="/addons/registry">
+              <Link href="/addons">
                 Browse addons
                 <ArrowRightIcon className="size-4" />
               </Link>
             </Button>
-            {user ? (
-              <PublishTemplateDialog
-                label="Publish template"
-                size="lg"
-                variant="ghost"
-                className="w-full gap-1.5 sm:w-auto"
-              />
-            ) : (
-              <Button
-                size="lg"
-                variant="ghost"
-                onClick={login}
-                className="w-full sm:w-auto"
-              >
-                <GitBranchPlusIcon className="size-4" />
-                Login to publish
-              </Button>
-            )}
           </div>
 
           <div className="mx-auto w-full max-w-2xl rounded-[1.75rem] border bg-card/95 p-5 text-left shadow-sm">
@@ -265,7 +243,7 @@ export default function Home() {
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/addons/registry">
+                <Link href="/addons">
                   View addons
                   <ArrowRightIcon className="size-4" />
                 </Link>
@@ -288,7 +266,7 @@ export default function Home() {
             </p>
           </div>
           <Button variant="outline" className="w-full sm:w-auto" asChild>
-            <Link href="/addons/registry">
+            <Link href="/addons">
               View all addons
               <ArrowRightIcon className="size-4" />
             </Link>

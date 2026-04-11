@@ -48,7 +48,7 @@ export async function publishTemplate(
 }
 
 export async function updateTemplate(url: string): Promise<void> {
-	await api.patch<void>("/template/", { url });
+	await api.patch<void>("/template", { url });
 }
 
 export async function deleteTemplate(templateRef: string): Promise<void> {

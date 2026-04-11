@@ -226,7 +226,7 @@ export default function AddonDetailsPage({
           </p>
         </div>
         <Button asChild variant="outline">
-          <Link href="/addons/registry">
+          <Link href="/addons">
             <ArrowLeftIcon className="size-4" />
             Back to addon registry
           </Link>
@@ -244,7 +244,7 @@ export default function AddonDetailsPage({
     <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
       <div>
         <Link
-          href="/addons/registry"
+          href="/addons"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeftIcon className="size-4" />

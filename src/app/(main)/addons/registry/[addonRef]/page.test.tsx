@@ -123,7 +123,7 @@ describe("AddonDetailsPage", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /back to addon registry/i }),
-    ).toHaveAttribute("href", "/addons/registry");
+    ).toHaveAttribute("href", "/addons");
     expect(useAddon).toHaveBeenCalledWith("drizzle@1.0.0");
     expect(useAddonManifest).toHaveBeenCalledWith(mockAddon.url);
 

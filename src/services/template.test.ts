@@ -138,7 +138,7 @@ describe("template services", () => {
 		await expect(
 			updateTemplate("https://github.com/demo-owner/demo-repo/tree/main/template"),
 		).resolves.toBeUndefined();
-		expect(api.patch).toHaveBeenCalledWith("/template/", {
+		expect(api.patch).toHaveBeenCalledWith("/template", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
 		});
 	});

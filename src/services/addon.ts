@@ -45,7 +45,7 @@ export async function publishAddon(
 }
 
 export async function updateAddon(url: string): Promise<void> {
-  await api.patch<void>("/addon/", { url });
+  await api.patch<void>("/addon", { url });
 }
 
 export async function deleteAddon(

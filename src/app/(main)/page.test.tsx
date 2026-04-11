@@ -1,10 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import Home from "@/app/(main)/page";
 
-vi.mock("@/hooks/useAuth", () => ({
-	useAuth: vi.fn(),
-}));
-
 vi.mock("@/hooks/useTemplates", () => ({
 	useTemplates: vi.fn(),
 }));
@@ -20,23 +16,11 @@ vi.mock("@/components/templates/TemplateCard", () => ({
 vi.mock("@/components/addons/AddonCard", () => ({
 	AddonCard: () => <div data-testid="addon-card" />,
 }));
-
-vi.mock("@/components/templates/PublishTemplateDialog", () => ({
-	PublishTemplateDialog: () => <div data-testid="publish-template-dialog" />,
-}));
-
-import { useAuth } from "@/hooks/useAuth";
 import { useAddons } from "@/hooks/useAddons";
 import { useTemplates } from "@/hooks/useTemplates";
 
 describe("Home", () => {
 	beforeEach(() => {
-		vi.mocked(useAuth).mockReturnValue({
-			user: null,
-			isLoading: false,
-			login: vi.fn(),
-			logout: vi.fn(),
-		});
 		vi.mocked(useTemplates).mockReturnValue({
 			templates: [],
 			isLoading: false,

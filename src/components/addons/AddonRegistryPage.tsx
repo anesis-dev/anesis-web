@@ -14,31 +14,10 @@ import {
 	AlertCircleIcon,
 	BookOpenIcon,
 	BoxesIcon,
-	FilesIcon,
 	UsersIcon,
 } from "lucide-react";
 
 const PAGE_SIZE = 9;
-
-function StatCard({
-	label,
-	value,
-	description,
-}: {
-	label: string;
-	value: string | number;
-	description: string;
-}) {
-	return (
-		<div className="rounded-2xl border bg-card p-5">
-			<p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-				{label}
-			</p>
-			<p className="mt-3 text-3xl font-semibold tracking-tight">{value}</p>
-			<p className="mt-2 text-sm text-muted-foreground">{description}</p>
-		</div>
-	);
-}
 
 function AddonSkeleton() {
 	return (
@@ -102,8 +81,6 @@ export function AddonRegistryPage() {
 		(currentPage - 1) * PAGE_SIZE,
 		currentPage * PAGE_SIZE,
 	);
-	const authorCount = new Set(addons.map((addon) => addon.config.author)).size;
-	const officialCount = addons.filter((addon) => addon.official).length;
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-5 lg:px-8">
@@ -119,12 +96,6 @@ export function AddonRegistryPage() {
 
 				<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
 					<Button variant="outline" asChild>
-						<Link href="/addons">
-							<FilesIcon className="size-4" />
-							Official catalog
-						</Link>
-					</Button>
-					<Button variant="outline" asChild>
 						<Link href="/docs/addons">
 							<BookOpenIcon className="size-4" />
 							Addon docs
@@ -139,24 +110,6 @@ export function AddonRegistryPage() {
 						</Button>
 					)}
 				</div>
-			</div>
-
-			<div className="grid gap-4 md:grid-cols-3">
-				<StatCard
-					label="Published"
-					value={isLoading ? "..." : addons.length}
-					description="Registry entries fetched from the live addon endpoint."
-				/>
-				<StatCard
-					label="Authors"
-					value={isLoading ? "..." : authorCount}
-					description="Distinct addon authors represented in the registry."
-				/>
-				<StatCard
-					label="Official"
-					value={isLoading ? "..." : officialCount}
-					description="Entries currently marked as official on the backend."
-				/>
 			</div>
 
 			<div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

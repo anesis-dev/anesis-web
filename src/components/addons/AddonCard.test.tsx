@@ -8,7 +8,7 @@ describe("AddonCard", () => {
 
     expect(screen.getByRole("link", { name: /open package/i })).toHaveAttribute(
       "href",
-      "/addons/registry/drizzle%401.0.0",
+      "/addons/drizzle%401.0.0",
     );
     expect(
       screen.getByRole("link", { name: /open repository for drizzle orm/i }),

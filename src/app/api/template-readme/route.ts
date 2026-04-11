@@ -12,12 +12,43 @@ interface GitHubContentEntry {
 	type: string;
 }
 
-function isReadmeFile(entry: GitHubContentEntry): boolean {
+function getReadmePriority(entry: GitHubContentEntry): number {
 	if (entry.type !== "file") {
-		return false;
+		return Number.POSITIVE_INFINITY;
 	}
 
-	return /^readme(\.[^.]+)?$/i.test(entry.name);
+	const normalizedName = entry.name.toLowerCase();
+
+	switch (normalizedName) {
+		case "readme.md":
+			return 0;
+		case "readme.md.tera":
+			return 1;
+		case "readme":
+			return 2;
+		case "readme.tera":
+			return 3;
+		default:
+			return /^readme(?:\.[^.]+)?(?:\.tera)?$/i.test(entry.name)
+				? 4
+				: Number.POSITIVE_INFINITY;
+	}
+}
+
+function findReadmeFile(entries: GitHubContentEntry[]): GitHubContentEntry | undefined {
+	return entries.reduce<GitHubContentEntry | undefined>((best, entry) => {
+		const priority = getReadmePriority(entry);
+
+		if (!Number.isFinite(priority)) {
+			return best;
+		}
+
+		if (!best || priority < getReadmePriority(best)) {
+			return entry;
+		}
+
+		return best;
+	}, undefined);
 }
 
 export async function GET(request: NextRequest) {
@@ -45,7 +76,7 @@ export async function GET(request: NextRequest) {
 
 		const payload = (await contentsResponse.json()) as GitHubContentEntry[] | GitHubContentEntry;
 		const entries = Array.isArray(payload) ? payload : [payload];
-		const readme = entries.find(isReadmeFile);
+		const readme = findReadmeFile(entries);
 
 		if (!readme?.download_url) {
 			return NextResponse.json({ content: null }, { status: 200 });

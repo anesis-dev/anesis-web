@@ -1,5 +1,5 @@
-import { AddonRegistryPage } from "@/components/addons/AddonRegistryPage";
+import { redirect } from "next/navigation";
 
 export default function AddonsRegistryRoute() {
-	return <AddonRegistryPage />;
+	redirect("/addons");
 }

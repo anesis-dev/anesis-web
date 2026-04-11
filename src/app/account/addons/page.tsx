@@ -63,7 +63,7 @@ export default function AccountAddonsPage() {
 					<div className="flex flex-wrap gap-3">
 						<Button onClick={login}>Login with GitHub</Button>
 						<Link href="/addons">
-							<Button variant="outline">Browse addon catalog</Button>
+							<Button variant="outline">Browse addon registry</Button>
 						</Link>
 					</div>
 				</div>
@@ -98,7 +98,7 @@ export default function AccountAddonsPage() {
 				/>
 				<div className="flex flex-wrap gap-2">
 					<Button variant="outline" asChild>
-						<Link href="/addons/registry">
+						<Link href="/addons">
 							<BoxesIcon className="size-4" />
 							Registry explorer
 						</Link>

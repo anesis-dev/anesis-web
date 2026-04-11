@@ -103,7 +103,7 @@ describe("addon services", () => {
     await expect(
       updateAddon("https://github.com/oxide-addons/nest-drizzle/tree/main"),
     ).resolves.toBeUndefined();
-    expect(api.patch).toHaveBeenCalledWith("/addon/", {
+    expect(api.patch).toHaveBeenCalledWith("/addon", {
       url: "https://github.com/oxide-addons/nest-drizzle/tree/main",
     });
   });

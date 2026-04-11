@@ -13,10 +13,10 @@ export function getAddonHref(
   const version = addon.version.trim();
 
   if (!addonId || !version) {
-    return "/addons/registry";
+    return "/addons";
   }
 
-  return `/addons/registry/${encodeURIComponent(
+  return `/addons/${encodeURIComponent(
     getAddonRef({ addon_id: addonId, version }),
   )}`;
 }

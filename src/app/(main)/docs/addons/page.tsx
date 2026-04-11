@@ -191,7 +191,7 @@ export default function DocsAddonsPage() {
 						</p>
 						<Button variant="outline" asChild>
 							<Link href="/addons">
-								Open addon catalog
+								Open addon registry
 								<ArrowRightIcon className="size-4" />
 							</Link>
 						</Button>

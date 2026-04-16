@@ -18,14 +18,14 @@ const authRequired = [
 	"`oxide template publish` and `oxide template update` send authenticated mutations.",
 	"`oxide addon install`, `oxide addon publish`, and `oxide addon update` require the saved token.",
 	"`oxide account` fetches the current user from the backend.",
-	"`oxide new` and `oxide <addon_id> <command>` require auth only when they must download an uncached template or addon first.",
+	"`oxide new` and `oxide use <addon-id> <command>` require auth only when they must download an uncached template or addon first.",
 ];
 
 const localOnly = [
 	"`oxide template list` and `oxide template remove` operate on local cache files.",
 	"`oxide addon list` and `oxide addon remove` operate on local addon cache files.",
 	"`oxide new` can run without logging in when the template is already cached locally.",
-	"`oxide <addon_id> <command>` can run without logging in when the addon is already cached locally.",
+	"`oxide use <addon-id> <command>` can run without logging in when the addon is already cached locally.",
 ];
 
 export default function DocsAuthenticationPage() {

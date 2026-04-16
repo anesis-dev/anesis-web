@@ -19,6 +19,14 @@ const installCargo = `cargo install oxide-cli`;
 
 const verifyInstall = `oxide --version`;
 
+const upgradeCommand = `oxide upgrade`;
+
+const completionsCommand = `# Example for zsh
+oxide completions zsh
+
+# Supported shells:
+# bash, zsh, fish, powershell`;
+
 const pathBash = `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc`;
 
@@ -149,6 +157,36 @@ export default function DocsInstallationPage() {
 							</code>
 							, so make sure your shell loads that directory.
 						</p>
+					</CardContent>
+				</Card>
+			</div>
+
+			<div className="grid gap-6 lg:grid-cols-2">
+				<Card>
+					<CardHeader>
+						<CardTitle>Upgrade Oxide</CardTitle>
+						<CardDescription>
+							Update the installed CLI binary from the latest GitHub Release.
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<CodeBlock code={upgradeCommand} />
+						<p className="text-sm text-muted-foreground">
+							After most commands, Oxide checks for a newer CLI release in the
+							background and prints a short notice when an update is available.
+						</p>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Shell completions</CardTitle>
+						<CardDescription>
+							Install tab completion for bash, zsh, fish, or PowerShell.
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<CodeBlock code={completionsCommand} />
 					</CardContent>
 				</Card>
 			</div>

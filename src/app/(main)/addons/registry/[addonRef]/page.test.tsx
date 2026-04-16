@@ -119,7 +119,7 @@ describe("AddonDetailsPage", () => {
       screen.queryByText("oxide addon update", { exact: false }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByText("oxide drizzle install", { exact: false }),
+      screen.getByText("oxide use drizzle install", { exact: false }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /back to addon registry/i }),
@@ -128,12 +128,12 @@ describe("AddonDetailsPage", () => {
     expect(useAddonManifest).toHaveBeenCalledWith(mockAddon.url);
 
     fireEvent.click(
-      screen.getByRole("button", { name: /copy oxide drizzle install/i }),
+      screen.getByRole("button", { name: /copy oxide use drizzle install/i }),
     );
 
     await waitFor(() =>
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        "oxide drizzle install",
+        "oxide use drizzle install",
       ),
     );
   });

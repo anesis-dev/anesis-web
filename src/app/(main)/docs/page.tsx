@@ -24,7 +24,7 @@ const quickStart = `oxide login
 oxide new my-app react-vite-ts
 cd my-app
 oxide addon install nest-drizzle
-oxide nest-drizzle install`;
+oxide use nest-drizzle install`;
 
 const pillars = [
 	{
@@ -180,7 +180,7 @@ export default function DocsOverviewPage() {
 								<span className="font-medium text-foreground">Addons</span> extend an
 								existing project. Run{" "}
 								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									oxide nest-drizzle install
+									oxide use nest-drizzle install
 								</code>{" "}
 								and Oxide reads the addon manifest, detects your project variant,
 								prompts for inputs, and applies declarative file operations.

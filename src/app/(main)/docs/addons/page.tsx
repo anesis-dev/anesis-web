@@ -28,13 +28,13 @@ oxide addon install nest-drizzle
 # ~/.oxide/cache/addons/nest-drizzle/`;
 
 const runCommandExample = `# Run an addon command from your project root
-oxide nest-drizzle install
+oxide use nest-drizzle install
 
 # The general form is:
-oxide <addon-id> <command>`;
+oxide use <addon-id> <command>`;
 
 const autoInstallNote = `# If the addon isn't cached yet, Oxide installs it automatically:
-oxide nest-drizzle install
+oxide use nest-drizzle install
 # → addon not found locally, installing...
 # → prompting for inputs...
 # → applying steps...`;
@@ -50,8 +50,8 @@ oxide new my-project nestjs
 cd my-project
 
 # 4. Run addon commands from inside the project
-oxide nest-drizzle install
-oxide nest-drizzle generate`;
+oxide use nest-drizzle install
+oxide use nest-drizzle generate`;
 
 const listRemoveExample = `# See which addons are cached locally
 oxide addon list
@@ -115,7 +115,7 @@ export default function DocsAddonsPage() {
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							oxide &lt;addon-id&gt; &lt;command&gt;
+							oxide use &lt;addon-id&gt; &lt;command&gt;
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							Variant detection
@@ -179,9 +179,9 @@ export default function DocsAddonsPage() {
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
 								oxide addon install
 							</code>{" "}
-							and use directly as the command prefix:{" "}
+							and then to{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide &lt;addon-id&gt; &lt;command&gt;
+								oxide use &lt;addon-id&gt; &lt;command&gt;
 							</code>
 							.
 						</p>
@@ -228,7 +228,7 @@ export default function DocsAddonsPage() {
 						<p>
 							When you run{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide &lt;addon-id&gt; &lt;command&gt;
+								oxide use &lt;addon-id&gt; &lt;command&gt;
 							</code>
 							, Oxide:
 						</p>

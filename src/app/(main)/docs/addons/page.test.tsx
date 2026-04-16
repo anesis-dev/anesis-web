@@ -19,7 +19,7 @@ describe("DocsAddonsPage", () => {
 	it("documents the external command form", () => {
 		render(<DocsAddonsPage />);
 
-		expect(screen.getAllByText(/oxide <addon-id> <command>/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/oxide use <addon-id> <command>/i).length).toBeGreaterThan(0);
 	});
 
 	it("explains the oxide.lock file", () => {

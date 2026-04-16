@@ -22,4 +22,14 @@ describe("DocsInstallationPage", () => {
 		).toBeInTheDocument();
 		expect(screen.getByText(/oxide-linux-aarch64\.tar\.gz/i)).toBeInTheDocument();
 	});
+
+	it("documents post-install upgrade and shell completion commands", () => {
+		render(<DocsInstallationPage />);
+
+		expect(screen.getByText("oxide upgrade", { exact: false })).toBeInTheDocument();
+		expect(
+			screen.getByText("oxide completions zsh", { exact: false }),
+		).toBeInTheDocument();
+		expect(screen.getByText(/bash, zsh, fish, powershell/i)).toBeInTheDocument();
+	});
 });

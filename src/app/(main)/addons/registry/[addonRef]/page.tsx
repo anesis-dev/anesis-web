@@ -115,7 +115,7 @@ function CommandCard({
 }
 
 function getAddonExecutionCommand(addonId: string, commandName: string) {
-  return `oxide ${addonId} ${commandName}`;
+  return `oxide use ${addonId} ${commandName}`;
 }
 
 function getExecutionHelper(command: AddonManifestCommand) {
@@ -478,7 +478,7 @@ export default function AddonDetailsPage({
                                 command.name,
                               )}
                               helper={getExecutionHelper(command)}
-                              copyLabel={`oxide ${addon.addon_id} ${command.name}`}
+                              copyLabel={`oxide use ${addon.addon_id} ${command.name}`}
                             />
                           </div>
                         </div>

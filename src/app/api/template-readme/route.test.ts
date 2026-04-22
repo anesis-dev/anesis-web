@@ -28,13 +28,26 @@ describe("GET /api/template-readme", () => {
 							name: "README.md",
 							path: "template/README.md",
 							download_url: "https://raw.githubusercontent.com/demo/readme.md",
+							url: "https://api.github.com/repos/demo-owner/demo-repo/contents/template/README.md?ref=main",
 							type: "file",
 						},
 					]),
 					{ status: 200 },
 				),
 			)
-			.mockResolvedValueOnce(new Response("# Demo README", { status: 200 }));
+			.mockResolvedValueOnce(
+				new Response(
+					JSON.stringify({
+						name: "README.md",
+						path: "template/README.md",
+						type: "file",
+						encoding: "base64",
+						content: Buffer.from("# Demo README", "utf8").toString("base64"),
+						download_url: "https://raw.githubusercontent.com/demo/readme.md",
+					}),
+					{ status: 200 },
+				),
+			);
 
 		const response = await GET(
 			new NextRequest(
@@ -48,6 +61,16 @@ describe("GET /api/template-readme", () => {
 			fileName: "README.md",
 			path: "template/README.md",
 		});
+		expect(global.fetch).toHaveBeenNthCalledWith(
+			2,
+			"https://api.github.com/repos/demo-owner/demo-repo/contents/template/README.md?ref=main",
+			expect.objectContaining({
+				headers: expect.objectContaining({
+					Accept: "application/vnd.github+json",
+					"User-Agent": "oxide-web",
+				}),
+			}),
+		);
 	});
 
 	it("returns content:null when no readme exists", async () => {

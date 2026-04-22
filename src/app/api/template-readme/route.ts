@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { env } from "@/config/env";
 import {
 	getGitHubContentsApiUrl,
 	parseGitHubTreeUrl,
@@ -10,6 +9,16 @@ interface GitHubContentEntry {
 	path: string;
 	download_url: string | null;
 	type: string;
+	url?: string;
+}
+
+interface GitHubFileContent {
+	content?: string;
+	download_url?: string | null;
+	encoding?: string;
+	name?: string;
+	path?: string;
+	type?: string;
 }
 
 function getReadmePriority(entry: GitHubContentEntry): number {
@@ -51,6 +60,67 @@ function findReadmeFile(entries: GitHubContentEntry[]): GitHubContentEntry | und
 	}, undefined);
 }
 
+function decodeGitHubFileContent(payload: GitHubFileContent): string | null {
+	if (typeof payload.content !== "string") {
+		return null;
+	}
+
+	const encoding = payload.encoding?.toLowerCase();
+
+	if (encoding === "base64") {
+		return Buffer.from(payload.content.replace(/\s/g, ""), "base64").toString(
+			"utf8",
+		);
+	}
+
+	if (!encoding || encoding === "utf-8" || encoding === "utf8") {
+		return payload.content;
+	}
+
+	return null;
+}
+
+async function fetchGitHubJson(url: string) {
+	return fetch(url, {
+		headers: {
+			Accept: "application/vnd.github+json",
+			"User-Agent": "oxide-web",
+		},
+		next: { revalidate: 60 * 5 },
+	});
+}
+
+async function loadReadmeContent(readme: GitHubContentEntry) {
+	let lastStatus = 502;
+
+	if (readme.url) {
+		const readmeApiResponse = await fetchGitHubJson(readme.url);
+		lastStatus = readmeApiResponse.status;
+
+		if (readmeApiResponse.ok) {
+			const payload = (await readmeApiResponse.json()) as GitHubFileContent;
+			const decoded = decodeGitHubFileContent(payload);
+
+			if (decoded !== null) {
+				return { content: decoded, status: 200 };
+			}
+		}
+	}
+
+	if (readme.download_url) {
+		const readmeResponse = await fetch(readme.download_url, {
+			next: { revalidate: 60 * 5 },
+		});
+		lastStatus = readmeResponse.status;
+
+		if (readmeResponse.ok) {
+			return { content: await readmeResponse.text(), status: 200 };
+		}
+	}
+
+	return { content: null, status: lastStatus };
+}
+
 export async function GET(request: NextRequest) {
 	const repositoryUrl = request.nextUrl.searchParams.get("url");
 
@@ -60,12 +130,8 @@ export async function GET(request: NextRequest) {
 
 	try {
 		const repo = parseGitHubTreeUrl(repositoryUrl);
-		const proxyUrl = new URL("/github/proxy", env.apiUrl);
-		proxyUrl.searchParams.set("url", getGitHubContentsApiUrl(repo));
 
-		const contentsResponse = await fetch(proxyUrl.toString(), {
-			next: { revalidate: 60 * 5 },
-		});
+		const contentsResponse = await fetchGitHubJson(getGitHubContentsApiUrl(repo));
 
 		if (!contentsResponse.ok) {
 			return NextResponse.json(
@@ -82,21 +148,17 @@ export async function GET(request: NextRequest) {
 			return NextResponse.json({ content: null }, { status: 200 });
 		}
 
-		const readmeResponse = await fetch(readme.download_url, {
-			next: { revalidate: 60 * 5 },
-		});
+		const readmeContent = await loadReadmeContent(readme);
 
-		if (!readmeResponse.ok) {
+		if (readmeContent.content === null) {
 			return NextResponse.json(
 				{ message: "Failed to load README from GitHub." },
-				{ status: readmeResponse.status },
+				{ status: readmeContent.status },
 			);
 		}
 
-		const content = await readmeResponse.text();
-
 		return NextResponse.json({
-			content,
+			content: readmeContent.content,
 			fileName: readme.name,
 			path: readme.path,
 		});

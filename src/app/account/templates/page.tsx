@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
+import { groupTemplatesByName } from "@/lib/template-versions";
 import { AlertCircleIcon, PackageIcon } from "lucide-react";
 
 const PAGE_SIZE = 6;
@@ -18,14 +19,26 @@ export default function AccountTemplatesPage() {
 	const { templates, isLoading, isError } = useMyTemplates(!!user);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const templateGroups = useMemo(() => groupTemplatesByName(templates), [templates]);
+	const latestTemplates = useMemo(
+		() => templateGroups.map((group) => group.latest),
+		[templateGroups],
+	);
+	const versionsByName = useMemo(
+		() =>
+			new Map(
+				templateGroups.map((group) => [group.name, group.versions]),
+			),
+		[templateGroups],
+	);
 
 	const myTemplates = useMemo(() => {
 		const query = search.trim().toLowerCase();
 		if (!query) {
-			return templates;
+			return latestTemplates;
 		}
 
-		return templates.filter((template) =>
+		return latestTemplates.filter((template) =>
 			[
 				template.name,
 				template.config.metadata.displayName,
@@ -38,7 +51,7 @@ export default function AccountTemplatesPage() {
 				.toLowerCase()
 				.includes(query),
 		);
-	}, [search, templates]);
+	}, [search, latestTemplates]);
 
 	const totalPages = Math.max(1, Math.ceil(myTemplates.length / PAGE_SIZE));
 	const currentPage = Math.min(page, totalPages);
@@ -126,7 +139,11 @@ export default function AccountTemplatesPage() {
 				<>
 					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 						{paginatedTemplates.map((template) => (
-							<OwnedTemplateCard key={template.id} template={template} />
+							<OwnedTemplateCard
+								key={template.name}
+								template={template}
+								versions={versionsByName.get(template.name) ?? [template]}
+							/>
 						))}
 					</div>
 					<PaginationControls

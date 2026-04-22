@@ -11,7 +11,11 @@ import {
 	Trash2Icon,
 } from "lucide-react";
 import { formatDate } from "@/lib/date";
-import { getTemplateHref, getTemplateRef } from "@/lib/template-ref";
+import {
+	getTemplateHref,
+	getTemplateLatestHref,
+	getTemplateRef,
+} from "@/lib/template-ref";
 import { deleteTemplate, updateTemplate } from "@/services/template";
 import { ITemplate } from "@/types/template";
 import { TemplateCard } from "@/components/templates/TemplateCard";
@@ -32,9 +36,16 @@ type Notice =
 	| { type: "error"; message: string }
 	| null;
 
-export function OwnedTemplateCard({ template }: { template: ITemplate }) {
+export function OwnedTemplateCard({
+	template,
+	versions = [template],
+}: {
+	template: ITemplate;
+	versions?: ITemplate[];
+}) {
 	const templateRef = getTemplateRef(template);
-	const templateHref = getTemplateHref(template);
+	const templateHref = getTemplateLatestHref(template.name);
+	const versionCount = versions.length;
 	const queryClient = useQueryClient();
 	const [notice, setNotice] = useState<Notice>(null);
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -50,6 +61,7 @@ export function OwnedTemplateCard({ template }: { template: ITemplate }) {
 			await Promise.all([
 				queryClient.invalidateQueries({ queryKey: ["templates"] }),
 				queryClient.invalidateQueries({ queryKey: ["my-templates"] }),
+				queryClient.invalidateQueries({ queryKey: ["template", template.name] }),
 				queryClient.invalidateQueries({ queryKey: ["template", templateRef] }),
 			]);
 			setNotice({
@@ -76,6 +88,7 @@ export function OwnedTemplateCard({ template }: { template: ITemplate }) {
 			await Promise.all([
 				queryClient.invalidateQueries({ queryKey: ["templates"] }),
 				queryClient.invalidateQueries({ queryKey: ["my-templates"] }),
+				queryClient.removeQueries({ queryKey: ["template", template.name] }),
 				queryClient.removeQueries({ queryKey: ["template", templateRef] }),
 			]);
 			setIsDeleteOpen(false);
@@ -92,7 +105,11 @@ export function OwnedTemplateCard({ template }: { template: ITemplate }) {
 
 	return (
 		<div className="flex flex-col gap-3">
-			<TemplateCard template={template} />
+			<TemplateCard
+				template={template}
+				versionCount={versionCount}
+				linkToLatest
+			/>
 
 			<div className="rounded-3xl border bg-card p-4 shadow-sm">
 				<div className="flex flex-col gap-4">
@@ -105,6 +122,23 @@ export function OwnedTemplateCard({ template }: { template: ITemplate }) {
 							Last synced {formatDate(template.updated_at)} from GitHub.
 						</p>
 					</div>
+
+					{versionCount > 1 && (
+						<div className="flex flex-wrap items-center gap-2">
+							<span className="text-xs font-medium text-muted-foreground">
+								Versions
+							</span>
+							{versions.map((version) => (
+								<Link
+									key={version.id}
+									href={getTemplateHref(version)}
+									className="rounded-full border bg-muted/30 px-2.5 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
+								>
+									v{version.version}
+								</Link>
+							))}
+						</div>
+					)}
 
 					<div className="flex flex-col gap-2">
 						<Button

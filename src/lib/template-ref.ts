@@ -14,3 +14,13 @@ export function getTemplateHref(template: Pick<ITemplate, "name" | "version">): 
 
 	return `/templates/${encodeURIComponent(getTemplateRef({ name, version }))}`;
 }
+
+export function getTemplateLatestHref(name: string): string {
+	const normalizedName = name.trim();
+
+	if (!normalizedName) {
+		return "/templates";
+	}
+
+	return `/templates/${encodeURIComponent(normalizedName)}`;
+}

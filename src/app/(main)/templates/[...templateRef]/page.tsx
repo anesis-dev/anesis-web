@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useMemo, useState } from "react";
 import {
 	ActivityIcon,
 	AlertCircleIcon,
@@ -10,6 +10,7 @@ import {
 	BookOpenTextIcon,
 	CalendarDaysIcon,
 	CheckIcon,
+	ChevronDownIcon,
 	CopyIcon,
 	ExternalLinkIcon,
 	GitBranchIcon,
@@ -23,12 +24,21 @@ import {
 import { formatDate } from "@/lib/date";
 import { parseGitHubTreeUrl } from "@/lib/github-tree-url";
 import { useTemplate } from "@/hooks/useTemplate";
+import { useTemplates } from "@/hooks/useTemplates";
 import { useTemplateReadme } from "@/hooks/useTemplateReadme";
-import { getTemplateRef } from "@/lib/template-ref";
+import { getTemplateHref, getTemplateRef } from "@/lib/template-ref";
+import { getTemplateVersionGroup } from "@/lib/template-versions";
 import { TemplateReadme } from "@/components/templates/TemplateReadme";
 import { TemplateApiUrlButton } from "@/components/templates/TemplateApiUrlButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function Pill({
 	children,
@@ -160,6 +170,7 @@ export default function TemplateDetailsPage({
 	const { templateRef } = use(params);
 	const joinedRef = templateRef.map((segment) => decodeURIComponent(segment)).join("/");
 	const { template, isLoading, isError } = useTemplate(joinedRef);
+	const { templates } = useTemplates();
 	const {
 		readme,
 		fileName,
@@ -167,6 +178,11 @@ export default function TemplateDetailsPage({
 		isLoading: isReadmeLoading,
 		isError: isReadmeError,
 	} = useTemplateReadme(template?.config.repository.url);
+	const versions = useMemo(() => {
+		if (!template) return [];
+
+		return getTemplateVersionGroup(templates, template.name)?.versions ?? [template];
+	}, [template, templates]);
 
 	if (isLoading) {
 		return (
@@ -213,7 +229,7 @@ export default function TemplateDetailsPage({
 	const keywordCount = String(template.config.metadata.tags.length);
 	const technologyCount = String(template.config.technologies.length);
 	const languageCount = String(template.config.languages.length);
-	const sourceDepth = String(source.path?.split("/").filter(Boolean).length ?? 0);
+	const versionCount = String(versions.length || 1);
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
@@ -314,6 +330,43 @@ export default function TemplateDetailsPage({
 								variant="outline"
 								className="h-auto min-h-11 whitespace-normal px-4 py-3 text-center sm:flex-1 xl:flex-none"
 							/>
+							{versions.length > 1 && (
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											type="button"
+											size="lg"
+											variant="outline"
+											className="h-auto min-h-11 whitespace-normal px-4 py-3 text-center sm:flex-1 xl:flex-none"
+										>
+											<BadgeInfoIcon className="size-4" />
+											v{template.version}
+											<ChevronDownIcon className="size-4" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end" className="w-56">
+										<DropdownMenuLabel>Template versions</DropdownMenuLabel>
+										{versions.map((version, index) => {
+											const active = version.version === template.version;
+
+											return (
+												<DropdownMenuItem key={version.id} asChild>
+													<Link
+														href={getTemplateHref(version)}
+														className="flex w-full items-center justify-between gap-3"
+													>
+														<span className="font-mono">v{version.version}</span>
+														<span className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+															{index === 0 ? "latest" : null}
+															{active ? <CheckIcon className="size-3.5" /> : null}
+														</span>
+													</Link>
+												</DropdownMenuItem>
+											);
+										})}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							)}
 						</div>
 					</div>
 
@@ -368,9 +421,9 @@ export default function TemplateDetailsPage({
 								helper="Language signals exposed to registry filters."
 							/>
 							<SnapshotCard
-								label="Source Depth"
-								value={sourceDepth}
-								helper="Nested folder depth inside the GitHub repository tree."
+								label="Versions"
+								value={versionCount}
+								helper="Published versions available under this template name."
 							/>
 						</CardContent>
 					</Card>

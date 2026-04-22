@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Home from "@/app/(main)/page";
 
 vi.mock("@/hooks/useTemplates", () => ({
@@ -36,15 +36,50 @@ describe("Home", () => {
 	it("shows a compact single-command install card on the hero", () => {
 		render(<Home />);
 
-		expect(screen.getByText(/^Install Oxide$/)).toBeInTheDocument();
 		expect(screen.queryByText(/quick start/i)).not.toBeInTheDocument();
 		expect(screen.queryByText(/all installation options/i)).not.toBeInTheDocument();
 		expect(
-			screen.getByText(
-				/curl -sSL https:\/\/raw\.githubusercontent\.com\/oxide-cli\/oxide\/main\/install\.sh \| bash/i,
-			),
+			screen.getByText("npm install -g @oxide-cli/oxide"),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /copy npm install command/i }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /^copy install command$/i }),
 		).toBeInTheDocument();
 		expect(screen.queryByText("oxide login")).not.toBeInTheDocument();
+	});
+
+	it("copies the npm install command from the command text", async () => {
+		render(<Home />);
+
+		fireEvent.click(
+			screen.getByRole("button", { name: /copy npm install command/i }),
+		);
+
+		await waitFor(() =>
+			expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+				"npm install -g @oxide-cli/oxide",
+			),
+		);
+		expect(
+			screen.getByRole("button", { name: /install command copied/i }),
+		).toBeInTheDocument();
+	});
+
+	it("copies the npm install command from the copy button", async () => {
+		render(<Home />);
+
+		fireEvent.click(
+			screen.getByRole("button", { name: /^copy install command$/i }),
+		);
+
+		await waitFor(() =>
+			expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+				"npm install -g @oxide-cli/oxide",
+			),
+		);
+		expect(screen.getByText("Copied")).toBeInTheDocument();
 	});
 
 	it("surfaces recent addons on the homepage", () => {

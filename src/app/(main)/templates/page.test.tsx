@@ -11,8 +11,17 @@ vi.mock("@/hooks/useAuth", () => ({
 }));
 
 vi.mock("@/components/templates/TemplateCard", () => ({
-	TemplateCard: ({ template }: { template: { config: { metadata: { displayName: string } } } }) => (
-		<div data-testid="template-card">{template.config.metadata.displayName}</div>
+	TemplateCard: ({
+		template,
+		versionCount,
+	}: {
+		template: { config: { metadata: { displayName: string } } };
+		versionCount?: number;
+	}) => (
+		<div data-testid="template-card">
+			{template.config.metadata.displayName}
+			{versionCount && versionCount > 1 ? ` (${versionCount})` : null}
+		</div>
 	),
 }));
 
@@ -101,5 +110,44 @@ describe("TemplatesPage", () => {
 		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
 		expect(screen.getByText("Special Template 13")).toBeInTheDocument();
 		expect(screen.queryByText("Page 2 of 2")).not.toBeInTheDocument();
+	});
+
+	it("collapses multiple versions of the same template into one latest card", () => {
+		vi.mocked(useTemplates).mockReturnValue({
+			templates: [
+				createTemplate({
+					id: "react-old",
+					name: "react-vite",
+					version: "0.2.0",
+					config: { metadata: { displayName: "React Vite", description: "", tags: [] } },
+				}),
+				createTemplate({
+					id: "react-new",
+					name: "react-vite",
+					version: "0.3.0",
+					config: { metadata: { displayName: "React Vite", description: "", tags: [] } },
+				}),
+			],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(useAuth).mockReturnValue({
+			user: null,
+			isLoading: false,
+			login: vi.fn(),
+			logout: vi.fn(),
+		});
+
+		render(<TemplatesPage />);
+
+		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
+		expect(screen.getByText("React Vite", { exact: false })).toHaveTextContent(
+			"(2)",
+		);
+		expect(
+			screen.getByText((_, element) =>
+				element?.textContent === "Showing 1 template",
+			),
+		).toBeInTheDocument();
 	});
 });

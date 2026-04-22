@@ -1,4 +1,8 @@
-import { getTemplateHref, getTemplateRef } from "@/lib/template-ref";
+import {
+	getTemplateHref,
+	getTemplateLatestHref,
+	getTemplateRef,
+} from "@/lib/template-ref";
 import { mockTemplate } from "@/test/fixtures";
 
 describe("template-ref", () => {
@@ -10,6 +14,11 @@ describe("template-ref", () => {
 		expect(getTemplateHref(mockTemplate)).toBe(
 			"/templates/demo-repo%400.1.0",
 		);
+	});
+
+	it("builds latest-version template hrefs", () => {
+		expect(getTemplateLatestHref("demo-repo")).toBe("/templates/demo-repo");
+		expect(getTemplateLatestHref("")).toBe("/templates");
 	});
 
 	it("encodes legacy slash-delimited refs into a single details route segment", () => {

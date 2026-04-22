@@ -11,8 +11,17 @@ vi.mock("@/hooks/useMyTemplates", () => ({
 }));
 
 vi.mock("@/components/templates/OwnedTemplateCard", () => ({
-	OwnedTemplateCard: ({ template }: { template: { name: string } }) => (
-		<div data-testid="owned-template-card">{template.name}</div>
+	OwnedTemplateCard: ({
+		template,
+		versions,
+	}: {
+		template: { name: string };
+		versions?: unknown[];
+	}) => (
+		<div data-testid="owned-template-card">
+			{template.name}
+			{versions && versions.length > 1 ? ` (${versions.length})` : null}
+		</div>
 	),
 }));
 
@@ -91,5 +100,30 @@ describe("AccountTemplatesPage", () => {
 		);
 		expect(screen.getAllByTestId("owned-template-card")).toHaveLength(1);
 		expect(screen.getByText("template-7")).toBeInTheDocument();
+	});
+
+	it("groups owned template versions by package name", () => {
+		vi.mocked(useAuth).mockReturnValue({
+			user: createUser(),
+			isLoading: false,
+			login: vi.fn(),
+			logout: vi.fn(),
+		});
+		vi.mocked(useMyTemplates).mockReturnValue({
+			templates: [
+				createTemplate({ id: "old", name: "api-template", version: "0.1.0" }),
+				createTemplate({ id: "new", name: "api-template", version: "0.2.0" }),
+			],
+			isLoading: false,
+			isError: false,
+		});
+
+		render(<AccountTemplatesPage />);
+
+		expect(screen.getAllByTestId("owned-template-card")).toHaveLength(1);
+		expect(screen.getByText("api-template", { exact: false })).toHaveTextContent(
+			"(2)",
+		);
+		expect(screen.getByText("1 template(s)")).toBeInTheDocument();
 	});
 });

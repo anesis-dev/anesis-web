@@ -11,6 +11,7 @@ import {
 } from "@/components/templates/TemplateFilters";
 import { PublishTemplateDialog } from "@/components/templates/PublishTemplateDialog";
 import { ITemplate } from "@/types/template";
+import { groupTemplatesByName } from "@/lib/template-versions";
 import { AlertCircleIcon, PackageIcon } from "lucide-react";
 
 const DEFAULT_FILTERS: TemplateFiltersState = {
@@ -106,10 +107,22 @@ export default function Templates() {
 	const { templates, isLoading, isError } = useTemplates();
 	const { user } = useAuth();
 	const [filters, setFilters] = useState<TemplateFiltersState>(DEFAULT_FILTERS);
+	const templateGroups = useMemo(() => groupTemplatesByName(templates), [templates]);
+	const latestTemplates = useMemo(
+		() => templateGroups.map((group) => group.latest),
+		[templateGroups],
+	);
+	const versionCountByName = useMemo(
+		() =>
+			new Map(
+				templateGroups.map((group) => [group.name, group.versions.length]),
+			),
+		[templateGroups],
+	);
 
 	const filtered = useMemo(
-		() => applyFilters(templates, filters),
-		[templates, filters],
+		() => applyFilters(latestTemplates, filters),
+		[latestTemplates, filters],
 	);
 	const [page, setPage] = useState(1);
 	const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -134,7 +147,7 @@ export default function Templates() {
 
 			{/* Filters */}
 			<TemplateFilters
-				templates={templates}
+				templates={latestTemplates}
 				filters={filters}
 				onChange={(nextFilters) => {
 					setFilters(nextFilters);
@@ -145,13 +158,13 @@ export default function Templates() {
 			{/* Result count */}
 			{!isLoading && !isError && (
 				<p className="text-xs text-muted-foreground">
-					{filtered.length === templates.length ? (
+					{filtered.length === latestTemplates.length ? (
 						<>
 							Showing{" "}
 							<span className="font-medium text-foreground">
-								{templates.length}
+								{latestTemplates.length}
 							</span>{" "}
-							{templates.length === 1 ? "template" : "templates"}
+							{latestTemplates.length === 1 ? "template" : "templates"}
 						</>
 					) : (
 						<>
@@ -161,9 +174,9 @@ export default function Templates() {
 							</span>{" "}
 							of{" "}
 							<span className="font-medium text-foreground">
-								{templates.length}
+								{latestTemplates.length}
 							</span>{" "}
-							{templates.length === 1 ? "template" : "templates"}
+							{latestTemplates.length === 1 ? "template" : "templates"}
 						</>
 					)}
 				</p>
@@ -210,7 +223,12 @@ export default function Templates() {
 			{!isLoading && !isError && filtered.length > 0 && (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{paginatedTemplates.map((template) => (
-						<TemplateCard key={template.id} template={template} />
+						<TemplateCard
+							key={template.name}
+							template={template}
+							versionCount={versionCountByName.get(template.name) ?? 1}
+							linkToLatest
+						/>
 					))}
 				</div>
 			)}

@@ -1,10 +1,14 @@
 import { Suspense } from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import TemplateDetailsPage from "@/app/(main)/templates/[...templateRef]/page";
-import { mockTemplate } from "@/test/fixtures";
+import { createTemplate, mockTemplate } from "@/test/fixtures";
 
 vi.mock("@/hooks/useTemplate", () => ({
 	useTemplate: vi.fn(),
+}));
+
+vi.mock("@/hooks/useTemplates", () => ({
+	useTemplates: vi.fn(),
 }));
 
 vi.mock("@/hooks/useTemplateReadme", () => ({
@@ -28,6 +32,7 @@ vi.mock("@/components/templates/TemplateApiUrlButton", () => ({
 }));
 
 import { useTemplate } from "@/hooks/useTemplate";
+import { useTemplates } from "@/hooks/useTemplates";
 import { useTemplateReadme } from "@/hooks/useTemplateReadme";
 
 describe("TemplateDetailsPage", () => {
@@ -36,6 +41,11 @@ describe("TemplateDetailsPage", () => {
 			template: undefined,
 			isLoading: false,
 			isError: true,
+		});
+		vi.mocked(useTemplates).mockReturnValue({
+			templates: [],
+			isLoading: false,
+			isError: false,
 		});
 		vi.mocked(useTemplateReadme).mockReturnValue({
 			readme: null,
@@ -68,6 +78,18 @@ describe("TemplateDetailsPage", () => {
 	it("renders a package-style template page with quick start and readme content", async () => {
 		vi.mocked(useTemplate).mockReturnValue({
 			template: mockTemplate,
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(useTemplates).mockReturnValue({
+			templates: [
+				mockTemplate,
+				createTemplate({
+					id: "older-template-version",
+					name: "demo-repo",
+					version: "0.0.9",
+				}),
+			],
 			isLoading: false,
 			isError: false,
 		});
@@ -104,6 +126,8 @@ describe("TemplateDetailsPage", () => {
 		).toBeInTheDocument();
 		expect(screen.getByText("Package Snapshot")).toBeInTheDocument();
 		expect(screen.getByText("Package Metadata")).toBeInTheDocument();
+		expect(screen.getByText("Versions")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /v0\.1\.0/i })).toBeInTheDocument();
 		expect(screen.getByText("README.md:# Demo")).toBeInTheDocument();
 		expect(
 			screen.getAllByText("demo-repo@0.1.0", { exact: false }).length,

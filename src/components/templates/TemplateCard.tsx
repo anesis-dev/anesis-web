@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTemplateHref } from "@/lib/template-ref";
+import { getTemplateHref, getTemplateLatestHref } from "@/lib/template-ref";
 import { ITemplate } from "@/types/template";
 import {
   Card,
@@ -23,6 +23,8 @@ import { cn } from "@/lib/utils";
 
 interface TemplateCardProps {
   template: ITemplate;
+  versionCount?: number;
+  linkToLatest?: boolean;
 }
 
 function Badge({
@@ -44,10 +46,16 @@ function Badge({
   );
 }
 
-export function TemplateCard({ template }: TemplateCardProps) {
+export function TemplateCard({
+  template,
+  versionCount = 1,
+  linkToLatest = false,
+}: TemplateCardProps) {
   const { config } = template;
   const { metadata, author, technologies, languages, official } = config;
-  const detailsHref = getTemplateHref(template);
+  const detailsHref = linkToLatest
+    ? getTemplateLatestHref(template.name)
+    : getTemplateHref(template);
 
   return (
     <Card className="gap-4 py-5 h-full transition-colors hover:border-foreground/30">
@@ -130,9 +138,16 @@ export function TemplateCard({ template }: TemplateCardProps) {
             <span className="truncate">@{author.github}</span>
           </Link>
 
-          <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
-            v{config.version}
-          </span>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {versionCount > 1 && (
+              <span className="rounded-full border bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                {versionCount} versions
+              </span>
+            )}
+            <span className="font-mono text-[11px] text-muted-foreground">
+              v{config.version}
+            </span>
+          </div>
         </div>
 
         <div className="flex w-full items-center gap-2">

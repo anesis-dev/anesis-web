@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AddonCard } from "@/components/addons/AddonCard";
 import { useAddons } from "@/hooks/useAddons";
 import { useTemplates } from "@/hooks/useTemplates";
@@ -12,13 +12,15 @@ import {
   ArrowRightIcon,
   BookOpenIcon,
   BoxesIcon,
+  CheckIcon,
   CommandIcon,
+  CopyIcon,
   LoaderIcon,
   ServerCogIcon,
   TerminalSquareIcon,
 } from "lucide-react";
 
-const installCommand = `curl -sSL https://raw.githubusercontent.com/oxide-cli/oxide/main/install.sh | bash`;
+const installCommand = `npm install -g @oxide-cli/oxide`;
 
 const features = [
   {
@@ -92,6 +94,19 @@ function AddonSkeleton() {
 export default function Home() {
   const { templates, isLoading: templatesLoading } = useTemplates();
   const { addons, isLoading: addonsLoading } = useAddons();
+  const [installCopied, setInstallCopied] = useState(false);
+
+  async function handleCopyInstallCommand() {
+    if (!navigator.clipboard?.writeText) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(installCommand);
+      setInstallCopied(true);
+      window.setTimeout(() => setInstallCopied(false), 1600);
+    } catch {}
+  }
 
   const featuredTemplates = useMemo(() => {
     return [...templates]
@@ -161,14 +176,40 @@ export default function Home() {
             </Button>
           </div>
 
-          <div className="mx-auto w-full max-w-2xl rounded-[1.75rem] border bg-card/95 p-5 text-left shadow-sm">
-            <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.24em] text-muted-foreground">
-              <TerminalSquareIcon className="size-4 text-primary" />
-              Install Oxide
+          <div className="mx-auto w-full max-w-2xl">
+            <div className="flex flex-col overflow-hidden rounded-xl border bg-background/85 text-left shadow-sm ring-1 ring-foreground/5 backdrop-blur sm:flex-row sm:items-stretch">
+              <button
+                type="button"
+                onClick={handleCopyInstallCommand}
+                aria-label={`Copy npm install command: ${installCommand}`}
+                className="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/45 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/45"
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-muted/45 text-primary">
+                  <TerminalSquareIcon className="size-4" />
+                </span>
+                <code className="block min-w-0 max-w-full overflow-x-auto whitespace-nowrap font-mono text-sm font-semibold text-foreground sm:text-base">
+                  {installCommand}
+                </code>
+              </button>
+              <div className="border-t p-2 sm:border-l sm:border-t-0">
+                <Button
+                  type="button"
+                  variant={installCopied ? "secondary" : "ghost"}
+                  className="w-full sm:w-auto"
+                  onClick={handleCopyInstallCommand}
+                  aria-label={
+                    installCopied ? "Install command copied" : "Copy install command"
+                  }
+                >
+                  {installCopied ? (
+                    <CheckIcon className="size-4" />
+                  ) : (
+                    <CopyIcon className="size-4" />
+                  )}
+                  {installCopied ? "Copied" : "Copy"}
+                </Button>
+              </div>
             </div>
-            <pre className="mt-3 overflow-x-auto rounded-xl border bg-background/90 px-3 py-3 whitespace-pre-wrap break-all text-sm text-foreground shadow-sm">
-              <code>{installCommand}</code>
-            </pre>
           </div>
         </div>
       </section>

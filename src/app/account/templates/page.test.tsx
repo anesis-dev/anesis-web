@@ -14,11 +14,16 @@ vi.mock("@/components/templates/OwnedTemplateCard", () => ({
 	OwnedTemplateCard: ({
 		template,
 		versions,
+		isAdmin,
 	}: {
 		template: { name: string };
 		versions?: unknown[];
+		isAdmin?: boolean;
 	}) => (
-		<div data-testid="owned-template-card">
+		<div
+			data-testid="owned-template-card"
+			data-admin={isAdmin ? "true" : "false"}
+		>
 			{template.name}
 			{versions && versions.length > 1 ? ` (${versions.length})` : null}
 		</div>
@@ -71,7 +76,7 @@ describe("AccountTemplatesPage", () => {
 
 	it("renders, paginates and filters the signed-in user's templates", async () => {
 		vi.mocked(useAuth).mockReturnValue({
-			user: createUser(),
+			user: createUser({ role: "user" }),
 			isLoading: false,
 			login: vi.fn(),
 			logout: vi.fn(),
@@ -84,19 +89,28 @@ describe("AccountTemplatesPage", () => {
 		render(<AccountTemplatesPage />);
 
 		expect(screen.getByText("Publish Template")).toBeInTheDocument();
-		expect(screen.getByText("7 template(s)")).toBeInTheDocument();
+		expect(
+			screen.getByText("7 package(s) across 7 published version(s)"),
+		).toBeInTheDocument();
 		expect(screen.getAllByTestId("owned-template-card")).toHaveLength(6);
+		expect(
+			screen.getAllByTestId("owned-template-card").every((card) =>
+				card.getAttribute("data-admin") === "false",
+			),
+		).toBe(true);
 
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
 		expect(screen.getAllByTestId("owned-template-card")).toHaveLength(1);
 		expect(screen.getByText("template-7")).toBeInTheDocument();
 
-		fireEvent.change(screen.getByPlaceholderText(/search your templates/i), {
+		fireEvent.change(screen.getByLabelText(/search your templates/i), {
 			target: { value: "special" },
 		});
 
 		await waitFor(() =>
-			expect(screen.getByText("1 template(s)")).toBeInTheDocument(),
+			expect(
+				screen.getByText("1 package(s) across 7 published version(s)"),
+			).toBeInTheDocument(),
 		);
 		expect(screen.getAllByTestId("owned-template-card")).toHaveLength(1);
 		expect(screen.getByText("template-7")).toBeInTheDocument();
@@ -104,7 +118,7 @@ describe("AccountTemplatesPage", () => {
 
 	it("groups owned template versions by package name", () => {
 		vi.mocked(useAuth).mockReturnValue({
-			user: createUser(),
+			user: createUser({ role: "user" }),
 			isLoading: false,
 			login: vi.fn(),
 			logout: vi.fn(),
@@ -124,6 +138,32 @@ describe("AccountTemplatesPage", () => {
 		expect(screen.getByText("api-template", { exact: false })).toHaveTextContent(
 			"(2)",
 		);
-		expect(screen.getByText("1 template(s)")).toBeInTheDocument();
+		expect(
+			screen.getByText("1 package(s) across 2 published version(s)"),
+		).toBeInTheDocument();
+	});
+
+	it("enables admin controls on package cards for administrators", () => {
+		vi.mocked(useAuth).mockReturnValue({
+			user: createUser({ role: "admin" }),
+			isLoading: false,
+			login: vi.fn(),
+			logout: vi.fn(),
+		});
+		vi.mocked(useMyTemplates).mockReturnValue({
+			templates: [createTemplate({ id: "admin-template", name: "control-room" })],
+			isLoading: false,
+			isError: false,
+		});
+
+		render(<AccountTemplatesPage />);
+
+		expect(
+			screen.getByText(/admin sync controls are enabled/i),
+		).toBeInTheDocument();
+		expect(screen.getByTestId("owned-template-card")).toHaveAttribute(
+			"data-admin",
+			"true",
+		);
 	});
 });

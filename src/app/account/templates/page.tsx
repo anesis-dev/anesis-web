@@ -5,14 +5,51 @@ import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/PaginationControls";
 import { OwnedTemplateCard } from "@/components/templates/OwnedTemplateCard";
 import { PublishTemplateDialog } from "@/components/templates/PublishTemplateDialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+	InputGroupText,
+} from "@/components/ui/input-group";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
 import { groupTemplatesByName } from "@/lib/template-versions";
-import { AlertCircleIcon, PackageIcon } from "lucide-react";
+import {
+	AlertCircleIcon,
+	GitBranchIcon,
+	PackageIcon,
+	SearchIcon,
+	ShieldCheckIcon,
+	SparklesIcon,
+} from "lucide-react";
 
 const PAGE_SIZE = 6;
+
+function MetricTile({
+	label,
+	value,
+	icon: Icon,
+}: {
+	label: string;
+	value: string | number;
+	icon: React.ElementType;
+}) {
+	return (
+		<div className="rounded-lg border bg-background/85 px-4 py-3 shadow-sm">
+			<div className="flex items-center justify-between gap-3">
+				<p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+					{label}
+				</p>
+				<Icon className="size-4 text-muted-foreground" />
+			</div>
+			<p className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+				{value}
+			</p>
+		</div>
+	);
+}
 
 export default function AccountTemplatesPage() {
 	const { user, login } = useAuth();
@@ -31,6 +68,8 @@ export default function AccountTemplatesPage() {
 			),
 		[templateGroups],
 	);
+	const isAdmin = user?.role === "admin";
+	const officialPackages = latestTemplates.filter((template) => template.official).length;
 
 	const myTemplates = useMemo(() => {
 		const query = search.trim().toLowerCase();
@@ -84,54 +123,127 @@ export default function AccountTemplatesPage() {
 	}
 
 	return (
-		<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-10 sm:px-5 lg:px-8">
-			<div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-				<div className="space-y-1">
-					<h1 className="text-3xl font-semibold tracking-tight">
-						Your templates
-					</h1>
-					<p className="text-sm text-muted-foreground">
-						Templates published under @{user.login}. Use a GitHub directory URL
-						to publish a new one.
+		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-5 lg:px-8">
+			<section className="overflow-hidden rounded-xl border bg-card shadow-sm">
+				<div className="bg-[linear-gradient(135deg,rgba(245,158,11,0.12),transparent_38%),linear-gradient(315deg,rgba(16,185,129,0.08),transparent_44%)] px-5 py-6 sm:px-6 sm:py-7">
+					<div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+						<div className="max-w-3xl space-y-3">
+							<div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+								<span className="rounded-md border bg-background/90 px-2.5 py-1">
+									Template workspace
+								</span>
+								{isAdmin ? (
+									<span className="rounded-md border bg-background/90 px-2.5 py-1">
+										Admin access
+									</span>
+								) : null}
+							</div>
+							<div className="space-y-2">
+								<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+									Your templates
+								</h1>
+								<p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+									Manage packages published under @{user.login}, refresh registry
+									metadata from GitHub, and keep official templates aligned when
+									admin controls are available.
+								</p>
+							</div>
+						</div>
+
+						<div className="grid gap-3 sm:grid-cols-3 xl:w-[28rem]">
+							<MetricTile
+								label="Packages"
+								value={isLoading ? "..." : latestTemplates.length}
+								icon={PackageIcon}
+							/>
+							<MetricTile
+								label="Versions"
+								value={isLoading ? "..." : templates.length}
+								icon={GitBranchIcon}
+							/>
+							<MetricTile
+								label="Official"
+								value={isLoading ? "..." : officialPackages}
+								icon={ShieldCheckIcon}
+							/>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+				<div className="space-y-3">
+					<InputGroup className="h-11 bg-background">
+						<InputGroupAddon>
+							<InputGroupText>
+								<SearchIcon className="size-4" />
+								Search
+							</InputGroupText>
+						</InputGroupAddon>
+						<InputGroupInput
+							value={search}
+							onChange={(event) => {
+								setSearch(event.target.value);
+								setPage(1);
+							}}
+							placeholder="Filter by package name, description, specialization, language, or stack"
+							aria-label="Search your templates"
+						/>
+					</InputGroup>
+					<p className="text-xs text-muted-foreground">
+						{isLoading
+							? "Loading templates..."
+							: `${myTemplates.length} package(s) across ${templates.length} published version(s)`}
 					</p>
 				</div>
-				<PublishTemplateDialog className="w-full gap-1.5 sm:w-auto" />
+
+				<PublishTemplateDialog className="h-11 w-full justify-center gap-1.5 sm:w-auto" />
 			</div>
 
-			<div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-				<Input
-					value={search}
-					onChange={(event) => {
-						setSearch(event.target.value);
-						setPage(1);
-					}}
-					placeholder="Search your templates"
-					className="w-full sm:max-w-sm"
-				/>
-				<p className="text-xs text-muted-foreground">
-					{isLoading
-						? "Loading templates..."
-						: `${myTemplates.length} template(s)`}
-				</p>
-			</div>
+			{isAdmin ? (
+				<Alert>
+					<SparklesIcon />
+					<AlertTitle>Admin sync controls are enabled</AlertTitle>
+					<AlertDescription>
+						Use <strong>Update as official</strong> on any package card to pull the
+						latest GitHub metadata and preserve official status in one step.
+					</AlertDescription>
+				</Alert>
+			) : null}
 
 			{isError && (
-				<div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-					<AlertCircleIcon className="mt-0.5 size-4 shrink-0" />
-					<p>Templates could not be loaded right now. Try again in a moment.</p>
-				</div>
+				<Alert variant="destructive">
+					<AlertCircleIcon />
+					<AlertTitle>Templates are unavailable</AlertTitle>
+					<AlertDescription>
+						Try again in a moment. The registry did not return your published
+						packages.
+					</AlertDescription>
+				</Alert>
 			)}
 
 			{!isLoading && !isError && myTemplates.length === 0 && (
-				<div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed py-16 text-center">
+				<div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed bg-muted/10 py-16 text-center">
 					<PackageIcon className="size-8 text-muted-foreground" />
 					<div className="space-y-1">
-						<p className="font-medium">No templates yet</p>
+						<p className="font-medium">
+							{templates.length === 0 ? "No templates yet" : "No templates match this filter"}
+						</p>
 						<p className="text-sm text-muted-foreground">
-							Publish your first template from a GitHub directory that contains
-							`oxide.template.json`.
+							{templates.length === 0
+								? "Publish your first template from a GitHub directory that contains `oxide.template.json`."
+								: "Try another search phrase or clear the current filter to see the rest of your packages."}
 						</p>
 					</div>
+					{templates.length > 0 ? (
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setSearch("")}
+						>
+							Clear search
+						</Button>
+					) : null}
 				</div>
 			)}
 
@@ -143,6 +255,7 @@ export default function AccountTemplatesPage() {
 								key={template.name}
 								template={template}
 								versions={versionsByName.get(template.name) ?? [template]}
+								isAdmin={isAdmin}
 							/>
 						))}
 					</div>

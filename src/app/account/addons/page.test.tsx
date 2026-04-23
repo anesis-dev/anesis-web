@@ -75,19 +75,19 @@ describe("AccountAddonsPage", () => {
 		render(<AccountAddonsPage />);
 
 		expect(screen.getByText("Publish Addon")).toBeInTheDocument();
-		expect(screen.getByText("7 addon(s)")).toBeInTheDocument();
+		expect(screen.getByText("7 addon(s) in your workspace")).toBeInTheDocument();
 		expect(screen.getAllByTestId("owned-addon-card")).toHaveLength(6);
 
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
 		expect(screen.getAllByTestId("owned-addon-card")).toHaveLength(1);
 		expect(screen.getByText("Addon 7")).toBeInTheDocument();
 
-		fireEvent.change(screen.getByPlaceholderText(/search your addons/i), {
+		fireEvent.change(screen.getByLabelText(/search your addons/i), {
 			target: { value: "special" },
 		});
 
 		await waitFor(() =>
-			expect(screen.getByText("1 addon(s)")).toBeInTheDocument(),
+			expect(screen.getByText("1 addon(s) in your workspace")).toBeInTheDocument(),
 		);
 		expect(screen.getAllByTestId("owned-addon-card")).toHaveLength(1);
 		expect(screen.getByText("Addon 7")).toBeInTheDocument();

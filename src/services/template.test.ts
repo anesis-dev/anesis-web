@@ -29,6 +29,7 @@ import {
 	fetchTemplates,
 	publishTemplate,
 	updateTemplate,
+	updateTemplateAsOfficial,
 	updateTemplateOfficialStatus,
 } from "@/services/template";
 
@@ -139,6 +140,19 @@ describe("template services", () => {
 			updateTemplate("https://github.com/demo-owner/demo-repo/tree/main/template"),
 		).resolves.toBeUndefined();
 		expect(api.patch).toHaveBeenCalledWith("/template", {
+			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
+		});
+	});
+
+	it("updates templates as official through the admin endpoint", async () => {
+		vi.mocked(api.patch).mockResolvedValueOnce(undefined);
+
+		await expect(
+			updateTemplateAsOfficial(
+				"https://github.com/demo-owner/demo-repo/tree/main/template",
+			),
+		).resolves.toBeUndefined();
+		expect(api.patch).toHaveBeenCalledWith("/template/official", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
 		});
 	});

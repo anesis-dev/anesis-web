@@ -116,7 +116,6 @@ function parseTemplateConfig(value: unknown, path: string): ITemplateConfig {
 			`${path}.technologies`,
 		),
 		languages: expectStringArray(config.languages, `${path}.languages`),
-		official: expectBoolean(config.official, `${path}.official`),
 		type: expectString(config.type, `${path}.type`),
 		metadata: {
 			displayName: expectString(metadata.displayName, `${path}.metadata.displayName`),

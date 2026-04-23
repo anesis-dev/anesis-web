@@ -9,12 +9,14 @@ vi.mock("@/hooks/useTemplates", () => ({
 
 vi.mock("@/services/template", () => ({
 	deleteTemplate: vi.fn(),
+	updateTemplateAsOfficial: vi.fn(),
 	updateTemplateOfficialStatus: vi.fn(),
 }));
 
 import { useTemplates } from "@/hooks/useTemplates";
 import {
 	deleteTemplate,
+	updateTemplateAsOfficial,
 	updateTemplateOfficialStatus,
 } from "@/services/template";
 
@@ -95,6 +97,43 @@ describe("AdminTemplatesPage", () => {
 		);
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["templates"] });
 		expect(screen.getByText(/is now marked as official/i)).toBeInTheDocument();
+	});
+
+	it("refreshes a template through the admin official endpoint", async () => {
+		const template = createTemplate({
+			id: "template-3",
+			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
+			config: {
+				metadata: {
+					displayName: "Official Template",
+				},
+			},
+		});
+		vi.mocked(useTemplates).mockReturnValue({
+			templates: [template],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(updateTemplateAsOfficial).mockResolvedValueOnce(undefined);
+
+		const { queryClient } = renderWithQueryClient(<AdminTemplatesPage />);
+		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: /refresh official metadata for official template/i,
+			}),
+		);
+
+		await waitFor(() =>
+			expect(updateTemplateAsOfficial).toHaveBeenCalledWith(
+				"https://github.com/demo-owner/demo-repo/tree/main/template",
+			),
+		);
+		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["templates"] });
+		expect(
+			screen.getByText(/refreshed from github and marked as official/i),
+		).toBeInTheDocument();
 	});
 
 	it("deletes a template through the admin dialog", async () => {

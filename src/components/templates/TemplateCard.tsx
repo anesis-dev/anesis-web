@@ -52,7 +52,7 @@ export function TemplateCard({
   linkToLatest = false,
 }: TemplateCardProps) {
   const { config } = template;
-  const { metadata, author, technologies, languages, official } = config;
+  const { metadata, author, technologies, languages } = config;
   const detailsHref = linkToLatest
     ? getTemplateLatestHref(template.name)
     : getTemplateHref(template);
@@ -69,7 +69,7 @@ export function TemplateCard({
               {metadata.displayName}
             </Link>
           </CardTitle>
-          {official && (
+          {template.official && (
             <span className="flex items-center gap-1 shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
               <ShieldCheckIcon className="size-3" />
               Official

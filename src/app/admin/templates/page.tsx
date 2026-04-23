@@ -17,6 +17,7 @@ import {
 	ExternalLinkIcon,
 	LoaderIcon,
 	PackageIcon,
+	RefreshCcwIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +27,11 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date";
 import { ITemplate } from "@/types/template";
-import { deleteTemplate, updateTemplateOfficialStatus } from "@/services/template";
+import {
+	deleteTemplate,
+	updateTemplateAsOfficial,
+	updateTemplateOfficialStatus,
+} from "@/services/template";
 import { getTemplateHref, getTemplateRef } from "@/lib/template-ref";
 import {
 	Dialog,
@@ -60,6 +65,7 @@ function SkeletonRow() {
 			</td>
 			<td className="py-3 px-4">
 				<div className="flex gap-2">
+					<div className="h-7 w-7 rounded bg-muted" />
 					<div className="h-7 w-7 rounded bg-muted" />
 					<div className="h-7 w-7 rounded bg-muted" />
 					<div className="h-7 w-7 rounded bg-muted" />
@@ -152,6 +158,30 @@ export default function AdminTemplatesPage() {
 		}
 	}
 
+	async function handleRefreshOfficialTemplate(template: ITemplate) {
+		setBusyAction(`refresh-official:${template.id}`);
+		setNotice(null);
+
+		try {
+			await updateTemplateAsOfficial(template.url);
+			await refreshTemplateQueries();
+			setNotice({
+				type: "success",
+				message: `${template.config.metadata.displayName} was refreshed from GitHub and marked as official.`,
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message:
+					error instanceof Error
+						? error.message
+						: "Failed to refresh template as official.",
+			});
+		} finally {
+			setBusyAction(null);
+		}
+	}
+
 	async function handleDeleteTemplate() {
 		if (!pendingDelete) {
 			return;
@@ -215,8 +245,9 @@ export default function AdminTemplatesPage() {
 				<CardHeader>
 					<CardTitle className="text-sm">Template moderation actions</CardTitle>
 					<CardDescription>
-						Use the controls below to promote community templates to official
-						or remove broken entries from the registry.
+						Use the controls below to promote community templates to official,
+						refresh official metadata from GitHub, or remove broken entries
+						from the registry.
 					</CardDescription>
 				</CardHeader>
 			</Card>
@@ -240,7 +271,7 @@ export default function AdminTemplatesPage() {
 
 			<div className="rounded-xl border overflow-hidden">
 				<div className="overflow-x-auto">
-					<table className="min-w-[820px] w-full text-sm">
+					<table className="min-w-[860px] w-full text-sm">
 						<thead>
 							<tr className="border-b bg-muted/40 text-left text-xs font-medium text-muted-foreground">
 								<th className="py-3 px-4">Name</th>
@@ -330,6 +361,22 @@ export default function AdminTemplatesPage() {
 													>
 														<ExternalLinkIcon />
 													</Link>
+												</Button>
+
+												<Button
+													size="icon-xs"
+													variant="ghost"
+													title="Refresh as official template"
+													aria-label={`Refresh official metadata for ${t.config.metadata.displayName}`}
+													disabled={busyAction !== null}
+													onClick={() => handleRefreshOfficialTemplate(t)}
+													className="text-muted-foreground hover:text-primary"
+												>
+													{busyAction === `refresh-official:${t.id}` ? (
+														<LoaderIcon className="animate-spin" />
+													) : (
+														<RefreshCcwIcon />
+													)}
 												</Button>
 
 												<Button

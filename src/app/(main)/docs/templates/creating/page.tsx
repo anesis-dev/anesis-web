@@ -32,7 +32,6 @@ const manifestExample = `{
   "name": "react-vite-ts",
   "version": "0.7.4",
   "oxideVersion": ">=0.7.0",
-  "official": false,
   "repository": {
     "url": "https://github.com/owner/repo/tree/main/templates/react-vite-ts"
   },
@@ -56,11 +55,6 @@ const manifestFields = [
 		field: "oxideVersion",
 		description:
 			'A semver range describing the minimum Oxide CLI version required. Use ">=0.7.0" to require at least that version.',
-	},
-	{
-		field: "official",
-		description:
-			"Set to true only for templates maintained by the Oxide team. Use false for community templates.",
 	},
 	{
 		field: "repository.url",

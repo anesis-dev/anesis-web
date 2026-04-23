@@ -26,7 +26,6 @@ export interface ITemplateConfig {
   scope: string;
   technologies: string[];
   languages: string[];
-  official: boolean;
   type: string;
   metadata: IMetadata;
 }

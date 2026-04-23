@@ -51,6 +51,10 @@ export async function updateTemplate(url: string): Promise<void> {
 	await api.patch<void>("/template", { url });
 }
 
+export async function updateTemplateAsOfficial(url: string): Promise<void> {
+	await api.patch<void>("/template/official", { url });
+}
+
 export async function deleteTemplate(templateRef: string): Promise<void> {
 	if (!hasExplicitTemplateVersion(templateRef)) {
 		throw new Error("Deleting a template requires an explicit version.");

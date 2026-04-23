@@ -30,7 +30,6 @@ export const mockTemplate: ITemplate = {
 		scope: "web",
 		technologies: ["react", "nextjs"],
 		languages: ["typescript"],
-		official: true,
 		type: "base",
 		metadata: {
 			displayName: "Demo Next Template",
@@ -100,8 +99,7 @@ export function createTemplate(overrides: TemplateOverrides = {}): ITemplate {
 	const name = overrides.name ?? overrides.config?.name ?? mockTemplate.name;
 	const version =
 		overrides.version ?? overrides.config?.version ?? mockTemplate.version;
-	const official =
-		overrides.official ?? overrides.config?.official ?? mockTemplate.official;
+	const official = overrides.official ?? mockTemplate.official;
 	const repositoryUrl =
 		overrides.url ??
 		overrides.config?.repository?.url ??
@@ -119,7 +117,6 @@ export function createTemplate(overrides: TemplateOverrides = {}): ITemplate {
 			...overrides.config,
 			name,
 			version,
-			official,
 			author: {
 				...mockTemplate.config.author,
 				...overrides.config?.author,

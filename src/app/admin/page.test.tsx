@@ -47,9 +47,19 @@ describe("AdminDashboard", () => {
 		});
 		vi.mocked(useUsers).mockReturnValue({
 			users: [
-				createUser(),
-				createUser({ id: "user-2", login: "builder", role: "user" }),
-				createUser({ id: "user-3", login: "ops", role: "user" }),
+				createUser({ created_at: "2026-03-20T08:30:00Z" }),
+				createUser({
+					id: "user-2",
+					login: "builder",
+					role: "user",
+					created_at: "2026-04-12T12:00:00Z",
+				}),
+				createUser({
+					id: "user-3",
+					login: "ops",
+					role: "user",
+					created_at: "2026-04-21T12:00:00Z",
+				}),
 			],
 			isLoading: false,
 			isError: false,
@@ -69,5 +79,8 @@ describe("AdminDashboard", () => {
 		expect(screen.getByText("3")).toBeInTheDocument();
 		expect(screen.getByText("Dashboard Template 11")).toBeInTheDocument();
 		expect(screen.getByText("Dashboard Template 4")).toBeInTheDocument();
+		expect(screen.getByText("Recent Users")).toBeInTheDocument();
+		expect(screen.getByText("@ops")).toBeInTheDocument();
+		expect(screen.getByText("Apr 21, 2026")).toBeInTheDocument();
 	});
 });

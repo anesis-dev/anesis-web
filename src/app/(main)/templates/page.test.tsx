@@ -112,19 +112,14 @@ describe("TemplatesPage", () => {
 		expect(screen.queryByText("Page 2 of 2")).not.toBeInTheDocument();
 	});
 
-	it("collapses multiple versions of the same template into one latest card", () => {
+	it("shows grouped template payloads with the backend-provided version count", () => {
 		vi.mocked(useTemplates).mockReturnValue({
 			templates: [
-				createTemplate({
-					id: "react-old",
-					name: "react-vite",
-					version: "0.2.0",
-					config: { metadata: { displayName: "React Vite", description: "", tags: [] } },
-				}),
 				createTemplate({
 					id: "react-new",
 					name: "react-vite",
 					version: "0.3.0",
+					versionCount: 2,
 					config: { metadata: { displayName: "React Vite", description: "", tags: [] } },
 				}),
 			],

@@ -13,11 +13,11 @@ vi.mock("@/hooks/useMyTemplates", () => ({
 vi.mock("@/components/templates/OwnedTemplateCard", () => ({
 	OwnedTemplateCard: ({
 		template,
-		versions,
+		versionCount,
 		isAdmin,
 	}: {
 		template: { name: string };
-		versions?: unknown[];
+		versionCount?: number;
 		isAdmin?: boolean;
 	}) => (
 		<div
@@ -25,7 +25,7 @@ vi.mock("@/components/templates/OwnedTemplateCard", () => ({
 			data-admin={isAdmin ? "true" : "false"}
 		>
 			{template.name}
-			{versions && versions.length > 1 ? ` (${versions.length})` : null}
+			{versionCount && versionCount > 1 ? ` (${versionCount})` : null}
 		</div>
 	),
 }));
@@ -125,8 +125,12 @@ describe("AccountTemplatesPage", () => {
 		});
 		vi.mocked(useMyTemplates).mockReturnValue({
 			templates: [
-				createTemplate({ id: "old", name: "api-template", version: "0.1.0" }),
-				createTemplate({ id: "new", name: "api-template", version: "0.2.0" }),
+				createTemplate({
+					id: "new",
+					name: "api-template",
+					version: "0.2.0",
+					versionCount: 2,
+				}),
 			],
 			isLoading: false,
 			isError: false,

@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/input-group";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
-import { groupTemplatesByName } from "@/lib/template-versions";
 import {
 	AlertCircleIcon,
 	GitBranchIcon,
@@ -56,28 +55,20 @@ export default function AccountTemplatesPage() {
 	const { templates, isLoading, isError } = useMyTemplates(!!user);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
-	const templateGroups = useMemo(() => groupTemplatesByName(templates), [templates]);
-	const latestTemplates = useMemo(
-		() => templateGroups.map((group) => group.latest),
-		[templateGroups],
-	);
-	const versionsByName = useMemo(
-		() =>
-			new Map(
-				templateGroups.map((group) => [group.name, group.versions]),
-			),
-		[templateGroups],
-	);
 	const isAdmin = user?.role === "admin";
-	const officialPackages = latestTemplates.filter((template) => template.official).length;
+	const officialPackages = templates.filter((template) => template.official).length;
+	const totalVersions = templates.reduce(
+		(total, template) => total + (template.versionCount ?? 1),
+		0,
+	);
 
 	const myTemplates = useMemo(() => {
 		const query = search.trim().toLowerCase();
 		if (!query) {
-			return latestTemplates;
+			return templates;
 		}
 
-		return latestTemplates.filter((template) =>
+		return templates.filter((template) =>
 			[
 				template.name,
 				template.config.metadata.displayName,
@@ -90,7 +81,7 @@ export default function AccountTemplatesPage() {
 				.toLowerCase()
 				.includes(query),
 		);
-	}, [search, latestTemplates]);
+	}, [search, templates]);
 
 	const totalPages = Math.max(1, Math.ceil(myTemplates.length / PAGE_SIZE));
 	const currentPage = Math.min(page, totalPages);
@@ -153,12 +144,12 @@ export default function AccountTemplatesPage() {
 						<div className="grid gap-3 sm:grid-cols-3 xl:w-[28rem]">
 							<MetricTile
 								label="Packages"
-								value={isLoading ? "..." : latestTemplates.length}
+								value={isLoading ? "..." : templates.length}
 								icon={PackageIcon}
 							/>
 							<MetricTile
 								label="Versions"
-								value={isLoading ? "..." : templates.length}
+								value={isLoading ? "..." : totalVersions}
 								icon={GitBranchIcon}
 							/>
 							<MetricTile
@@ -193,7 +184,7 @@ export default function AccountTemplatesPage() {
 					<p className="text-xs text-muted-foreground">
 						{isLoading
 							? "Loading templates..."
-							: `${myTemplates.length} package(s) across ${templates.length} published version(s)`}
+							: `${myTemplates.length} package(s) across ${totalVersions} published version(s)`}
 					</p>
 				</div>
 
@@ -252,9 +243,9 @@ export default function AccountTemplatesPage() {
 					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 						{paginatedTemplates.map((template) => (
 							<OwnedTemplateCard
-								key={template.name}
+								key={template.id}
 								template={template}
-								versions={versionsByName.get(template.name) ?? [template]}
+								versionCount={template.versionCount ?? 1}
 								isAdmin={isAdmin}
 							/>
 						))}

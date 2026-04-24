@@ -9,8 +9,10 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { useTemplates } from "@/hooks/useTemplates";
+import { useAuth } from "@/hooks/useAuth";
 import {
 	AlertCircleIcon,
+	GitBranchIcon,
 	ShieldCheckIcon,
 	ShieldOffIcon,
 	Trash2Icon,
@@ -24,7 +26,6 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date";
 import { ITemplate } from "@/types/template";
 import {
@@ -41,6 +42,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { useTemplateVersions } from "@/hooks/useTemplateVersions";
 
 function SkeletonRow() {
 	return (
@@ -95,7 +97,137 @@ type Notice =
 	| { type: "error"; message: string }
 	| null;
 
+function TemplateVersionsDialog({
+	template,
+	open,
+	busyAction,
+	onOpenChange,
+	onToggleOfficial,
+}: {
+	template: ITemplate | null;
+	open: boolean;
+	busyAction: string | null;
+	onOpenChange: (open: boolean) => void;
+	onToggleOfficial: (template: ITemplate) => void;
+}) {
+	const templateName = template?.name ?? "";
+	const { versions, isLoading, isError } = useTemplateVersions(templateName);
+
+	const visibleVersions =
+		versions.length > 0 ? versions : template ? [template] : [];
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className="sm:max-w-3xl">
+				<DialogHeader>
+					<DialogTitle>Template versions</DialogTitle>
+					<DialogDescription>
+						{template ? (
+							<>
+								Choose the exact published version for{" "}
+								<span className="font-mono text-foreground">{template.name}</span> and
+								change its moderation status.
+							</>
+						) : (
+							"No template selected."
+						)}
+					</DialogDescription>
+				</DialogHeader>
+
+				{isLoading ? (
+					<div className="space-y-3">
+						{Array.from({ length: 3 }).map((_, index) => (
+							<div
+								key={index}
+								className="animate-pulse rounded-xl border bg-muted/20 p-4"
+							>
+								<div className="h-4 w-28 rounded bg-muted" />
+								<div className="mt-3 h-3 w-40 rounded bg-muted" />
+							</div>
+						))}
+					</div>
+				) : isError ? (
+					<div className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+						Unable to load template versions right now.
+					</div>
+				) : (
+					<div className="max-h-[65vh] space-y-3 overflow-y-auto pr-1">
+						{visibleVersions.map((version) => {
+							const isBusy = busyAction === `official:${version.id}`;
+
+							return (
+								<div
+									key={version.id}
+									className="rounded-xl border bg-background/80 p-4"
+								>
+									<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+										<div className="space-y-2">
+											<div className="flex flex-wrap items-center gap-2">
+												<span className="rounded-md border bg-muted/30 px-2.5 py-1 font-mono text-xs text-foreground">
+													v{version.version}
+												</span>
+												<OfficialBadge official={version.official} />
+											</div>
+											<div className="space-y-1 text-sm text-muted-foreground">
+												<p className="font-medium text-foreground">
+													{version.config.metadata.displayName}
+												</p>
+												<p>
+													Published {formatDate(version.created_at)} and updated{" "}
+													{formatDate(version.updated_at)}
+												</p>
+											</div>
+										</div>
+
+										<div className="flex flex-wrap items-center gap-2">
+											<Button asChild size="sm" variant="outline">
+												<Link href={getTemplateHref(version)}>
+													Open version
+												</Link>
+											</Button>
+											<Button
+												type="button"
+												size="sm"
+												variant={version.official ? "secondary" : "default"}
+												disabled={busyAction !== null}
+												onClick={() => onToggleOfficial(version)}
+												aria-label={
+													version.official
+														? `Mark version ${version.version} as community`
+														: `Mark version ${version.version} as official`
+												}
+											>
+												{isBusy ? (
+													<>
+														<LoaderIcon className="size-3.5 animate-spin" />
+														Updating...
+													</>
+												) : version.official ? (
+													<>
+														<ShieldOffIcon className="size-3.5" />
+														Mark as community
+													</>
+												) : (
+													<>
+														<ShieldCheckIcon className="size-3.5" />
+														Mark as official
+													</>
+												)}
+											</Button>
+										</div>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				)}
+			</DialogContent>
+		</Dialog>
+	);
+}
+
 export default function AdminTemplatesPage() {
+	const { user } = useAuth();
 	const { templates, isLoading, isError } = useTemplates();
 	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
@@ -103,6 +235,7 @@ export default function AdminTemplatesPage() {
 	const [notice, setNotice] = useState<Notice>(null);
 	const [busyAction, setBusyAction] = useState<string | null>(null);
 	const [pendingDelete, setPendingDelete] = useState<ITemplate | null>(null);
+	const [versionsTarget, setVersionsTarget] = useState<ITemplate | null>(null);
 
 	const filtered = useMemo(() => {
 		const q = search.trim().toLowerCase();
@@ -128,7 +261,34 @@ export default function AdminTemplatesPage() {
 			queryClient.invalidateQueries({ queryKey: ["templates"] }),
 			queryClient.invalidateQueries({ queryKey: ["my-templates"] }),
 			queryClient.invalidateQueries({ queryKey: ["template"] }),
+			queryClient.invalidateQueries({ queryKey: ["template-versions"] }),
 		]);
+	}
+
+	async function handleRefreshOfficialTemplate(template: ITemplate) {
+		setBusyAction(`refresh-official:${template.id}`);
+		setNotice(null);
+
+		try {
+			await updateTemplateAsOfficial(template.url);
+			await refreshTemplateQueries();
+			setNotice({
+				type: "success",
+				message: template.official
+					? `${template.config.metadata.displayName} was refreshed from GitHub and kept official.`
+					: `${template.config.metadata.displayName} was refreshed from GitHub and marked as official.`,
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message:
+					error instanceof Error
+						? error.message
+						: "Failed to refresh template as official.",
+			});
+		} finally {
+			setBusyAction(null);
+		}
 	}
 
 	async function handleToggleOfficial(template: ITemplate) {
@@ -142,8 +302,8 @@ export default function AdminTemplatesPage() {
 			setNotice({
 				type: "success",
 				message: nextOfficial
-					? `${template.config.metadata.displayName} is now marked as official.`
-					: `${template.config.metadata.displayName} was moved back to community.`,
+					? `${template.config.metadata.displayName} v${template.version} is now marked as official.`
+					: `${template.config.metadata.displayName} v${template.version} was moved back to community.`,
 			});
 		} catch (error) {
 			setNotice({
@@ -152,30 +312,6 @@ export default function AdminTemplatesPage() {
 					error instanceof Error
 						? error.message
 						: "Failed to update template official status.",
-			});
-		} finally {
-			setBusyAction(null);
-		}
-	}
-
-	async function handleRefreshOfficialTemplate(template: ITemplate) {
-		setBusyAction(`refresh-official:${template.id}`);
-		setNotice(null);
-
-		try {
-			await updateTemplateAsOfficial(template.url);
-			await refreshTemplateQueries();
-			setNotice({
-				type: "success",
-				message: `${template.config.metadata.displayName} was refreshed from GitHub and marked as official.`,
-			});
-		} catch (error) {
-			setNotice({
-				type: "error",
-				message:
-					error instanceof Error
-						? error.message
-						: "Failed to refresh template as official.",
 			});
 		} finally {
 			setBusyAction(null);
@@ -245,9 +381,9 @@ export default function AdminTemplatesPage() {
 				<CardHeader>
 					<CardTitle className="text-sm">Template moderation actions</CardTitle>
 					<CardDescription>
-						Use the controls below to promote community templates to official,
-						refresh official metadata from GitHub, or remove broken entries
-						from the registry.
+						Open a package version list, choose the exact release you want to
+						moderate, then change its official status or keep owner-based GitHub
+						re-sync available where appropriate.
 					</CardDescription>
 				</CardHeader>
 			</Card>
@@ -345,8 +481,25 @@ export default function AdminTemplatesPage() {
 											{formatDate(t.created_at)}
 										</td>
 										<td className="py-3 px-4">
-											<div className="flex items-center gap-1">
-												{/* View */}
+											<div className="flex flex-wrap items-center gap-1.5">
+												{(() => {
+													const isOwnedByCurrentUser = user?.id === t.owner_id;
+
+													return (
+														<>
+												<Button
+													type="button"
+													size="sm"
+													variant="outline"
+													onClick={() => setVersionsTarget(t)}
+													className="h-7 gap-1.5 px-2.5 text-xs"
+													aria-label={`Manage versions for ${t.config.metadata.displayName}`}
+												>
+													<GitBranchIcon className="size-3.5" />
+													{t.versionCount ?? 1} version
+													{(t.versionCount ?? 1) === 1 ? "" : "s"}
+												</Button>
+
 												<Button
 													asChild
 													size="icon-xs"
@@ -366,9 +519,19 @@ export default function AdminTemplatesPage() {
 												<Button
 													size="icon-xs"
 													variant="ghost"
-													title="Refresh as official template"
-													aria-label={`Refresh official metadata for ${t.config.metadata.displayName}`}
-													disabled={busyAction !== null}
+													title={
+														isOwnedByCurrentUser
+															? "Refresh as official template"
+															: "Only the template owner can re-sync it from GitHub"
+													}
+													aria-label={
+														isOwnedByCurrentUser
+															? t.official
+																? `Refresh official metadata for ${t.config.metadata.displayName}`
+																: `Refresh ${t.config.metadata.displayName} as official`
+															: `GitHub refresh unavailable for ${t.config.metadata.displayName}`
+													}
+													disabled={busyAction !== null || !isOwnedByCurrentUser}
 													onClick={() => handleRefreshOfficialTemplate(t)}
 													className="text-muted-foreground hover:text-primary"
 												>
@@ -394,11 +557,11 @@ export default function AdminTemplatesPage() {
 													}
 													disabled={busyAction !== null}
 													onClick={() => handleToggleOfficial(t)}
-													className={cn(
+													className={
 														t.official
 															? "text-primary hover:text-muted-foreground"
-															: "text-muted-foreground hover:text-primary",
-													)}
+															: "text-muted-foreground hover:text-primary"
+													}
 												>
 													{busyAction === `official:${t.id}` ? (
 														<LoaderIcon className="animate-spin" />
@@ -424,6 +587,9 @@ export default function AdminTemplatesPage() {
 														<Trash2Icon />
 													)}
 												</Button>
+														</>
+													);
+												})()}
 											</div>
 										</td>
 									</tr>
@@ -498,6 +664,18 @@ export default function AdminTemplatesPage() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			<TemplateVersionsDialog
+				template={versionsTarget}
+				open={versionsTarget !== null}
+				busyAction={busyAction}
+				onOpenChange={(open) => {
+					if (!open) {
+						setVersionsTarget(null);
+					}
+				}}
+				onToggleOfficial={handleToggleOfficial}
+			/>
 		</div>
 	);
 }

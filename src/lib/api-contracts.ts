@@ -47,6 +47,25 @@ function expectStringArray(value: unknown, path: string): string[] {
 	return value;
 }
 
+function expectStringFromKeys(
+	record: Record<string, unknown>,
+	keys: string[],
+	path: string,
+): string {
+	for (const key of keys) {
+		const value = record[key];
+		if (value !== undefined && value !== null) {
+			return expectString(value, `${path}.${key}`);
+		}
+	}
+
+	throw new Error(
+		`Invalid API response: ${path} must include one of ${keys
+			.map((key) => `"${key}"`)
+			.join(", ")}.`,
+	);
+}
+
 function expectOptionalString(value: unknown, path: string): string | undefined {
 	if (value === undefined || value === null) {
 		return undefined;
@@ -125,7 +144,7 @@ function parseTemplateConfig(value: unknown, path: string): ITemplateConfig {
 	};
 }
 
-function parseTemplate(value: unknown, path: string): ITemplate {
+function parseLegacyTemplate(value: unknown, path: string): ITemplate {
 	const template = expectRecord(value, path);
 
 	return {
@@ -139,6 +158,133 @@ function parseTemplate(value: unknown, path: string): ITemplate {
 		updated_at: expectString(template.updated_at, `${path}.updated_at`),
 		config: parseTemplateConfig(template.config, `${path}.config`),
 		name: expectString(template.name, `${path}.name`),
+	};
+}
+
+type ParsedTemplateInfo = {
+	repoUrl: string;
+	author: ITemplateConfig["author"];
+	specialization: string;
+	scope: string;
+	technologies: string[];
+	languages: string[];
+	type: string;
+	displayName: string;
+	description: string;
+	tags: string[];
+};
+
+function parseTemplateInfo(value: unknown, path: string): ParsedTemplateInfo {
+	const info = expectRecord(value, path);
+	const author = expectRecord(info.author, `${path}.author`);
+
+	return {
+		repoUrl: expectStringFromKeys(info, ["repo_url", "repoUrl"], path),
+		author: {
+			name: expectString(author.name, `${path}.author.name`),
+			github: expectString(author.github, `${path}.author.github`),
+		},
+		specialization: expectString(info.specialization, `${path}.specialization`),
+		scope: expectString(info.scope, `${path}.scope`),
+		technologies: expectStringArray(info.technologies, `${path}.technologies`),
+		languages: expectStringArray(info.languages, `${path}.languages`),
+		type: expectStringFromKeys(info, ["type", "template_type"], path),
+		displayName: expectStringFromKeys(info, ["displayName", "display_name"], path),
+		description: expectString(info.description, `${path}.description`),
+		tags: expectStringArray(info.tags, `${path}.tags`),
+	};
+}
+
+function buildTemplateConfig(
+	name: string,
+	version: string,
+	info: ParsedTemplateInfo,
+): ITemplateConfig {
+	return {
+		$schema: "",
+		name,
+		version,
+		oxideVersion: "",
+		author: info.author,
+		repository: {
+			type: "github",
+			url: info.repoUrl,
+			release: "",
+		},
+		specialization: info.specialization,
+		scope: info.scope,
+		technologies: info.technologies,
+		languages: info.languages,
+		type: info.type,
+		metadata: {
+			displayName: info.displayName,
+			description: info.description,
+			tags: info.tags,
+		},
+	};
+}
+
+function buildTemplateId(name: string, version: string): string {
+	return `${name}@${version}`;
+}
+
+function parseCurrentTemplate(value: unknown, path: string): ITemplate {
+	const template = expectRecord(value, path);
+	const name = expectString(template.name, `${path}.name`);
+	const version = expectStringFromKeys(template, ["version", "verison"], path);
+	const info = parseTemplateInfo(template.info, `${path}.info`);
+	const createdAt = expectString(template.created_at, `${path}.created_at`);
+	const id =
+		template.id === undefined || template.id === null
+			? buildTemplateId(name, version)
+			: expectString(template.id, `${path}.id`);
+
+	return {
+		id,
+		owner_id: expectString(template.owner_id, `${path}.owner_id`),
+		url: info.repoUrl,
+		official: expectBoolean(template.official, `${path}.official`),
+		commit_sha: "",
+		version,
+		created_at: createdAt,
+		updated_at:
+			expectOptionalString(template.updated_at, `${path}.updated_at`) ?? createdAt,
+		config: buildTemplateConfig(name, version, info),
+		name,
+	};
+}
+
+function parseTemplate(value: unknown, path: string): ITemplate {
+	const template = expectRecord(value, path);
+
+	if ("config" in template) {
+		return parseLegacyTemplate(template, path);
+	}
+
+	if ("info" in template) {
+		return parseCurrentTemplate(template, path);
+	}
+
+	throw new Error(
+		`Invalid API response: ${path} must contain either legacy template fields or the current template info payload.`,
+	);
+}
+
+function parseLatestTemplateGroup(value: unknown, path: string): ITemplate {
+	const group = expectRecord(value, path);
+	const latest = parseTemplate(group.latest, `${path}.latest`);
+	const name = expectString(group.name, `${path}.name`);
+	const versionCount = expectNumber(group.versionCount, `${path}.versionCount`);
+
+	return {
+		...latest,
+		name,
+		config: {
+			...latest.config,
+			name,
+			version: latest.version,
+		},
+		versionCount,
 	};
 }
 
@@ -177,13 +323,59 @@ export function parseTemplatesResponse(value: unknown): ITemplate[] {
 		throw new Error("Invalid API response: templates payload must be an array.");
 	}
 
-	return value.map((template, index) =>
-		parseTemplate(template, `templates[${index}]`),
-	);
+	return value.map((template, index) => {
+		if (isRecord(template) && "latest" in template) {
+			return parseLatestTemplateGroup(template, `templates[${index}]`);
+		}
+
+		return parseTemplate(template, `templates[${index}]`);
+	});
 }
 
 export function parseTemplateResponse(value: unknown): ITemplate {
 	return parseTemplate(value, "template");
+}
+
+export function parseTemplateVersionsResponse(
+	value: unknown,
+	templateName: string,
+): ITemplate[] {
+	if (!Array.isArray(value)) {
+		throw new Error(
+			"Invalid API response: template versions payload must be an array.",
+		);
+	}
+
+	const normalizedName = templateName.trim().toLowerCase();
+	const matchedGroup = value.find((group, index) => {
+		const record = expectRecord(group, `templateVersions[${index}]`);
+		return (
+			expectString(record.name, `templateVersions[${index}].name`).toLowerCase() ===
+			normalizedName
+		);
+	});
+
+	if (!matchedGroup) {
+		return [];
+	}
+
+	const group = expectRecord(matchedGroup, "templateVersions[group]");
+	const versionCount = expectNumber(
+		group.versionCount,
+		"templateVersions[group].versionCount",
+	);
+	const versions = group.versions;
+
+	if (!Array.isArray(versions)) {
+		throw new Error(
+			"Invalid API response: templateVersions[group].versions must be an array.",
+		);
+	}
+
+	return versions.map((template, index) => ({
+		...parseTemplate(template, `templateVersions[group].versions[${index}]`),
+		versionCount,
+	}));
 }
 
 export function parseAddonsResponse(value: unknown): IAddon[] {

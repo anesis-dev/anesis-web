@@ -70,16 +70,15 @@ function Badge({
 
 export function OwnedTemplateCard({
 	template,
-	versions = [template],
+	versionCount = template.versionCount ?? 1,
 	isAdmin = false,
 }: {
 	template: ITemplate;
-	versions?: ITemplate[];
+	versionCount?: number;
 	isAdmin?: boolean;
 }) {
 	const templateRef = getTemplateRef(template);
 	const templateHref = getTemplateLatestHref(template.name);
-	const versionCount = versions.length;
 	const queryClient = useQueryClient();
 	const [notice, setNotice] = useState<Notice>(null);
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -93,6 +92,7 @@ export function OwnedTemplateCard({
 			queryClient.invalidateQueries({ queryKey: ["my-templates"] }),
 			queryClient.invalidateQueries({ queryKey: ["template", template.name] }),
 			queryClient.invalidateQueries({ queryKey: ["template", templateRef] }),
+			queryClient.invalidateQueries({ queryKey: ["template-versions", template.name] }),
 		]);
 	}
 
@@ -153,6 +153,7 @@ export function OwnedTemplateCard({
 				queryClient.invalidateQueries({ queryKey: ["my-templates"] }),
 				queryClient.removeQueries({ queryKey: ["template", template.name] }),
 				queryClient.removeQueries({ queryKey: ["template", templateRef] }),
+				queryClient.removeQueries({ queryKey: ["template-versions", template.name] }),
 			]);
 			setIsDeleteOpen(false);
 		} catch (error) {
@@ -185,6 +186,11 @@ export function OwnedTemplateCard({
 							<Badge className="border-border/70 bg-background/80 font-mono text-muted-foreground">
 								v{template.version}
 							</Badge>
+							{versionCount > 1 ? (
+								<Badge className="border-border/70 bg-background/80 text-muted-foreground">
+									{versionCount} versions
+								</Badge>
+							) : null}
 						</div>
 
 						<div className="space-y-1.5">

@@ -4,6 +4,7 @@ import {
 	parseTemplateResponse,
 	parseTemplateUrlResponse,
 	parseTemplatesResponse,
+	parseTemplateVersionsResponse,
 } from "@/lib/api-contracts";
 import { ITemplate, ITemplateUrlResponse } from "@/types/template";
 
@@ -24,6 +25,17 @@ export async function fetchMyTemplates(): Promise<ITemplate[]> {
 export async function fetchTemplate(templateRef: string): Promise<ITemplate> {
 	return parseTemplateResponse(
 		await api.get<unknown>(`/template/${encodeURIComponent(templateRef)}`),
+	);
+}
+
+export async function fetchTemplateVersions(
+	templateName: string,
+): Promise<ITemplate[]> {
+	return parseTemplateVersionsResponse(
+		await api.get<unknown>(
+			`/template/${encodeURIComponent(templateName)}/versions`,
+		),
+		templateName,
 	);
 }
 

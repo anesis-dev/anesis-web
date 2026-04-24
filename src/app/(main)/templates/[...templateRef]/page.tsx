@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { use, useMemo, useState } from "react";
+import { use, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	ActivityIcon,
 	AlertCircleIcon,
@@ -15,21 +16,25 @@ import {
 	ExternalLinkIcon,
 	GitBranchIcon,
 	LinkIcon,
+	LoaderIcon,
 	PackageIcon,
 	ScaleIcon,
 	ShieldCheckIcon,
+	ShieldOffIcon,
 	TerminalSquareIcon,
 	UserIcon,
 } from "lucide-react";
 import { formatDate } from "@/lib/date";
 import { parseGitHubTreeUrl } from "@/lib/github-tree-url";
+import { useAuth } from "@/hooks/useAuth";
 import { useTemplate } from "@/hooks/useTemplate";
-import { useTemplates } from "@/hooks/useTemplates";
+import { useTemplateVersions } from "@/hooks/useTemplateVersions";
 import { useTemplateReadme } from "@/hooks/useTemplateReadme";
 import { getTemplateHref, getTemplateRef } from "@/lib/template-ref";
-import { getTemplateVersionGroup } from "@/lib/template-versions";
 import { TemplateReadme } from "@/components/templates/TemplateReadme";
 import { TemplateApiUrlButton } from "@/components/templates/TemplateApiUrlButton";
+import { updateTemplateOfficialStatus } from "@/services/template";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -51,6 +56,11 @@ function Pill({
 		</span>
 	);
 }
+
+type Notice =
+	| { type: "success"; message: string }
+	| { type: "error"; message: string }
+	| null;
 
 function MetaItem({
 	label,
@@ -167,10 +177,12 @@ export default function TemplateDetailsPage({
 }: {
 	params: Promise<{ templateRef: string[] }>;
 }) {
+	const { user } = useAuth();
+	const queryClient = useQueryClient();
 	const { templateRef } = use(params);
 	const joinedRef = templateRef.map((segment) => decodeURIComponent(segment)).join("/");
 	const { template, isLoading, isError } = useTemplate(joinedRef);
-	const { templates } = useTemplates();
+	const { versions } = useTemplateVersions(template?.name ?? "");
 	const {
 		readme,
 		fileName,
@@ -178,11 +190,8 @@ export default function TemplateDetailsPage({
 		isLoading: isReadmeLoading,
 		isError: isReadmeError,
 	} = useTemplateReadme(template?.config.repository.url);
-	const versions = useMemo(() => {
-		if (!template) return [];
-
-		return getTemplateVersionGroup(templates, template.name)?.versions ?? [template];
-	}, [template, templates]);
+	const [notice, setNotice] = useState<Notice>(null);
+	const [isOfficialPending, setIsOfficialPending] = useState(false);
 
 	if (isLoading) {
 		return (
@@ -219,17 +228,58 @@ export default function TemplateDetailsPage({
 		);
 	}
 
-	const canonicalRef = getTemplateRef(template);
-	const publishedAt = formatDate(template.created_at);
-	const updatedAt = formatDate(template.updated_at);
-	const source = getSourceInfo(template.config.repository.url);
-	const templateName = template.name;
+	const currentTemplate = template;
+	const canonicalRef = getTemplateRef(currentTemplate);
+	const publishedAt = formatDate(currentTemplate.created_at);
+	const updatedAt = formatDate(currentTemplate.updated_at);
+	const source = getSourceInfo(currentTemplate.config.repository.url);
+	const availableVersions = versions.length > 0 ? versions : [currentTemplate];
+	const templateName = currentTemplate.name;
 	const createCommand = `oxide new my-app ${templateName}`;
 	const installCommand = `oxide template install ${templateName}`;
-	const keywordCount = String(template.config.metadata.tags.length);
-	const technologyCount = String(template.config.technologies.length);
-	const languageCount = String(template.config.languages.length);
-	const versionCount = String(versions.length || 1);
+	const keywordCount = String(currentTemplate.config.metadata.tags.length);
+	const technologyCount = String(currentTemplate.config.technologies.length);
+	const languageCount = String(currentTemplate.config.languages.length);
+	const versionCount = String(availableVersions.length);
+	const oxideVersion = currentTemplate.config.oxideVersion || "Not provided";
+	const releaseTag = currentTemplate.config.repository.release || "Not provided";
+	const isAdmin = user?.role === "admin";
+
+	async function refreshTemplateQueries() {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ["templates"] }),
+			queryClient.invalidateQueries({ queryKey: ["my-templates"] }),
+			queryClient.invalidateQueries({ queryKey: ["template"] }),
+			queryClient.invalidateQueries({ queryKey: ["template-versions", currentTemplate.name] }),
+		]);
+	}
+
+	async function handleToggleOfficialStatus() {
+		setIsOfficialPending(true);
+		setNotice(null);
+
+		try {
+			const nextOfficial = !currentTemplate.official;
+			await updateTemplateOfficialStatus(currentTemplate.id, nextOfficial);
+			await refreshTemplateQueries();
+			setNotice({
+				type: "success",
+				message: nextOfficial
+					? `Version ${currentTemplate.version} is now marked as official.`
+					: `Version ${currentTemplate.version} was moved back to community.`,
+			});
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message:
+					error instanceof Error
+						? error.message
+						: "Failed to update the official status for this version.",
+			});
+		} finally {
+			setIsOfficialPending(false);
+		}
+	}
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
@@ -330,7 +380,39 @@ export default function TemplateDetailsPage({
 								variant="outline"
 								className="h-auto min-h-11 whitespace-normal px-4 py-3 text-center sm:flex-1 xl:flex-none"
 							/>
-							{versions.length > 1 && (
+							{isAdmin ? (
+								<Button
+									type="button"
+									size="lg"
+									variant={template.official ? "secondary" : "default"}
+									onClick={handleToggleOfficialStatus}
+									disabled={isOfficialPending}
+									className="h-auto min-h-11 whitespace-normal px-4 py-3 text-center sm:flex-1 xl:flex-none"
+									aria-label={
+										template.official
+											? `Mark version ${template.version} as community`
+											: `Mark version ${template.version} as official`
+									}
+								>
+									{isOfficialPending ? (
+										<>
+											<LoaderIcon className="size-4 animate-spin" />
+											Updating status...
+										</>
+									) : template.official ? (
+										<>
+											<ShieldOffIcon className="size-4" />
+											Mark as community
+										</>
+									) : (
+										<>
+											<ShieldCheckIcon className="size-4" />
+											Mark as official
+										</>
+									)}
+								</Button>
+							) : null}
+							{availableVersions.length > 1 && (
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button
@@ -346,7 +428,7 @@ export default function TemplateDetailsPage({
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end" className="w-56">
 										<DropdownMenuLabel>Template versions</DropdownMenuLabel>
-										{versions.map((version, index) => {
+										{availableVersions.map((version, index) => {
 											const active = version.version === template.version;
 
 											return (
@@ -394,6 +476,16 @@ export default function TemplateDetailsPage({
 					</div>
 				</div>
 			</section>
+
+			{notice ? (
+				<Alert variant={notice.type === "error" ? "destructive" : "default"}>
+					<AlertCircleIcon />
+					<AlertTitle>
+						{notice.type === "error" ? "Action failed" : "Action completed"}
+					</AlertTitle>
+					<AlertDescription>{notice.message}</AlertDescription>
+				</Alert>
+			) : null}
 
 			<div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
 				<div className="min-w-0 flex flex-col gap-6">
@@ -490,7 +582,7 @@ export default function TemplateDetailsPage({
 										Oxide Version
 									</p>
 									<p className="mt-2 text-foreground">
-										{template.config.oxideVersion}
+										{oxideVersion}
 									</p>
 								</div>
 								<div>
@@ -510,7 +602,7 @@ export default function TemplateDetailsPage({
 										Release
 									</p>
 									<p className="mt-2 break-all text-foreground">
-										{template.config.repository.release}
+										{releaseTag}
 									</p>
 								</div>
 							</div>

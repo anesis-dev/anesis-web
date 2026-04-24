@@ -41,6 +41,7 @@ export interface ITemplate {
   updated_at: string;
   config: ITemplateConfig;
   name: string;
+  versionCount?: number;
 }
 
 export interface ITemplateUrlResponse {

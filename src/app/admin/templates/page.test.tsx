@@ -7,13 +7,23 @@ vi.mock("@/hooks/useTemplates", () => ({
 	useTemplates: vi.fn(),
 }));
 
+vi.mock("@/hooks/useTemplateVersions", () => ({
+	useTemplateVersions: vi.fn(),
+}));
+
+vi.mock("@/hooks/useAuth", () => ({
+	useAuth: vi.fn(),
+}));
+
 vi.mock("@/services/template", () => ({
 	deleteTemplate: vi.fn(),
 	updateTemplateAsOfficial: vi.fn(),
 	updateTemplateOfficialStatus: vi.fn(),
 }));
 
+import { useAuth } from "@/hooks/useAuth";
 import { useTemplates } from "@/hooks/useTemplates";
+import { useTemplateVersions } from "@/hooks/useTemplateVersions";
 import {
 	deleteTemplate,
 	updateTemplateAsOfficial,
@@ -21,10 +31,32 @@ import {
 } from "@/services/template";
 
 describe("AdminTemplatesPage", () => {
+	beforeEach(() => {
+		vi.mocked(useAuth).mockReturnValue({
+			user: {
+				id: "admin-user-id",
+				login: "admin",
+				github_id: 1,
+				avatar_url: "https://example.com/avatar.png",
+				role: "admin",
+				created_at: "2026-01-01T00:00:00Z",
+			},
+			isLoading: false,
+			login: vi.fn(),
+			logout: vi.fn(),
+		});
+		vi.mocked(useTemplateVersions).mockReturnValue({
+			versions: [],
+			isLoading: false,
+			isError: false,
+		});
+	});
+
 	it("renders moderation controls and filters templates", async () => {
 		const templates = Array.from({ length: 11 }, (_, index) =>
 			createTemplate({
 				id: `admin-template-${index + 1}`,
+				owner_id: index < 5 ? "admin-user-id" : "other-user-id",
 				name: `template-${index + 1}`,
 				config: {
 					specialization: index < 5 ? "backend" : "frontend",
@@ -63,10 +95,12 @@ describe("AdminTemplatesPage", () => {
 		expect(screen.queryByText("Admin Template 11")).not.toBeInTheDocument();
 	});
 
-	it("updates template official status through the admin action", async () => {
+	it("marks a community template as official through the version-status admin action", async () => {
 		const template = createTemplate({
 			id: "template-1",
 			official: false,
+			url: "https://github.com/demo-owner/community-template/tree/main/template",
+			owner_id: "other-user-id",
 			config: {
 				metadata: {
 					displayName: "Admin Template 1",
@@ -96,13 +130,17 @@ describe("AdminTemplatesPage", () => {
 			),
 		);
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["templates"] });
-		expect(screen.getByText(/is now marked as official/i)).toBeInTheDocument();
+		expect(
+			screen.getByText(/admin template 1 v0\.1\.0 is now marked as official/i),
+		).toBeInTheDocument();
 	});
 
 	it("refreshes a template through the admin official endpoint", async () => {
 		const template = createTemplate({
 			id: "template-3",
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
+			official: true,
+			owner_id: "admin-user-id",
 			config: {
 				metadata: {
 					displayName: "Official Template",
@@ -132,7 +170,95 @@ describe("AdminTemplatesPage", () => {
 		);
 		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["templates"] });
 		expect(
-			screen.getByText(/refreshed from github and marked as official/i),
+			screen.getByText(/refreshed from github and kept official/i),
+		).toBeInTheDocument();
+	});
+
+	it("disables github refresh for templates the admin does not own", () => {
+		const template = createTemplate({
+			id: "template-4",
+			owner_id: "other-user-id",
+			config: {
+				metadata: {
+					displayName: "Community Template",
+				},
+			},
+		});
+		vi.mocked(useTemplates).mockReturnValue({
+			templates: [template],
+			isLoading: false,
+			isError: false,
+		});
+
+		renderWithQueryClient(<AdminTemplatesPage />);
+
+		expect(
+			screen.getByRole("button", {
+				name: /github refresh unavailable for community template/i,
+			}),
+		).toBeDisabled();
+	});
+
+	it("opens a version picker and updates a specific older version", async () => {
+		const latest = createTemplate({
+			id: "template-latest",
+			name: "demo-repo",
+			version: "0.3.0",
+			versionCount: 3,
+			official: true,
+			config: {
+				metadata: {
+					displayName: "Demo Template",
+				},
+			},
+		});
+		const olderVersion = createTemplate({
+			id: "template-older",
+			name: "demo-repo",
+			version: "0.2.0",
+			official: false,
+			config: {
+				metadata: {
+					displayName: "Demo Template",
+				},
+			},
+		});
+
+		vi.mocked(useTemplates).mockReturnValue({
+			templates: [latest],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(useTemplateVersions).mockReturnValue({
+			versions: [latest, olderVersion],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(updateTemplateOfficialStatus).mockResolvedValueOnce(undefined);
+
+		const { queryClient } = renderWithQueryClient(<AdminTemplatesPage />);
+		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+		fireEvent.click(
+			screen.getByRole("button", { name: /manage versions for demo template/i }),
+		);
+
+		expect(screen.getByText(/choose the exact published version/i)).toBeInTheDocument();
+		expect(screen.getByText("v0.2.0")).toBeInTheDocument();
+
+		fireEvent.click(
+			screen.getByRole("button", { name: /mark version 0\.2\.0 as official/i }),
+		);
+
+		await waitFor(() =>
+			expect(updateTemplateOfficialStatus).toHaveBeenCalledWith(
+				"template-older",
+				true,
+			),
+		);
+		expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["templates"] });
+		expect(
+			screen.getByText(/demo template v0\.2\.0 is now marked as official/i),
 		).toBeInTheDocument();
 	});
 

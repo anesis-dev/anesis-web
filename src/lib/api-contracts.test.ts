@@ -47,6 +47,88 @@ describe("api-contracts", () => {
 		});
 	});
 
+	it("parses current template payloads when updated_at is omitted", () => {
+		const currentTemplatePayload = {
+			id: "5a4564c0-a749-4e5b-91d8-6812d17dcb8b",
+			name: "next",
+			verison: "0.3.1",
+			owner_id: "6ffde3a6-e277-4559-9e94-bcd4765a8d1f",
+			official: true,
+			info: {
+				repo_url: "https://github.com/oxide-cli/templates/tree/main/ts/next",
+				author: {
+					name: "Maksym Zhuk",
+					github: "oxide-cli",
+				},
+				specialization: "fullstack",
+				scope: "web",
+				technologies: ["next"],
+				languages: ["typescript"],
+				type: "base",
+				displayName: "Next",
+				description:
+					"A modern fullstack Next.js template, ready for scalable web applications.",
+				tags: ["next", "nextjs", "react", "typescript", "fullstack", "ssr", "web"],
+			},
+			created_at: "2026-04-23T14:51:29.355675Z",
+		};
+
+		expect(parseTemplateResponse(currentTemplatePayload)).toEqual({
+			id: "5a4564c0-a749-4e5b-91d8-6812d17dcb8b",
+			name: "next",
+			owner_id: "6ffde3a6-e277-4559-9e94-bcd4765a8d1f",
+			url: "https://github.com/oxide-cli/templates/tree/main/ts/next",
+			official: true,
+			commit_sha: "",
+			version: "0.3.1",
+			created_at: "2026-04-23T14:51:29.355675Z",
+			updated_at: "2026-04-23T14:51:29.355675Z",
+			config: {
+				$schema: "",
+				name: "next",
+				version: "0.3.1",
+				oxideVersion: "",
+				author: {
+					name: "Maksym Zhuk",
+					github: "oxide-cli",
+				},
+				repository: {
+					type: "github",
+					url: "https://github.com/oxide-cli/templates/tree/main/ts/next",
+					release: "",
+				},
+				specialization: "fullstack",
+				scope: "web",
+				technologies: ["next"],
+				languages: ["typescript"],
+				type: "base",
+				metadata: {
+					displayName: "Next",
+					description:
+						"A modern fullstack Next.js template, ready for scalable web applications.",
+					tags: ["next", "nextjs", "react", "typescript", "fullstack", "ssr", "web"],
+				},
+			},
+		});
+
+		expect(
+			parseTemplatesResponse([
+				{
+					name: "next",
+					versionCount: 3,
+					latest: currentTemplatePayload,
+				},
+			]),
+		).toEqual([
+			expect.objectContaining({
+				name: "next",
+				version: "0.3.1",
+				versionCount: 3,
+				updated_at: "2026-04-23T14:51:29.355675Z",
+			}),
+		]);
+	});
+
 	it("parses valid addon payloads", () => {
 		expect(parseAddonsResponse([mockAddon])).toEqual([mockAddon]);
 		expect(

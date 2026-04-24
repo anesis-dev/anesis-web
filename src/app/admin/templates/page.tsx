@@ -172,10 +172,7 @@ function TemplateVersionsDialog({
 												<p className="font-medium text-foreground">
 													{version.config.metadata.displayName}
 												</p>
-												<p>
-													Published {formatDate(version.created_at)} and updated{" "}
-													{formatDate(version.updated_at)}
-												</p>
+												<p>Published {formatDate(version.created_at)}</p>
 											</div>
 										</div>
 

@@ -231,7 +231,6 @@ export default function TemplateDetailsPage({
 	const currentTemplate = template;
 	const canonicalRef = getTemplateRef(currentTemplate);
 	const publishedAt = formatDate(currentTemplate.created_at);
-	const updatedAt = formatDate(currentTemplate.updated_at);
 	const source = getSourceInfo(currentTemplate.config.repository.url);
 	const availableVersions = versions.length > 0 ? versions : [currentTemplate];
 	const templateName = currentTemplate.name;
@@ -241,8 +240,6 @@ export default function TemplateDetailsPage({
 	const technologyCount = String(currentTemplate.config.technologies.length);
 	const languageCount = String(currentTemplate.config.languages.length);
 	const versionCount = String(availableVersions.length);
-	const oxideVersion = currentTemplate.config.oxideVersion || "Not provided";
-	const releaseTag = currentTemplate.config.repository.release || "Not provided";
 	const isAdmin = user?.role === "admin";
 
 	async function refreshTemplateQueries() {
@@ -579,17 +576,17 @@ export default function TemplateDetailsPage({
 								</div>
 								<div>
 									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Oxide Version
+										Published
 									</p>
 									<p className="mt-2 text-foreground">
-										{oxideVersion}
+										{publishedAt}
 									</p>
 								</div>
 								<div>
 									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Last Updated
+										Template Type
 									</p>
-									<p className="mt-2 text-foreground">{updatedAt}</p>
+									<p className="mt-2 text-foreground">{template.config.type}</p>
 								</div>
 								<div>
 									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -599,10 +596,10 @@ export default function TemplateDetailsPage({
 								</div>
 								<div>
 									<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-										Release
+										Specialization
 									</p>
 									<p className="mt-2 break-all text-foreground">
-										{releaseTag}
+										{template.config.specialization}
 									</p>
 								</div>
 							</div>

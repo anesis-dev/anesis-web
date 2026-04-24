@@ -14,8 +14,8 @@ function parseSemver(version: string): [number, number, number] | null {
 }
 
 export function compareTemplateVersionsDesc(
-	a: Pick<ITemplate, "version" | "updated_at">,
-	b: Pick<ITemplate, "version" | "updated_at">,
+	a: Pick<ITemplate, "version" | "created_at" | "updated_at">,
+	b: Pick<ITemplate, "version" | "created_at" | "updated_at">,
 ): number {
 	const aParts = parseSemver(a.version);
 	const bParts = parseSemver(b.version);
@@ -30,7 +30,10 @@ export function compareTemplateVersionsDesc(
 		return b.version.localeCompare(a.version, undefined, { numeric: true });
 	}
 
-	return b.updated_at.localeCompare(a.updated_at);
+	const aTimestamp = a.updated_at ?? a.created_at ?? "";
+	const bTimestamp = b.updated_at ?? b.created_at ?? "";
+
+	return bTimestamp.localeCompare(aTimestamp);
 }
 
 export function sortTemplateVersions(templates: ITemplate[]): ITemplate[] {

@@ -12,6 +12,7 @@ vi.mock("@/lib/api-contracts", () => ({
 	parseTemplateResponse: vi.fn(),
 	parseTemplateUrlResponse: vi.fn(),
 	parseTemplatesResponse: vi.fn(),
+	parseTemplateVersionsResponse: vi.fn(),
 }));
 
 import { api } from "@/api/client";
@@ -20,6 +21,7 @@ import {
 	parseTemplateResponse,
 	parseTemplateUrlResponse,
 	parseTemplatesResponse,
+	parseTemplateVersionsResponse,
 } from "@/lib/api-contracts";
 import {
 	deleteTemplate,
@@ -27,6 +29,7 @@ import {
 	fetchTemplate,
 	fetchTemplateUrl,
 	fetchTemplates,
+	fetchTemplateVersions,
 	publishTemplate,
 	updateTemplate,
 	updateTemplateAsOfficial,
@@ -113,6 +116,40 @@ describe("template services", () => {
 			subdir: undefined,
 		});
 		expect(api.get).toHaveBeenCalledWith("/template/demo-repo/url");
+	});
+
+	it("fetches the published versions for a template package", async () => {
+		vi.mocked(api.get).mockResolvedValueOnce({
+			data: {
+				name: "demo-repo",
+				versionCount: 2,
+				latestVersion: "0.2.0",
+				latest: { id: "latest" },
+				versions: [{ id: "latest" }, { id: "older" }],
+			},
+		});
+		vi.mocked(parseTemplateVersionsResponse).mockReturnValueOnce([
+			{ id: "latest" },
+			{ id: "older" },
+		] as never);
+
+		await expect(fetchTemplateVersions("demo-repo")).resolves.toEqual([
+			{ id: "latest" },
+			{ id: "older" },
+		]);
+		expect(api.get).toHaveBeenCalledWith("/template/demo-repo/versions");
+		expect(parseTemplateVersionsResponse).toHaveBeenCalledWith(
+			{
+				data: {
+					name: "demo-repo",
+					versionCount: 2,
+					latestVersion: "0.2.0",
+					latest: { id: "latest" },
+					versions: [{ id: "latest" }, { id: "older" }],
+				},
+			},
+			"demo-repo",
+		);
 	});
 
 	it("publishes template urls through the publish endpoint", async () => {

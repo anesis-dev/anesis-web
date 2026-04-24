@@ -42,4 +42,23 @@ describe("template-versions", () => {
 			"other",
 		]);
 	});
+
+	it("falls back to created_at when updated_at is unavailable", () => {
+		const versions = [
+			createTemplate({
+				id: "older",
+				version: "preview",
+				created_at: "2026-04-01T10:00:00Z",
+				updated_at: undefined,
+			}),
+			createTemplate({
+				id: "newer",
+				version: "preview",
+				created_at: "2026-04-02T10:00:00Z",
+				updated_at: undefined,
+			}),
+		].sort(compareTemplateVersionsDesc);
+
+		expect(versions.map((template) => template.id)).toEqual(["newer", "older"]);
+	});
 });

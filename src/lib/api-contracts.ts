@@ -288,6 +288,32 @@ function parseLatestTemplateGroup(value: unknown, path: string): ITemplate {
 	};
 }
 
+function parseTemplateVersionsGroup(
+	value: unknown,
+	path: string,
+	expectedTemplateName: string,
+): ITemplate[] {
+	const group = expectRecord(value, path);
+	const name = expectString(group.name, `${path}.name`);
+	const normalizedExpectedName = expectedTemplateName.trim().toLowerCase();
+
+	if (name.toLowerCase() !== normalizedExpectedName) {
+		return [];
+	}
+
+	const versionCount = expectNumber(group.versionCount, `${path}.versionCount`);
+	const versions = group.versions;
+
+	if (!Array.isArray(versions)) {
+		throw new Error(`Invalid API response: ${path}.versions must be an array.`);
+	}
+
+	return versions.map((template, index) => ({
+		...parseTemplate(template, `${path}.versions[${index}]`),
+		versionCount,
+	}));
+}
+
 function parseAddon(value: unknown, path: string): IAddon {
 	const addon = expectRecord(value, path);
 
@@ -340,42 +366,34 @@ export function parseTemplateVersionsResponse(
 	value: unknown,
 	templateName: string,
 ): ITemplate[] {
-	if (!Array.isArray(value)) {
+	if (Array.isArray(value)) {
+		const normalizedName = templateName.trim().toLowerCase();
+		const matchedGroup = value.find((group, index) => {
+			const record = expectRecord(group, `templateVersions[${index}]`);
+			return (
+				expectString(record.name, `templateVersions[${index}].name`).toLowerCase() ===
+				normalizedName
+			);
+		});
+
+		if (!matchedGroup) {
+			return [];
+		}
+
+		return parseTemplateVersionsGroup(
+			matchedGroup,
+			"templateVersions[group]",
+			templateName,
+		);
+	}
+
+	if (!isRecord(value)) {
 		throw new Error(
-			"Invalid API response: template versions payload must be an array.",
+			"Invalid API response: template versions payload must be an object or array.",
 		);
 	}
 
-	const normalizedName = templateName.trim().toLowerCase();
-	const matchedGroup = value.find((group, index) => {
-		const record = expectRecord(group, `templateVersions[${index}]`);
-		return (
-			expectString(record.name, `templateVersions[${index}].name`).toLowerCase() ===
-			normalizedName
-		);
-	});
-
-	if (!matchedGroup) {
-		return [];
-	}
-
-	const group = expectRecord(matchedGroup, "templateVersions[group]");
-	const versionCount = expectNumber(
-		group.versionCount,
-		"templateVersions[group].versionCount",
-	);
-	const versions = group.versions;
-
-	if (!Array.isArray(versions)) {
-		throw new Error(
-			"Invalid API response: templateVersions[group].versions must be an array.",
-		);
-	}
-
-	return versions.map((template, index) => ({
-		...parseTemplate(template, `templateVersions[group].versions[${index}]`),
-		versionCount,
-	}));
+	return parseTemplateVersionsGroup(value, "templateVersions", templateName);
 }
 
 export function parseAddonsResponse(value: unknown): IAddon[] {

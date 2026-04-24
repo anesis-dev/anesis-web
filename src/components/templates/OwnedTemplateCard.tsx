@@ -85,6 +85,7 @@ export function OwnedTemplateCard({
 	const [isRefreshingOfficial, setIsRefreshingOfficial] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+	const publishedAt = formatDate(template.created_at);
 
 	async function refreshTemplateQueries() {
 		await Promise.all([
@@ -242,7 +243,7 @@ export function OwnedTemplateCard({
 						<span className="truncate">@{template.config.author.github}</span>
 					</Link>
 					<span className="font-mono">v{template.version}</span>
-					<span>Synced {formatDate(template.updated_at)}</span>
+					<span>Published {publishedAt}</span>
 				</div>
 			</CardHeader>
 
@@ -259,10 +260,10 @@ export function OwnedTemplateCard({
 
 					<div className="rounded-lg border bg-muted/15 px-3 py-3">
 						<p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-							Last sync
+							Published
 						</p>
 						<p className="mt-2 text-sm font-medium text-foreground">
-							{formatDate(template.updated_at)}
+							{publishedAt}
 						</p>
 					</div>
 				</div>

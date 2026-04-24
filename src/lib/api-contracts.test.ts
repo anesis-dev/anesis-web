@@ -7,6 +7,7 @@ import {
 	parseTemplateResponse,
 	parseTemplateUrlResponse,
 	parseTemplatesResponse,
+	parseTemplateVersionsResponse,
 	parseUsersResponse,
 } from "@/lib/api-contracts";
 import {
@@ -125,6 +126,37 @@ describe("api-contracts", () => {
 				version: "0.3.1",
 				versionCount: 3,
 				updated_at: "2026-04-23T14:51:29.355675Z",
+			}),
+		]);
+
+		expect(
+			parseTemplateVersionsResponse(
+				{
+					name: "next",
+					latestVersion: "0.3.1",
+					versionCount: 3,
+					latest: currentTemplatePayload,
+					versions: [
+						currentTemplatePayload,
+						{
+							...currentTemplatePayload,
+							id: "version-2",
+							verison: "0.3.0",
+						},
+					],
+				},
+				"next",
+			),
+		).toEqual([
+			expect.objectContaining({
+				name: "next",
+				version: "0.3.1",
+				versionCount: 3,
+			}),
+			expect.objectContaining({
+				name: "next",
+				version: "0.3.0",
+				versionCount: 3,
 			}),
 		]);
 	});

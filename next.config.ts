@@ -5,7 +5,8 @@ import type { NextConfig } from "next";
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 function createNextConfig(): NextConfig {
-	return {
+	const apiProxyUrl = process.env.API_PROXY_URL?.replace(/\/+$/, "");
+	const config: NextConfig = {
 		reactStrictMode: true,
 		turbopack: {
 			root: projectRoot,
@@ -31,6 +32,17 @@ function createNextConfig(): NextConfig {
 			],
 		},
 	};
+
+	if (apiProxyUrl) {
+		config.rewrites = async () => [
+			{
+				source: "/api/backend/:path*",
+				destination: `${apiProxyUrl}/:path*`,
+			},
+		];
+	}
+
+	return config;
 }
 
 export default createNextConfig();

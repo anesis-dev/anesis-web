@@ -35,6 +35,24 @@ describe("AuthCallbackPage", () => {
 		expect(replace).toHaveBeenCalledWith("/");
 	});
 
+	it("accepts callbacks where the server already set the session cookie", async () => {
+		const replace = vi.fn();
+		vi.mocked(useRouter).mockReturnValue({
+			replace,
+		} as never);
+		const queryClient = createTestQueryClient();
+		queryClient.setQueryData(["me"], { id: "user-1" });
+		window.history.pushState({}, "", "/auth/callback?signed_in=1");
+
+		render(<AuthCallbackPage />, {
+			wrapper: createQueryClientWrapper(queryClient),
+		});
+
+		await waitFor(() => expect(replace).toHaveBeenCalledWith("/"));
+		expect(exchangeAuthCode).not.toHaveBeenCalled();
+		expect(queryClient.getQueryData(["me"])).toBeUndefined();
+	});
+
 	it("shows an error when the callback code is missing", async () => {
 		const replace = vi.fn();
 		vi.mocked(useRouter).mockReturnValue({

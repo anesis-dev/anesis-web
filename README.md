@@ -42,6 +42,20 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 
 `NEXT_PUBLIC_API_URL` is recommended, but the app also falls back to `http://localhost:4000` in local development if the variable is missing or invalid.
 
+For production deployments where the browser app and API live on different
+sites, route browser API traffic through the frontend origin so Safari can keep
+the `httpOnly` auth cookie in a first-party context:
+
+```env
+NEXT_PUBLIC_API_URL=/api/backend
+API_PROXY_URL=https://oxide-server.onrender.com
+```
+
+`API_PROXY_URL` is used by `next.config.ts` to rewrite `/api/backend/*` to the
+server. The server's `WEB_CALLBACK_URL` must point at the same rewritten
+callback path, for example
+`https://oxide-cli.vercel.app/api/backend/auth/callback`.
+
 3. Start the frontend:
 
 ```bash

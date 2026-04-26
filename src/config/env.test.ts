@@ -21,6 +21,15 @@ describe("env config", () => {
 		expect(env.apiUrl).toBe("https://api.example.test");
 	});
 
+	it("allows same-origin api paths for production proxies", async () => {
+		vi.stubEnv("NEXT_PUBLIC_API_URL", "/api/backend///");
+		vi.resetModules();
+
+		const { env } = await import("@/config/env");
+
+		expect(env.apiUrl).toBe("/api/backend");
+	});
+
 	it("falls back to the local api default for invalid values", async () => {
 		vi.stubEnv("NEXT_PUBLIC_API_URL", "not-a-url");
 		vi.resetModules();

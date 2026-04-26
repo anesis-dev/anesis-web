@@ -4,11 +4,19 @@ function normalizeUrl(value: string): string {
 	return value.replace(/\/+$/, "");
 }
 
+function normalizePath(value: string): string {
+	return value.replace(/\/+$/, "");
+}
+
 function getApiUrl(): string {
 	const value = process.env.NEXT_PUBLIC_API_URL;
 
 	if (!value) {
 		return DEFAULT_LOCAL_API_URL;
+	}
+
+	if (value.startsWith("/") && !value.startsWith("//")) {
+		return normalizePath(value);
 	}
 
 	try {

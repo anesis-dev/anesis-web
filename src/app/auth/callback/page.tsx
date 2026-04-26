@@ -13,7 +13,15 @@ export default function AuthCallbackPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get("code");
+    const params = new URLSearchParams(window.location.search);
+    const signedIn = params.get("signed_in") === "1";
+    if (signedIn) {
+      queryClient.removeQueries({ queryKey: ["me"] });
+      router.replace("/");
+      return;
+    }
+
+    const code = params.get("code");
     if (!code) {
       setError(
         "Missing authorization code. Start the GitHub sign-in flow again.",

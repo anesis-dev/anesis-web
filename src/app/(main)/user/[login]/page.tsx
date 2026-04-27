@@ -68,7 +68,9 @@ export default function UserProfilePage({
 		isLoading: userLoading,
 		isError: userError,
 	} = useGitHubUser(login);
-	const { templates, isLoading: templatesLoading } = useTemplates();
+	const { templates, isLoading: templatesLoading } = useTemplates({
+		pageSize: 100,
+	});
 
 	const userTemplates: ITemplate[] = templates.filter(
 		(t) => t.config.author.github.toLowerCase() === login.toLowerCase(),

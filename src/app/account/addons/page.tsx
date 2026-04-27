@@ -52,9 +52,15 @@ function MetricTile({
 
 export default function AccountAddonsPage() {
 	const { user, login } = useAuth();
-	const { addons, isLoading, isError } = useMyAddons(!!user);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const searchActive = search.trim().length > 0;
+	const { addons, isLoading, isError, pagination } = useMyAddons({
+		enabled: !!user,
+		page: searchActive ? 1 : page,
+		pageSize: searchActive ? 100 : PAGE_SIZE,
+	});
+	const totalCount = pagination?.total ?? addons.length;
 	const officialAddons = addons.filter((addon) => addon.official).length;
 	const communityAddons = addons.length - officialAddons;
 
@@ -82,12 +88,21 @@ export default function AccountAddonsPage() {
 		);
 	}, [addons, search]);
 
-	const totalPages = Math.max(1, Math.ceil(myAddons.length / PAGE_SIZE));
-	const currentPage = Math.min(page, totalPages);
-	const paginatedAddons = myAddons.slice(
-		(currentPage - 1) * PAGE_SIZE,
-		currentPage * PAGE_SIZE,
+	const localPagination = searchActive || !pagination;
+	const totalPages = Math.max(
+		1,
+		localPagination
+			? Math.ceil(myAddons.length / PAGE_SIZE)
+			: (pagination?.totalPages ?? 1),
 	);
+	const currentPage = Math.min(page, totalPages);
+	const visibleAddons = localPagination
+		? myAddons.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+		: myAddons;
+	const addonSummary =
+		!pagination || totalCount === myAddons.length
+			? `${myAddons.length} addon(s) in your workspace`
+			: `${myAddons.length} of ${totalCount} addon(s) in your workspace`;
 
 	if (!user) {
 		return (
@@ -135,7 +150,7 @@ export default function AccountAddonsPage() {
 						<div className="grid gap-3 sm:grid-cols-3 xl:w-[28rem]">
 							<MetricTile
 								label="Entries"
-								value={isLoading ? "..." : addons.length}
+								value={isLoading ? "..." : totalCount}
 								icon={BoxesIcon}
 							/>
 							<MetricTile
@@ -173,7 +188,7 @@ export default function AccountAddonsPage() {
 						/>
 					</InputGroup>
 					<p className="text-xs text-muted-foreground">
-						{isLoading ? "Loading addons..." : `${myAddons.length} addon(s) in your workspace`}
+						{isLoading ? "Loading addons..." : addonSummary}
 					</p>
 				</div>
 
@@ -212,10 +227,10 @@ export default function AccountAddonsPage() {
 				</div>
 			)}
 
-			{!isLoading && !isError && paginatedAddons.length > 0 && (
+			{!isLoading && !isError && myAddons.length > 0 && (
 				<>
 					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-						{paginatedAddons.map((addon) => (
+						{visibleAddons.map((addon) => (
 							<OwnedAddonCard key={addon.id} addon={addon} />
 						))}
 					</div>

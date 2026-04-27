@@ -92,8 +92,10 @@ function AddonSkeleton() {
 }
 
 export default function Home() {
-  const { templates, isLoading: templatesLoading } = useTemplates();
-  const { addons, isLoading: addonsLoading } = useAddons();
+  const { templates, isLoading: templatesLoading } = useTemplates({
+    pageSize: 100,
+  });
+  const { addons, isLoading: addonsLoading } = useAddons({ pageSize: 100 });
   const [installCopied, setInstallCopied] = useState(false);
 
   async function handleCopyInstallCommand() {

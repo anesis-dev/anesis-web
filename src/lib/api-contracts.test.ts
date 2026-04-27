@@ -1,12 +1,14 @@
 import {
 	parseAddonUrlResponse,
 	parseAddonsResponse,
+	parseAddonsPageResponse,
 	parseGitHubUserResponse,
 	parseMeResponse,
 	parsePublishAddonResponse,
 	parseTemplateResponse,
 	parseTemplateUrlResponse,
 	parseTemplatesResponse,
+	parseTemplatesPageResponse,
 	parseTemplateVersionsResponse,
 	parseUsersResponse,
 } from "@/lib/api-contracts";
@@ -35,6 +37,21 @@ describe("api-contracts", () => {
 	it("parses valid template payloads", () => {
 		expect(parseTemplateResponse(mockTemplate)).toEqual(mockTemplate);
 		expect(parseTemplatesResponse([mockTemplate])).toEqual([mockTemplate]);
+		expect(
+			parseTemplatesPageResponse({
+				data: [mockTemplate],
+				total: 21,
+				page: 2,
+				page_size: 12,
+				total_pages: 2,
+			}),
+		).toEqual({
+			data: [mockTemplate],
+			total: 21,
+			page: 2,
+			pageSize: 12,
+			totalPages: 2,
+		});
 		expect(
 			parseTemplateUrlResponse({
 				archive_url: "https://api.github.com/demo.tar.gz",
@@ -164,6 +181,21 @@ describe("api-contracts", () => {
 	it("parses valid addon payloads", () => {
 		expect(parseAddonsResponse([mockAddon])).toEqual([mockAddon]);
 		expect(
+			parseAddonsPageResponse({
+				data: [mockAddon],
+				total: 35,
+				page: 3,
+				page_size: 10,
+				total_pages: 4,
+			}),
+		).toEqual({
+			data: [mockAddon],
+			total: 35,
+			page: 3,
+			pageSize: 10,
+			totalPages: 4,
+		});
+		expect(
 			parsePublishAddonResponse({
 				message: "published",
 				addon_id: "drizzle",
@@ -186,6 +218,15 @@ describe("api-contracts", () => {
 	it("rejects invalid template payloads", () => {
 		expect(() => parseTemplatesResponse({})).toThrow(/must be an array/);
 		expect(() =>
+			parseTemplatesPageResponse({
+				data: [mockTemplate],
+				total: 1,
+				page: 1,
+				page_size: "20",
+				total_pages: 1,
+			}),
+		).toThrow(/page_size must be a number/);
+		expect(() =>
 			parseTemplateResponse({
 				...mockTemplate,
 				commit_sha: undefined,
@@ -198,6 +239,15 @@ describe("api-contracts", () => {
 
 	it("rejects invalid addon payloads", () => {
 		expect(() => parseAddonsResponse({})).toThrow(/must be an array/);
+		expect(() =>
+			parseAddonsPageResponse({
+				data: {},
+				total: 1,
+				page: 1,
+				page_size: 20,
+				total_pages: 1,
+			}),
+		).toThrow(/data must be an array/);
 		expect(() =>
 			parseAddonsResponse([
 				{

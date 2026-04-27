@@ -52,28 +52,52 @@ function getWrapper() {
 
 describe("data hooks", () => {
   it("loads templates", async () => {
-    vi.mocked(fetchTemplates).mockResolvedValueOnce([mockTemplate]);
+    vi.mocked(fetchTemplates).mockResolvedValueOnce({
+      data: [mockTemplate],
+      total: 21,
+      page: 2,
+      pageSize: 12,
+      totalPages: 2,
+    });
 
-    const { result } = renderHook(() => useTemplates(), {
+    const { result } = renderHook(() => useTemplates({ page: 2, pageSize: 12 }), {
       wrapper: getWrapper(),
     });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.templates).toEqual([mockTemplate]);
-    expect(fetchTemplates).toHaveBeenCalledTimes(1);
+    expect(result.current.pagination).toEqual({
+      total: 21,
+      page: 2,
+      pageSize: 12,
+      totalPages: 2,
+    });
+    expect(fetchTemplates).toHaveBeenCalledWith({ page: 2, pageSize: 12 });
   });
 
   it("loads addons", async () => {
     const addon = createAddon();
-    vi.mocked(fetchAddons).mockResolvedValueOnce([addon]);
+    vi.mocked(fetchAddons).mockResolvedValueOnce({
+      data: [addon],
+      total: 19,
+      page: 3,
+      pageSize: 9,
+      totalPages: 3,
+    });
 
-    const { result } = renderHook(() => useAddons(), {
+    const { result } = renderHook(() => useAddons({ page: 3, pageSize: 9 }), {
       wrapper: getWrapper(),
     });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.addons).toEqual([addon]);
-    expect(fetchAddons).toHaveBeenCalledTimes(1);
+    expect(result.current.pagination).toEqual({
+      total: 19,
+      page: 3,
+      pageSize: 9,
+      totalPages: 3,
+    });
+    expect(fetchAddons).toHaveBeenCalledWith({ page: 3, pageSize: 9 });
   });
 
   it("loads a single addon by ref when a ref is provided", async () => {
@@ -111,7 +135,13 @@ describe("data hooks", () => {
 
   it("loads addons for the current user from the server", async () => {
     const owned = createAddon();
-    vi.mocked(fetchMyAddons).mockResolvedValueOnce([owned]);
+    vi.mocked(fetchMyAddons).mockResolvedValueOnce({
+      data: [owned],
+      total: 1,
+      page: 1,
+      pageSize: 20,
+      totalPages: 1,
+    });
 
     const { result } = renderHook(() => useMyAddons(true), {
       wrapper: getWrapper(),
@@ -119,7 +149,8 @@ describe("data hooks", () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.addons).toEqual([owned]);
-    expect(fetchMyAddons).toHaveBeenCalledTimes(1);
+    expect(result.current.pagination.total).toBe(1);
+    expect(fetchMyAddons).toHaveBeenCalledWith({ page: 1, pageSize: 20 });
   });
 
   it("loads a template by ref when a ref is provided", async () => {

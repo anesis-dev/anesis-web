@@ -111,11 +111,15 @@ function UserRoleBadge({ role }: { role: "admin" | "user" }) {
 }
 
 export default function AdminDashboard() {
-	const { templates, isLoading } = useTemplates();
-	const { addons, isLoading: addonsLoading } = useAddons();
+	const { templates, isLoading, pagination: templatePagination } = useTemplates({
+		pageSize: 100,
+	});
+	const { addons, isLoading: addonsLoading, pagination: addonPagination } = useAddons({
+		pageSize: 100,
+	});
 	const { users, isLoading: usersLoading, isError: usersError } = useUsers();
 
-	const totalTemplates = templates.length;
+	const totalTemplates = templatePagination?.total ?? templates.length;
 	const officialTemplates = templates.filter((t) => t.official).length;
 	const communityTemplates = totalTemplates - officialTemplates;
 
@@ -161,7 +165,7 @@ export default function AdminDashboard() {
 				/>
 				<StatCard
 					title="Published Addons"
-					value={addons.length}
+					value={addonPagination?.total ?? addons.length}
 					description="Registered in the addon registry"
 					icon={BoxesIcon}
 					loading={addonsLoading}

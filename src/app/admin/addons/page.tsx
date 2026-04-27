@@ -76,10 +76,14 @@ function SkeletonRow() {
 }
 
 export default function AdminAddonsPage() {
-	const { addons, isLoading, isError } = useAddons();
 	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const searchActive = search.trim().length > 0;
+	const { addons, isLoading, isError, pagination } = useAddons({
+		page: searchActive ? 1 : page,
+		pageSize: searchActive ? 100 : PAGE_SIZE,
+	});
 	const [notice, setNotice] = useState<Notice>(null);
 	const [busyAction, setBusyAction] = useState<string | null>(null);
 	const [pendingDelete, setPendingDelete] = useState<IAddon | null>(null);
@@ -104,12 +108,18 @@ export default function AdminAddonsPage() {
 		);
 	}, [addons, search]);
 
-	const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-	const currentPage = Math.min(page, totalPages);
-	const paginatedAddons = filtered.slice(
-		(currentPage - 1) * PAGE_SIZE,
-		currentPage * PAGE_SIZE,
+	const totalCount = pagination?.total ?? addons.length;
+	const localPagination = searchActive || !pagination;
+	const totalPages = Math.max(
+		1,
+		localPagination
+			? Math.ceil(filtered.length / PAGE_SIZE)
+			: (pagination?.totalPages ?? 1),
 	);
+	const currentPage = Math.min(page, totalPages);
+	const visibleAddons = localPagination
+		? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+		: filtered;
 
 	async function refreshAddonQueries() {
 		await Promise.all([
@@ -185,9 +195,9 @@ export default function AdminAddonsPage() {
 
 				{!isLoading && (
 					<span className="mt-1 font-mono text-sm text-muted-foreground">
-						{filtered.length === addons.length
-							? `${addons.length} total`
-							: `${filtered.length} / ${addons.length}`}
+						{filtered.length === totalCount
+							? `${totalCount} total`
+							: `${filtered.length} / ${totalCount}`}
 					</span>
 				)}
 			</div>
@@ -266,7 +276,7 @@ export default function AdminAddonsPage() {
 									</td>
 								</tr>
 							) : (
-								paginatedAddons.map((addon) => (
+								visibleAddons.map((addon) => (
 									<tr
 										key={addon.id}
 										className="border-b transition-colors last:border-0 hover:bg-muted/30"

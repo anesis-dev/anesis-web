@@ -225,10 +225,14 @@ function TemplateVersionsDialog({
 
 export default function AdminTemplatesPage() {
 	const { user } = useAuth();
-	const { templates, isLoading, isError } = useTemplates();
 	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const searchActive = search.trim().length > 0;
+	const { templates, isLoading, isError, pagination } = useTemplates({
+		page: searchActive ? 1 : page,
+		pageSize: searchActive ? 100 : PAGE_SIZE,
+	});
 	const [notice, setNotice] = useState<Notice>(null);
 	const [busyAction, setBusyAction] = useState<string | null>(null);
 	const [pendingDelete, setPendingDelete] = useState<ITemplate | null>(null);
@@ -246,12 +250,18 @@ export default function AdminTemplatesPage() {
 		);
 	}, [templates, search]);
 
-	const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-	const currentPage = Math.min(page, totalPages);
-	const paginatedTemplates = filtered.slice(
-		(currentPage - 1) * PAGE_SIZE,
-		currentPage * PAGE_SIZE,
+	const totalCount = pagination?.total ?? templates.length;
+	const localPagination = searchActive || !pagination;
+	const totalPages = Math.max(
+		1,
+		localPagination
+			? Math.ceil(filtered.length / PAGE_SIZE)
+			: (pagination?.totalPages ?? 1),
 	);
+	const currentPage = Math.min(page, totalPages);
+	const visibleTemplates = localPagination
+		? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+		: filtered;
 
 	async function refreshTemplateQueries() {
 		await Promise.all([
@@ -356,9 +366,9 @@ export default function AdminTemplatesPage() {
 
 				{!isLoading && (
 					<span className="mt-1 font-mono text-sm text-muted-foreground">
-						{filtered.length === templates.length
-							? `${templates.length} total`
-							: `${filtered.length} / ${templates.length}`}
+						{filtered.length === totalCount
+							? `${totalCount} total`
+							: `${filtered.length} / ${totalCount}`}
 					</span>
 				)}
 			</div>
@@ -444,7 +454,7 @@ export default function AdminTemplatesPage() {
 									</td>
 								</tr>
 							) : (
-								paginatedTemplates.map((t) => (
+								visibleTemplates.map((t) => (
 									<tr
 										key={t.id}
 										className="border-b transition-colors last:border-0 hover:bg-muted/30"

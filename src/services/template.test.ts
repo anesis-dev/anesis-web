@@ -11,7 +11,7 @@ vi.mock("@/lib/api-contracts", () => ({
 	parsePublishTemplateResponse: vi.fn(),
 	parseTemplateResponse: vi.fn(),
 	parseTemplateUrlResponse: vi.fn(),
-	parseTemplatesResponse: vi.fn(),
+	parseTemplatesPageResponse: vi.fn(),
 	parseTemplateVersionsResponse: vi.fn(),
 }));
 
@@ -20,7 +20,7 @@ import {
 	parsePublishTemplateResponse,
 	parseTemplateResponse,
 	parseTemplateUrlResponse,
-	parseTemplatesResponse,
+	parseTemplatesPageResponse,
 	parseTemplateVersionsResponse,
 } from "@/lib/api-contracts";
 import {
@@ -39,19 +39,43 @@ import {
 describe("template services", () => {
 	it("fetches all templates through the public endpoint", async () => {
 		vi.mocked(api.get).mockResolvedValueOnce({ data: [] });
-		vi.mocked(parseTemplatesResponse).mockReturnValueOnce([{ id: "1" }] as never);
+		vi.mocked(parseTemplatesPageResponse).mockReturnValueOnce({
+			data: [{ id: "1" }],
+			total: 21,
+			page: 2,
+			pageSize: 12,
+			totalPages: 2,
+		} as never);
 
-		await expect(fetchTemplates()).resolves.toEqual([{ id: "1" }]);
-		expect(api.get).toHaveBeenCalledWith("/template/all");
-		expect(parseTemplatesResponse).toHaveBeenCalledWith({ data: [] });
+		await expect(fetchTemplates({ page: 2, pageSize: 12 })).resolves.toEqual({
+			data: [{ id: "1" }],
+			total: 21,
+			page: 2,
+			pageSize: 12,
+			totalPages: 2,
+		});
+		expect(api.get).toHaveBeenCalledWith("/template/all?page=2&page_size=12");
+		expect(parseTemplatesPageResponse).toHaveBeenCalledWith({ data: [] });
 	});
 
 	it("fetches the authenticated user's templates", async () => {
 		vi.mocked(api.get).mockResolvedValueOnce({ data: [] });
-		vi.mocked(parseTemplatesResponse).mockReturnValueOnce([{ id: "2" }] as never);
+		vi.mocked(parseTemplatesPageResponse).mockReturnValueOnce({
+			data: [{ id: "2" }],
+			total: 1,
+			page: 1,
+			pageSize: 6,
+			totalPages: 1,
+		} as never);
 
-		await expect(fetchMyTemplates()).resolves.toEqual([{ id: "2" }]);
-		expect(api.get).toHaveBeenCalledWith("/template/my");
+		await expect(fetchMyTemplates({ page: 1, pageSize: 6 })).resolves.toEqual({
+			data: [{ id: "2" }],
+			total: 1,
+			page: 1,
+			pageSize: 6,
+			totalPages: 1,
+		});
+		expect(api.get).toHaveBeenCalledWith("/template/my?page=1&page_size=6");
 	});
 
 	it("fetches a single template using an encoded template ref", async () => {

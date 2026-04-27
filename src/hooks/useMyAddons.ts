@@ -1,13 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchMyAddons } from "@/services/addon";
+import {
+	getEmptyPagination,
+	normalizePaginatedQueryOptions,
+	PaginatedQueryOptions,
+} from "@/hooks/pagination";
 import { IAddon } from "@/types/addon";
+import { IPaginatedResponse } from "@/types/pagination";
 
-export function useMyAddons(enabled = true) {
-	const { data: addons = [], isLoading, isError } = useQuery<IAddon[]>({
-		queryKey: ["addons", "my"],
-		queryFn: fetchMyAddons,
+export function useMyAddons(options: PaginatedQueryOptions | boolean = {}) {
+	const { page, pageSize, enabled } = normalizePaginatedQueryOptions(options);
+	const fallback = getEmptyPagination<IAddon>(page, pageSize);
+	const {
+		data = fallback,
+		isLoading,
+		isError,
+	} = useQuery<IPaginatedResponse<IAddon>>({
+		queryKey: ["addons", "my", page, pageSize],
+		queryFn: () => fetchMyAddons({ page, pageSize }),
 		enabled,
 	});
 
-	return { addons, isLoading, isError };
+	return {
+		addons: data.data,
+		pagination: {
+			total: data.total,
+			page: data.page,
+			pageSize: data.pageSize,
+			totalPages: data.totalPages,
+		},
+		isLoading,
+		isError,
+	};
 }

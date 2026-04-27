@@ -74,6 +74,16 @@ function applyFilters(
 	});
 }
 
+function hasActiveFilters(filters: TemplateFiltersState): boolean {
+	return Boolean(
+		filters.search.trim() ||
+			filters.official ||
+			filters.specialization ||
+			filters.languages.length > 0 ||
+			filters.technologies.length > 0,
+	);
+}
+
 function SkeletonCard() {
 	return (
 		<div className="flex flex-col gap-4 rounded-xl border bg-card py-5 px-6 animate-pulse">
@@ -103,17 +113,27 @@ function SkeletonCard() {
 }
 
 export default function Templates() {
-	const { templates, isLoading, isError } = useTemplates();
-	const { user } = useAuth();
 	const [filters, setFilters] = useState<TemplateFiltersState>(DEFAULT_FILTERS);
-	const filtered = useMemo(() => applyFilters(templates, filters), [templates, filters]);
 	const [page, setPage] = useState(1);
-	const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-	const currentPage = Math.min(page, totalPages);
-	const paginatedTemplates = filtered.slice(
-		(currentPage - 1) * PAGE_SIZE,
-		currentPage * PAGE_SIZE,
+	const filtersActive = hasActiveFilters(filters);
+	const { templates, isLoading, isError, pagination } = useTemplates({
+		page: filtersActive ? 1 : page,
+		pageSize: filtersActive ? 100 : PAGE_SIZE,
+	});
+	const { user } = useAuth();
+	const filtered = useMemo(() => applyFilters(templates, filters), [templates, filters]);
+	const totalCount = pagination?.total ?? templates.length;
+	const localPagination = filtersActive || !pagination;
+	const totalPages = Math.max(
+		1,
+		localPagination
+			? Math.ceil(filtered.length / PAGE_SIZE)
+			: (pagination?.totalPages ?? 1),
 	);
+	const currentPage = Math.min(page, totalPages);
+	const visibleTemplates = localPagination
+		? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+		: filtered;
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8 sm:px-5 lg:px-8">
@@ -141,13 +161,13 @@ export default function Templates() {
 			{/* Result count */}
 			{!isLoading && !isError && (
 				<p className="text-xs text-muted-foreground">
-					{filtered.length === templates.length ? (
+					{filtered.length === totalCount ? (
 						<>
 							Showing{" "}
 							<span className="font-medium text-foreground">
-								{templates.length}
+								{totalCount}
 							</span>{" "}
-							{templates.length === 1 ? "template" : "templates"}
+							{totalCount === 1 ? "template" : "templates"}
 						</>
 					) : (
 						<>
@@ -157,9 +177,9 @@ export default function Templates() {
 							</span>{" "}
 							of{" "}
 							<span className="font-medium text-foreground">
-								{templates.length}
+								{totalCount}
 							</span>{" "}
-							{templates.length === 1 ? "template" : "templates"}
+							{totalCount === 1 ? "template" : "templates"}
 						</>
 					)}
 				</p>
@@ -205,7 +225,7 @@ export default function Templates() {
 			{/* Grid */}
 			{!isLoading && !isError && filtered.length > 0 && (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{paginatedTemplates.map((template) => (
+					{visibleTemplates.map((template) => (
 						<TemplateCard
 							key={template.id}
 							template={template}
@@ -216,7 +236,7 @@ export default function Templates() {
 				</div>
 			)}
 
-			{!isLoading && !isError && filtered.length > 0 && (
+			{!isLoading && !isError && (
 				<PaginationControls
 					page={currentPage}
 					totalPages={totalPages}

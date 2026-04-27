@@ -9,14 +9,14 @@ vi.mock("@/api/client", () => ({
 
 vi.mock("@/lib/api-contracts", () => ({
   parseAddonUrlResponse: vi.fn(),
-  parseAddonsResponse: vi.fn(),
+  parseAddonsPageResponse: vi.fn(),
   parsePublishAddonResponse: vi.fn(),
 }));
 
 import { api } from "@/api/client";
 import {
   parseAddonUrlResponse,
-  parseAddonsResponse,
+  parseAddonsPageResponse,
   parsePublishAddonResponse,
 } from "@/lib/api-contracts";
 import {
@@ -24,6 +24,7 @@ import {
   fetchAddon,
   fetchAddonUrl,
   fetchAddons,
+  fetchMyAddons,
   publishAddon,
   updateAddon,
   updateAddonOfficialStatus,
@@ -32,28 +33,64 @@ import {
 describe("addon services", () => {
   it("fetches all addons through the public endpoint", async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ data: [] });
-    vi.mocked(parseAddonsResponse).mockReturnValueOnce([
-      { id: "addon-1" },
-    ] as never);
+    vi.mocked(parseAddonsPageResponse).mockReturnValueOnce({
+      data: [{ id: "addon-1" }],
+      total: 18,
+      page: 2,
+      pageSize: 9,
+      totalPages: 2,
+    } as never);
 
-    await expect(fetchAddons()).resolves.toEqual([{ id: "addon-1" }]);
-    expect(api.get).toHaveBeenCalledWith("/addon/all");
-    expect(parseAddonsResponse).toHaveBeenCalledWith({ data: [] });
+    await expect(fetchAddons({ page: 2, pageSize: 9 })).resolves.toEqual({
+      data: [{ id: "addon-1" }],
+      total: 18,
+      page: 2,
+      pageSize: 9,
+      totalPages: 2,
+    });
+    expect(api.get).toHaveBeenCalledWith("/addon/all?page=2&page_size=9");
+    expect(parseAddonsPageResponse).toHaveBeenCalledWith({ data: [] });
+  });
+
+  it("fetches the authenticated user's addons", async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ data: [] });
+    vi.mocked(parseAddonsPageResponse).mockReturnValueOnce({
+      data: [{ id: "owned-addon" }],
+      total: 1,
+      page: 1,
+      pageSize: 6,
+      totalPages: 1,
+    } as never);
+
+    await expect(fetchMyAddons({ page: 1, pageSize: 6 })).resolves.toEqual({
+      data: [{ id: "owned-addon" }],
+      total: 1,
+      page: 1,
+      pageSize: 6,
+      totalPages: 1,
+    });
+    expect(api.get).toHaveBeenCalledWith("/addon/my?page=1&page_size=6");
   });
 
   it("fetches a single addon by ref from the public endpoint", async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ data: [] });
-    vi.mocked(parseAddonsResponse).mockReturnValueOnce([
-      { addon_id: "drizzle", version: "1.0.0", id: "addon-1" },
-      { addon_id: "nest-drizzle", version: "1.1.0", id: "addon-2" },
-    ] as never);
+    vi.mocked(parseAddonsPageResponse).mockReturnValueOnce({
+      data: [
+        { addon_id: "drizzle", version: "1.0.0", id: "addon-1" },
+        { addon_id: "nest-drizzle", version: "1.1.0", id: "addon-2" },
+      ],
+      total: 2,
+      page: 1,
+      pageSize: 100,
+      totalPages: 1,
+    } as never);
 
     await expect(fetchAddon("drizzle@1.0.0")).resolves.toEqual({
       addon_id: "drizzle",
       version: "1.0.0",
       id: "addon-1",
     });
-    expect(api.get).toHaveBeenCalledWith("/addon/all");
+    expect(api.get).toHaveBeenCalledWith("/addon/all?page=1&page_size=100");
   });
 
   it("fetches the authenticated addon archive url", async () => {
@@ -122,7 +159,13 @@ describe("addon services", () => {
 
   it("throws when an addon ref is not found in the public list", async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ data: [] });
-    vi.mocked(parseAddonsResponse).mockReturnValueOnce([] as never);
+    vi.mocked(parseAddonsPageResponse).mockReturnValueOnce({
+      data: [],
+      total: 0,
+      page: 1,
+      pageSize: 100,
+      totalPages: 0,
+    } as never);
 
     await expect(fetchAddon("missing@1.0.0")).rejects.toThrow(
       'Addon "missing@1.0.0" was not found.',

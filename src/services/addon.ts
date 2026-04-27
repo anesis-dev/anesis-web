@@ -2,28 +2,59 @@ import { api } from "@/api/client";
 import { getAddonRef } from "@/lib/addon-ref";
 import {
   parseAddonUrlResponse,
-  parseAddonsResponse,
+  parseAddonsPageResponse,
   parsePublishAddonResponse,
 } from "@/lib/api-contracts";
+import { IPaginatedResponse, IPaginationParams } from "@/types/pagination";
 import { IAddon, IAddonUrlResponse } from "@/types/addon";
 
-export async function fetchAddons(): Promise<IAddon[]> {
-  return parseAddonsResponse(await api.get<unknown>("/addon/all"));
+function buildPaginationPath(path: string, pagination: IPaginationParams): string {
+  const page = Math.max(1, Math.trunc(pagination.page ?? 1));
+  const pageSize = Math.min(100, Math.max(1, Math.trunc(pagination.pageSize ?? 20)));
+  const params = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+  });
+
+  return `${path}?${params.toString()}`;
+}
+
+export async function fetchAddons(
+  pagination: IPaginationParams = {},
+): Promise<IPaginatedResponse<IAddon>> {
+  return parseAddonsPageResponse(
+    await api.get<unknown>(buildPaginationPath("/addon/all", pagination)),
+  );
 }
 
 export async function fetchAddon(addonRef: string): Promise<IAddon> {
-  const addons = await fetchAddons();
-  const addon = addons.find((entry) => getAddonRef(entry) === addonRef);
+  const pageSize = 100;
+  let page = 1;
 
-  if (!addon) {
-    throw new Error(`Addon "${addonRef}" was not found.`);
+  while (true) {
+    const response = await fetchAddons({ page, pageSize });
+    const addon = response.data.find((entry) => getAddonRef(entry) === addonRef);
+
+    if (addon) {
+      return addon;
+    }
+
+    if (page >= response.totalPages) {
+      break;
+    }
+
+    page += 1;
   }
 
-  return addon;
+  throw new Error(`Addon "${addonRef}" was not found.`);
 }
 
-export async function fetchMyAddons(): Promise<IAddon[]> {
-  return parseAddonsResponse(await api.get<unknown>("/addon/my"));
+export async function fetchMyAddons(
+  pagination: IPaginationParams = {},
+): Promise<IPaginatedResponse<IAddon>> {
+  return parseAddonsPageResponse(
+    await api.get<unknown>(buildPaginationPath("/addon/my", pagination)),
+  );
 }
 
 export async function fetchAddonUrl(

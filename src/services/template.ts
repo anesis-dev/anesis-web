@@ -3,10 +3,22 @@ import {
 	parsePublishTemplateResponse,
 	parseTemplateResponse,
 	parseTemplateUrlResponse,
-	parseTemplatesResponse,
+	parseTemplatesPageResponse,
 	parseTemplateVersionsResponse,
 } from "@/lib/api-contracts";
+import { IPaginatedResponse, IPaginationParams } from "@/types/pagination";
 import { ITemplate, ITemplateUrlResponse } from "@/types/template";
+
+function buildPaginationPath(path: string, pagination: IPaginationParams): string {
+	const page = Math.max(1, Math.trunc(pagination.page ?? 1));
+	const pageSize = Math.min(100, Math.max(1, Math.trunc(pagination.pageSize ?? 20)));
+	const params = new URLSearchParams({
+		page: String(page),
+		page_size: String(pageSize),
+	});
+
+	return `${path}?${params.toString()}`;
+}
 
 function hasExplicitTemplateVersion(templateRef: string): boolean {
 	const [name, version] = templateRef.split("@");
@@ -14,12 +26,20 @@ function hasExplicitTemplateVersion(templateRef: string): boolean {
 	return Boolean(name?.trim() && version?.trim());
 }
 
-export async function fetchTemplates(): Promise<ITemplate[]> {
-	return parseTemplatesResponse(await api.get<unknown>("/template/all"));
+export async function fetchTemplates(
+	pagination: IPaginationParams = {},
+): Promise<IPaginatedResponse<ITemplate>> {
+	return parseTemplatesPageResponse(
+		await api.get<unknown>(buildPaginationPath("/template/all", pagination)),
+	);
 }
 
-export async function fetchMyTemplates(): Promise<ITemplate[]> {
-	return parseTemplatesResponse(await api.get<unknown>("/template/my"));
+export async function fetchMyTemplates(
+	pagination: IPaginationParams = {},
+): Promise<IPaginatedResponse<ITemplate>> {
+	return parseTemplatesPageResponse(
+		await api.get<unknown>(buildPaginationPath("/template/my", pagination)),
+	);
 }
 
 export async function fetchTemplate(templateRef: string): Promise<ITemplate> {

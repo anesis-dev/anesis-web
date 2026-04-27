@@ -41,10 +41,14 @@ function AddonSkeleton() {
 }
 
 export function AddonRegistryPage() {
-	const { addons, isLoading, isError } = useAddons();
 	const { user, login } = useAuth();
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const searchActive = search.trim().length > 0;
+	const { addons, isLoading, isError, pagination } = useAddons({
+		page: searchActive ? 1 : page,
+		pageSize: searchActive ? 100 : PAGE_SIZE,
+	});
 
 	const filtered = useMemo(() => {
 		const query = search.trim().toLowerCase();
@@ -75,12 +79,18 @@ export function AddonRegistryPage() {
 		);
 	}, [addons, search]);
 
-	const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-	const currentPage = Math.min(page, totalPages);
-	const paginatedAddons = filtered.slice(
-		(currentPage - 1) * PAGE_SIZE,
-		currentPage * PAGE_SIZE,
+	const totalCount = pagination?.total ?? addons.length;
+	const localPagination = searchActive || !pagination;
+	const totalPages = Math.max(
+		1,
+		localPagination
+			? Math.ceil(filtered.length / PAGE_SIZE)
+			: (pagination?.totalPages ?? 1),
 	);
+	const currentPage = Math.min(page, totalPages);
+	const visibleAddons = localPagination
+		? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+		: filtered;
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-5 lg:px-8">
@@ -132,11 +142,11 @@ export function AddonRegistryPage() {
 
 			{!isLoading && !isError && (
 				<p className="text-xs text-muted-foreground">
-					{filtered.length === addons.length ? (
+					{filtered.length === totalCount ? (
 						<>
 							Showing{" "}
-							<span className="font-medium text-foreground">{addons.length}</span>{" "}
-							{addons.length === 1 ? "addon" : "addons"}
+							<span className="font-medium text-foreground">{totalCount}</span>{" "}
+							{totalCount === 1 ? "addon" : "addons"}
 						</>
 					) : (
 						<>
@@ -145,7 +155,7 @@ export function AddonRegistryPage() {
 								{filtered.length}
 							</span>{" "}
 							of{" "}
-							<span className="font-medium text-foreground">{addons.length}</span>{" "}
+							<span className="font-medium text-foreground">{totalCount}</span>{" "}
 							addons
 						</>
 					)}
@@ -189,16 +199,18 @@ export function AddonRegistryPage() {
 			{!isLoading && !isError && filtered.length > 0 && (
 				<>
 					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-						{paginatedAddons.map((addon) => (
+						{visibleAddons.map((addon) => (
 							<AddonCard key={addon.id} addon={addon} />
 						))}
 					</div>
-					<PaginationControls
-						page={currentPage}
-						totalPages={totalPages}
-						onPageChange={setPage}
-					/>
 				</>
+			)}
+			{!isLoading && !isError && (
+				<PaginationControls
+					page={currentPage}
+					totalPages={totalPages}
+					onPageChange={setPage}
+				/>
 			)}
 		</div>
 	);

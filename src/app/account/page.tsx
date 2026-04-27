@@ -95,10 +95,16 @@ export default function AccountPage() {
 	const { githubUser, isLoading: githubLoading } = useGitHubUser(
 		user?.login ?? "",
 	);
-	const { addons: myAddons, isLoading: addonsLoading } = useMyAddons(!!user);
-	const { templates: myTemplates, isLoading: templatesLoading } = useMyTemplates(
-		!!user,
-	);
+	const {
+		addons: myAddons,
+		isLoading: addonsLoading,
+		pagination: addonPagination,
+	} = useMyAddons({ enabled: !!user, pageSize: 100 });
+	const {
+		templates: myTemplates,
+		isLoading: templatesLoading,
+		pagination: templatePagination,
+	} = useMyTemplates({ enabled: !!user, pageSize: 100 });
 
 	if (authLoading) {
 		return (
@@ -212,7 +218,7 @@ export default function AccountPage() {
 						My Templates
 						{!templatesLoading && (
 							<span className="ml-2 font-mono text-sm font-normal text-muted-foreground">
-								{myTemplates.length}
+								{templatePagination?.total ?? myTemplates.length}
 							</span>
 						)}
 					</h2>
@@ -257,7 +263,7 @@ export default function AccountPage() {
 							My Addons
 							{!addonsLoading && (
 								<span className="ml-2 font-mono text-sm font-normal text-muted-foreground">
-									{myAddons.length}
+									{addonPagination?.total ?? myAddons.length}
 								</span>
 							)}
 						</h2>

@@ -52,10 +52,16 @@ function MetricTile({
 
 export default function AccountTemplatesPage() {
 	const { user, login } = useAuth();
-	const { templates, isLoading, isError } = useMyTemplates(!!user);
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const searchActive = search.trim().length > 0;
+	const { templates, isLoading, isError, pagination } = useMyTemplates({
+		enabled: !!user,
+		page: searchActive ? 1 : page,
+		pageSize: searchActive ? 100 : PAGE_SIZE,
+	});
 	const isAdmin = user?.role === "admin";
+	const totalCount = pagination?.total ?? templates.length;
 	const officialPackages = templates.filter((template) => template.official).length;
 	const totalVersions = templates.reduce(
 		(total, template) => total + (template.versionCount ?? 1),
@@ -83,12 +89,21 @@ export default function AccountTemplatesPage() {
 		);
 	}, [search, templates]);
 
-	const totalPages = Math.max(1, Math.ceil(myTemplates.length / PAGE_SIZE));
-	const currentPage = Math.min(page, totalPages);
-	const paginatedTemplates = myTemplates.slice(
-		(currentPage - 1) * PAGE_SIZE,
-		currentPage * PAGE_SIZE,
+	const localPagination = searchActive || !pagination;
+	const totalPages = Math.max(
+		1,
+		localPagination
+			? Math.ceil(myTemplates.length / PAGE_SIZE)
+			: (pagination?.totalPages ?? 1),
 	);
+	const currentPage = Math.min(page, totalPages);
+	const visibleTemplates = localPagination
+		? myTemplates.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+		: myTemplates;
+	const packageSummary =
+		!pagination || totalCount === myTemplates.length
+			? `${myTemplates.length} package(s) across ${totalVersions} published version(s)`
+			: `${myTemplates.length} of ${totalCount} package(s) across ${totalVersions} visible version(s)`;
 
 	if (!user) {
 		return (
@@ -144,7 +159,7 @@ export default function AccountTemplatesPage() {
 						<div className="grid gap-3 sm:grid-cols-3 xl:w-[28rem]">
 							<MetricTile
 								label="Packages"
-								value={isLoading ? "..." : templates.length}
+								value={isLoading ? "..." : totalCount}
 								icon={PackageIcon}
 							/>
 							<MetricTile
@@ -182,9 +197,7 @@ export default function AccountTemplatesPage() {
 						/>
 					</InputGroup>
 					<p className="text-xs text-muted-foreground">
-						{isLoading
-							? "Loading templates..."
-							: `${myTemplates.length} package(s) across ${totalVersions} published version(s)`}
+						{isLoading ? "Loading templates..." : packageSummary}
 					</p>
 				</div>
 
@@ -238,10 +251,10 @@ export default function AccountTemplatesPage() {
 				</div>
 			)}
 
-			{!isLoading && !isError && paginatedTemplates.length > 0 && (
+			{!isLoading && !isError && myTemplates.length > 0 && (
 				<>
 					<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-						{paginatedTemplates.map((template) => (
+						{visibleTemplates.map((template) => (
 							<OwnedTemplateCard
 								key={template.id}
 								template={template}

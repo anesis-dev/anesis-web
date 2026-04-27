@@ -49,8 +49,16 @@ function DashboardCard({
 
 export default function DashboardPage() {
 	const { user } = useAuth();
-	const { templates: myTemplates, isLoading } = useMyTemplates(!!user);
-	const { addons: myAddons, isLoading: addonsLoading } = useMyAddons(!!user);
+	const {
+		templates: myTemplates,
+		isLoading,
+		pagination: templatePagination,
+	} = useMyTemplates({ enabled: !!user, pageSize: 100 });
+	const {
+		addons: myAddons,
+		isLoading: addonsLoading,
+		pagination: addonPagination,
+	} = useMyAddons({ enabled: !!user, pageSize: 100 });
 	const officialTemplates = myTemplates.filter((template) => template.official);
 
 	if (!user) {
@@ -96,7 +104,7 @@ export default function DashboardPage() {
 				<DashboardCard
 					title="Published templates"
 					description="Templates connected to your GitHub account"
-					value={isLoading ? "..." : myTemplates.length}
+					value={isLoading ? "..." : (templatePagination?.total ?? myTemplates.length)}
 					icon={PackageIcon}
 				/>
 				<DashboardCard
@@ -108,7 +116,7 @@ export default function DashboardPage() {
 				<DashboardCard
 					title="Published addons"
 					description="Addon registry entries linked to your account"
-					value={addonsLoading ? "..." : myAddons.length}
+					value={addonsLoading ? "..." : (addonPagination?.total ?? myAddons.length)}
 					icon={BoxesIcon}
 				/>
 			</div>

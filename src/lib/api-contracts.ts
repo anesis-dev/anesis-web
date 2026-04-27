@@ -1,5 +1,6 @@
 import { IAddon, IAddonConfig, IAddonUrlResponse } from "@/types/addon";
 import { IGitHubUser } from "@/types/github";
+import { IPaginatedResponse } from "@/types/pagination";
 import { ITemplate, ITemplateConfig, ITemplateUrlResponse } from "@/types/template";
 import { IUser } from "@/types/user";
 
@@ -332,6 +333,27 @@ function parseAddon(value: unknown, path: string): IAddon {
 	};
 }
 
+function parsePaginatedResponse<T>(
+	value: unknown,
+	path: string,
+	parseItem: (value: unknown, path: string) => T,
+): IPaginatedResponse<T> {
+	const payload = expectRecord(value, path);
+	const data = payload.data;
+
+	if (!Array.isArray(data)) {
+		throw new Error(`Invalid API response: ${path}.data must be an array.`);
+	}
+
+	return {
+		data: data.map((item, index) => parseItem(item, `${path}.data[${index}]`)),
+		total: expectNumber(payload.total, `${path}.total`),
+		page: expectNumber(payload.page, `${path}.page`),
+		pageSize: expectNumber(payload.page_size, `${path}.page_size`),
+		totalPages: expectNumber(payload.total_pages, `${path}.total_pages`),
+	};
+}
+
 export function parseMeResponse(value: unknown): IUser {
 	return parseUser(value, "user");
 }
@@ -355,6 +377,18 @@ export function parseTemplatesResponse(value: unknown): ITemplate[] {
 		}
 
 		return parseTemplate(template, `templates[${index}]`);
+	});
+}
+
+export function parseTemplatesPageResponse(
+	value: unknown,
+): IPaginatedResponse<ITemplate> {
+	return parsePaginatedResponse(value, "templates", (template, path) => {
+		if (isRecord(template) && "latest" in template) {
+			return parseLatestTemplateGroup(template, path);
+		}
+
+		return parseTemplate(template, path);
 	});
 }
 
@@ -402,6 +436,12 @@ export function parseAddonsResponse(value: unknown): IAddon[] {
 	}
 
 	return value.map((addon, index) => parseAddon(addon, `addons[${index}]`));
+}
+
+export function parseAddonsPageResponse(
+	value: unknown,
+): IPaginatedResponse<IAddon> {
+	return parsePaginatedResponse(value, "addons", parseAddon);
 }
 
 export function parsePublishTemplateResponse(

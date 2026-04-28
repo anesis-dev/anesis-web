@@ -178,7 +178,7 @@ export default async function DocsReferencePage() {
 						</Button>
 						<Button variant="outline" asChild>
 							<Link
-								href="https://github.com/anesis-dev/anesis"
+								href="https://github.com/anesis-dev/anesis-cli"
 								target="_blank"
 								rel="noopener noreferrer"
 							>

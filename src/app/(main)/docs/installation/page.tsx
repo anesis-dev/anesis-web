@@ -9,9 +9,9 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-const installUnix = `curl -sSL https://raw.githubusercontent.com/anesis-dev/anesis/main/install.sh | bash`;
+const installUnix = `curl -sSL https://raw.githubusercontent.com/anesis-dev/anesis-cli/main/install.sh | bash`;
 
-const installWindows = `irm https://raw.githubusercontent.com/anesis-dev/anesis/main/install.ps1 | iex`;
+const installWindows = `irm https://raw.githubusercontent.com/anesis-dev/anesis-cli/main/install.ps1 | iex`;
 
 const installNpm = `npm install -g @anesis-cli/anesis`;
 
@@ -34,16 +34,16 @@ const pathZsh = `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc`;
 
 const manualInstall = `# Linux x86_64
-https://github.com/anesis-dev/anesis/releases/latest/download/anesis-linux-x86_64.tar.gz
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-linux-x86_64.tar.gz
 
 # Linux ARM64
-https://github.com/anesis-dev/anesis/releases/latest/download/anesis-linux-aarch64.tar.gz
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-linux-aarch64.tar.gz
 
 # macOS Apple Silicon
-https://github.com/anesis-dev/anesis/releases/latest/download/anesis-macos-aarch64.tar.gz
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-macos-aarch64.tar.gz
 
 # Windows x86_64
-https://github.com/anesis-dev/anesis/releases/latest/download/anesis-windows-x86_64.zip`;
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-windows-x86_64.zip`;
 
 export default function DocsInstallationPage() {
 	return (

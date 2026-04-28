@@ -8,7 +8,7 @@ const footerLinks = [
 	{ title: "Addons", href: "/docs/addons" },
 	{
 		title: "GitHub",
-		href: "https://github.com/anesis-dev/anesis",
+		href: "https://github.com/anesis-dev/anesis-cli",
 		external: true,
 	},
 ];
@@ -67,7 +67,7 @@ export default function Footer() {
 						</p>
 						<div className="flex flex-col gap-2">
 							<Link
-								href="https://github.com/anesis-dev/anesis"
+								href="https://github.com/anesis-dev/anesis-cli"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-sm text-muted-foreground transition-colors hover:text-foreground"

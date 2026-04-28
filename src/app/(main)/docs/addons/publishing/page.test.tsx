@@ -13,8 +13,8 @@ describe("DocsAddonsPublishingPage", () => {
 	it("shows publish and update commands", () => {
 		render(<DocsAddonsPublishingPage />);
 
-		expect(screen.getAllByText(/oxide addon publish https:\/\/github\.com\/owner\/repo/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide addon update/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis addon publish https:\/\/github\.com\/owner\/repo/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis addon update/i).length).toBeGreaterThan(0);
 	});
 
 	it("documents the GitHub URL rules", () => {

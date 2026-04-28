@@ -19,13 +19,13 @@ import {
 } from "@/components/ui/card";
 
 const publishExamples = `# Publish a template whose manifest is at the repo root
-oxide template publish https://github.com/owner/repo
+anesis template publish https://github.com/owner/repo
 
 # Publish a template in a subdirectory
-oxide template publish https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
+anesis template publish https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
 
 const updateExample = `# Update an existing registry entry
-oxide template update https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
+anesis template update https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
 
 const urlRules = [
 	"The host must be `github.com` — other Git hosts are not supported.",
@@ -48,7 +48,7 @@ const publishSteps = [
 	{
 		step: "3",
 		title: "Backend fetches the tree",
-		body: "The backend fetches the GitHub directory tree, reads `oxide.template.json` from the published path, and validates the manifest.",
+		body: "The backend fetches the GitHub directory tree, reads `anesis.template.json` from the published path, and validates the manifest.",
 	},
 	{
 		step: "4",
@@ -58,9 +58,9 @@ const publishSteps = [
 ];
 
 const updateNotes = [
-	"Use the same URL that was passed to `oxide template publish`.",
+	"Use the same URL that was passed to `anesis template publish`.",
 	"The backend re-fetches the tree, re-reads the manifest, and updates the stored commit SHA.",
-	"Users who already have the old version cached will get the new version on their next `oxide template install` or `oxide template update`.",
+	"Users who already have the old version cached will get the new version on their next `anesis template install` or `anesis template update`.",
 ];
 
 export default function DocsTemplatesPublishingPage() {
@@ -79,14 +79,14 @@ export default function DocsTemplatesPublishingPage() {
 						</h1>
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
 							Publishing makes your template available to anyone with access to the
-							Oxide registry. You point the CLI at a GitHub URL, and the backend does
+							Anesis registry. You point the CLI at a GitHub URL, and the backend does
 							the rest — it fetches the directory tree, reads your manifest, and
 							creates the registry entry.
 						</p>
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Requires oxide login
+							Requires anesis login
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							GitHub URL
@@ -107,7 +107,7 @@ export default function DocsTemplatesPublishingPage() {
 					<div>
 						<CardTitle>Authentication required</CardTitle>
 						<CardDescription>
-							Both `oxide template publish` and `oxide template update` require a
+							Both `anesis template publish` and `anesis template update` require a
 							saved login session.
 						</CardDescription>
 					</div>
@@ -116,7 +116,7 @@ export default function DocsTemplatesPublishingPage() {
 					<p>
 						Run{" "}
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							oxide login
+							anesis login
 						</code>{" "}
 						before publishing. The CLI sends your auth token with the request so the
 						backend can associate the template with your account.

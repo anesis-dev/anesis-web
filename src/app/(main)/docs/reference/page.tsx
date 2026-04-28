@@ -30,39 +30,39 @@ GitHub URL:
 
 const localState = [
 	{
-		path: "~/.oxide",
+		path: "~/.anesis",
 		description: "Root home directory created by the CLI at startup.",
 	},
 	{
-		path: "~/.oxide/cache/templates",
+		path: "~/.anesis/cache/templates",
 		description: "Extracted template cache directories.",
 	},
 	{
-		path: "~/.oxide/cache/templates/oxide-templates.json",
+		path: "~/.anesis/cache/templates/anesis-templates.json",
 		description: "Template cache index with metadata and commit SHAs.",
 	},
 	{
-		path: "~/.oxide/cache/addons",
+		path: "~/.anesis/cache/addons",
 		description: "Extracted addon cache directories.",
 	},
 	{
-		path: "~/.oxide/cache/addons/oxide-addons.json",
+		path: "~/.anesis/cache/addons/anesis-addons.json",
 		description: "Addon cache index with id, name, version, path, and commit SHA.",
 	},
 	{
-		path: "~/.oxide/auth.json",
+		path: "~/.anesis/auth.json",
 		description: "Local auth session returned by the browser login flow.",
 	},
 	{
-		path: "oxide.lock",
+		path: "anesis.lock",
 		description: "Per-project addon execution state written in the project root.",
 	},
 ];
 
 const cacheFields = [
-	"`oxide-templates.json` tracks template `name`, `version`, `source`, `path`, `official`, and `commit_sha`.",
-	"`oxide-addons.json` tracks addon `id`, `name`, `version`, `path`, `commit_sha`, and `repo_url`.",
-	"`oxide.lock` stores `id`, `version`, `variant`, and `commands_executed` for each addon used in a project.",
+	"`anesis-templates.json` tracks template `name`, `version`, `source`, `path`, `official`, and `commit_sha`.",
+	"`anesis-addons.json` tracks addon `id`, `name`, `version`, `path`, `commit_sha`, and `repo_url`.",
+	"`anesis.lock` stores `id`, `version`, `variant`, and `commands_executed` for each addon used in a project.",
 ];
 
 export default async function DocsReferencePage() {
@@ -88,14 +88,14 @@ export default async function DocsReferencePage() {
 							Local state, validation rules, and schema links
 						</h1>
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
-							Use this page as a compact operational reference for where Oxide
+							Use this page as a compact operational reference for where Anesis
 							stores files, how it validates user input, and where the backend
 							exposes the current template schema.
 						</p>
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							`~/.oxide` home
+							`~/.anesis` home
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							Schema endpoint preview
@@ -107,7 +107,7 @@ export default async function DocsReferencePage() {
 			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
 				<Card>
 					<CardHeader>
-						<CardTitle>Local Oxide state</CardTitle>
+						<CardTitle>Local Anesis state</CardTitle>
 						<CardDescription>
 							These directories and files are created or updated by the current
 							CLI implementation.
@@ -166,7 +166,7 @@ export default async function DocsReferencePage() {
 					<CardHeader>
 						<CardTitle>Related surfaces</CardTitle>
 						<CardDescription>
-							These pages pair naturally with the docs while working with Oxide.
+							These pages pair naturally with the docs while working with Anesis.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="flex flex-wrap gap-3">
@@ -178,7 +178,7 @@ export default async function DocsReferencePage() {
 						</Button>
 						<Button variant="outline" asChild>
 							<Link
-								href="https://github.com/oxide-cli/oxide"
+								href="https://github.com/anesis-dev/anesis"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -202,7 +202,7 @@ export default async function DocsReferencePage() {
 					<div className="flex flex-wrap gap-3">
 						<Button variant="outline" asChild>
 							<Link
-								href={`${env.apiUrl}/schema/oxide.template.schema.json`}
+								href={`${env.apiUrl}/schema/anesis.template.schema.json`}
 								target="_blank"
 								rel="noopener noreferrer"
 							>

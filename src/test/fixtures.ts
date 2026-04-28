@@ -13,10 +13,10 @@ export const mockTemplate: ITemplate = {
 	created_at: "2026-04-01T10:00:00Z",
 	updated_at: "2026-04-03T10:00:00Z",
 	config: {
-		$schema: "http://localhost:4000/schema/oxide.template.schema.json",
+		$schema: "http://localhost:4000/schema/anesis.template.schema.json",
 		name: "demo-repo",
 		version: "0.1.0",
-		oxideVersion: ">=0.2.0",
+		anesisVersion: ">=0.2.0",
 		author: {
 			name: "Demo Owner",
 			github: "octocat",
@@ -52,7 +52,7 @@ export const mockUser: IUser = {
 export const mockAddon: IAddon = {
 	id: "33333333-3333-3333-3333-333333333333",
 	owner_id: "22222222-2222-2222-2222-222222222222",
-	url: "https://github.com/oxide-addons/drizzle/tree/main",
+	url: "https://github.com/anesis-addons/drizzle/tree/main",
 	addon_id: "drizzle",
 	name: "Drizzle ORM",
 	version: "1.0.0",
@@ -64,7 +64,7 @@ export const mockAddon: IAddon = {
 		name: "Drizzle ORM",
 		version: "1.0.0",
 		description: "Adds Drizzle ORM scaffolding helpers.",
-		author: "oxide-addons",
+		author: "anesis-addons",
 	},
 	created_at: "2026-04-05T10:00:00Z",
 	updated_at: "2026-04-06T10:00:00Z",

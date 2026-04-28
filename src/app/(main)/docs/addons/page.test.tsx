@@ -11,21 +11,21 @@ describe("DocsAddonsPage", () => {
 			}),
 		).toBeInTheDocument();
 
-		expect(screen.getAllByText(/oxide addon install/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide addon list/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide addon remove/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis addon install/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis addon list/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis addon remove/i).length).toBeGreaterThan(0);
 	});
 
 	it("documents the external command form", () => {
 		render(<DocsAddonsPage />);
 
-		expect(screen.getAllByText(/oxide use <addon-id> <command>/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis use <addon-id> <command>/i).length).toBeGreaterThan(0);
 	});
 
-	it("explains the oxide.lock file", () => {
+	it("explains the anesis.lock file", () => {
 		render(<DocsAddonsPage />);
 
-		expect(screen.getAllByText(/oxide\.lock/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis\.lock/i).length).toBeGreaterThan(0);
 		expect(screen.getAllByText(/"once": true/i).length).toBeGreaterThan(0);
 	});
 

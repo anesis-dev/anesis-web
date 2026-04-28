@@ -5,11 +5,11 @@ import { getLocalAddonCatalog } from "@/services/addon-catalog";
 
 describe("addon catalog service", () => {
 	it("loads local addon manifests and derives catalog metadata", async () => {
-		const root = await mkdtemp(path.join(os.tmpdir(), "oxide-addons-"));
+		const root = await mkdtemp(path.join(os.tmpdir(), "anesis-addons-"));
 		const addonDir = path.join(root, "nest-drizzle");
 		await mkdir(addonDir, { recursive: true });
 		await writeFile(
-			path.join(addonDir, "oxide.addon.json"),
+			path.join(addonDir, "anesis.addon.json"),
 			JSON.stringify(
 				{
 					schema_version: "1",
@@ -17,7 +17,7 @@ describe("addon catalog service", () => {
 					name: "Nest Drizzle",
 					version: "0.1.0",
 					description: "Adds Drizzle ORM to a NestJS project.",
-					author: "oxide-cli",
+					author: "anesis-cli",
 					requires: ["config"],
 					inputs: [
 						{
@@ -96,7 +96,7 @@ describe("addon catalog service", () => {
 			stepTypes: ["create", "inject", "replace"],
 			inputNames: ["driver", "name"],
 		});
-		expect(catalog[0].manifestPath).toMatch(/nest-drizzle\/oxide\.addon\.json$/);
+		expect(catalog[0].manifestPath).toMatch(/nest-drizzle\/anesis\.addon\.json$/);
 		expect(catalog[0].detect[0].rules[0]).toMatchObject({
 			type: "json_contains",
 			file: "package.json",
@@ -107,7 +107,7 @@ describe("addon catalog service", () => {
 	});
 
 	it("returns an empty list when the addons directory is missing", async () => {
-		const missing = path.join(os.tmpdir(), "oxide-addons-missing");
+		const missing = path.join(os.tmpdir(), "anesis-addons-missing");
 
 		await expect(getLocalAddonCatalog(missing)).resolves.toEqual([]);
 	});

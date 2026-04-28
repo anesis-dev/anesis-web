@@ -12,6 +12,6 @@ describe("DocsAuthenticationPage", () => {
 		).toBeInTheDocument();
 		expect(screen.queryByText(/Go to your browser/i)).not.toBeInTheDocument();
 		expect(screen.getByText(/open the browser to/i)).toBeInTheDocument();
-		expect(screen.getAllByText(/~\/\.oxide\/auth\.json/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/~\/\.anesis\/auth\.json/i).length).toBeGreaterThan(0);
 	});
 });

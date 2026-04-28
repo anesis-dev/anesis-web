@@ -9,15 +9,15 @@ import { fetchTemplateSchema } from "@/services/schema";
 describe("schema service", () => {
 	it("loads and formats the template schema", async () => {
 		const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValueOnce(
-			new Response(JSON.stringify({ title: "oxide.template" }), { status: 200 }),
+			new Response(JSON.stringify({ title: "anesis.template" }), { status: 200 }),
 		);
 
 		await expect(fetchTemplateSchema()).resolves.toBe(
-			'{\n  "title": "oxide.template"\n}',
+			'{\n  "title": "anesis.template"\n}',
 		);
 
 		expect(fetchSpy).toHaveBeenCalledWith(
-			"http://api.example.test/schema/oxide.template.schema.json",
+			"http://api.example.test/schema/anesis.template.schema.json",
 			{
 				next: { revalidate: 60 * 60 },
 			},

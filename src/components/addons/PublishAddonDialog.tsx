@@ -101,7 +101,7 @@ export function PublishAddonDialog({
 					<DialogDescription>
 						Paste the GitHub URL pointing to the directory that contains your{" "}
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							oxide.addon.json
+							anesis.addon.json
 						</code>{" "}
 						file.
 					</DialogDescription>

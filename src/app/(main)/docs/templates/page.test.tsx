@@ -11,10 +11,10 @@ describe("DocsTemplatesPage", () => {
 			}),
 		).toBeInTheDocument();
 
-		expect(screen.getAllByText(/oxide template install/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide new/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide template list/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide template remove/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis template install/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis new/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis template list/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis template remove/i).length).toBeGreaterThan(0);
 	});
 
 	it("links to creating and publishing sub-pages", () => {
@@ -24,7 +24,7 @@ describe("DocsTemplatesPage", () => {
 		expect(screen.getAllByText(/publishing templates/i).length).toBeGreaterThan(0);
 	});
 
-	it("explains the oxide new flow step by step", () => {
+	it("explains the anesis new flow step by step", () => {
 		render(<DocsTemplatesPage />);
 
 		expect(screen.getByText(/validate the project name/i)).toBeInTheDocument();
@@ -36,6 +36,6 @@ describe("DocsTemplatesPage", () => {
 		render(<DocsTemplatesPage />);
 
 		expect(screen.getAllByText(/commit sha/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide-templates\.json/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis-templates\.json/i).length).toBeGreaterThan(0);
 	});
 });

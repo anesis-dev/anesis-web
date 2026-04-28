@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       "url",
       getGitHubContentsApiUrl({
         ...repo,
-        path: repo.path ? `${repo.path}/oxide.addon.json` : "oxide.addon.json",
+        path: repo.path ? `${repo.path}/anesis.addon.json` : "anesis.addon.json",
       }),
     );
 

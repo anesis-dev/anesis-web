@@ -22,7 +22,7 @@ describe("OwnedAddonCard", () => {
 			screen.getByRole("link", { name: /open repository for drizzle orm/i }),
 		).toHaveAttribute(
 			"href",
-			"https://github.com/oxide-addons/drizzle/tree/main",
+			"https://github.com/anesis-addons/drizzle/tree/main",
 		);
 		expect(
 			screen.getByRole("button", { name: /update addon drizzle orm/i }),

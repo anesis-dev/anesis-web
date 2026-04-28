@@ -19,13 +19,13 @@ import {
 } from "@/components/ui/card";
 
 const publishExample = `# Publish an addon whose manifest is at the repo root
-oxide addon publish https://github.com/owner/repo
+anesis addon publish https://github.com/owner/repo
 
 # Publish an addon in a subdirectory
-oxide addon publish https://github.com/owner/repo/tree/main/addons/nest-drizzle`;
+anesis addon publish https://github.com/owner/repo/tree/main/addons/nest-drizzle`;
 
 const updateExample = `# Update an existing registry entry with the latest commit
-oxide addon update https://github.com/owner/repo/tree/main/addons/nest-drizzle`;
+anesis addon update https://github.com/owner/repo/tree/main/addons/nest-drizzle`;
 
 const urlRules = [
 	"The host must be `github.com` — other Git hosts are not supported.",
@@ -48,7 +48,7 @@ const publishSteps = [
 	{
 		step: "3",
 		title: "Backend fetches the tree",
-		body: "The backend fetches the GitHub directory tree, reads `oxide.addon.json` from the published path, and validates the manifest.",
+		body: "The backend fetches the GitHub directory tree, reads `anesis.addon.json` from the published path, and validates the manifest.",
 	},
 	{
 		step: "4",
@@ -73,13 +73,13 @@ export default function DocsAddonsPublishingPage() {
 						</h1>
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
 							Publishing makes your addon available to anyone with access to the
-							Oxide registry. Point the CLI at a GitHub URL, and the backend fetches
+							Anesis registry. Point the CLI at a GitHub URL, and the backend fetches
 							the directory, reads your manifest, and creates the registry entry.
 						</p>
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Requires oxide login
+							Requires anesis login
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							GitHub URL
@@ -100,7 +100,7 @@ export default function DocsAddonsPublishingPage() {
 					<div>
 						<CardTitle>Authentication required</CardTitle>
 						<CardDescription>
-							Both `oxide addon publish` and `oxide addon update` require a saved
+							Both `anesis addon publish` and `anesis addon update` require a saved
 							login session.
 						</CardDescription>
 					</div>
@@ -109,7 +109,7 @@ export default function DocsAddonsPublishingPage() {
 					<p>
 						Run{" "}
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							oxide login
+							anesis login
 						</code>{" "}
 						before publishing. The CLI sends your auth token with the request so the
 						backend can associate the addon with your account.
@@ -162,7 +162,7 @@ export default function DocsAddonsPublishingPage() {
 						<p className="text-sm text-muted-foreground">
 							Use the same URL that was passed to{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide addon publish
+								anesis addon publish
 							</code>
 							. The backend re-fetches the tree, re-reads the manifest, and updates
 							the stored commit SHA. Users will get the new version on their next

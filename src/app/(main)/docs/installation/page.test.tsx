@@ -7,28 +7,28 @@ describe("DocsInstallationPage", () => {
 
 		expect(
 			screen.getByRole("heading", {
-				name: /install oxide from scripts, npm, cargo, or release artifacts/i,
+				name: /install anesis from scripts, npm, cargo, or release artifacts/i,
 			}),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("npm install -g @oxide-cli/oxide", {
+			screen.getByText("npm install -g @anesis-cli/anesis", {
 				exact: false,
 			}),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("cargo install oxide-cli", {
+			screen.getByText("cargo install anesis-cli", {
 				exact: false,
 			}),
 		).toBeInTheDocument();
-		expect(screen.getByText(/oxide-linux-aarch64\.tar\.gz/i)).toBeInTheDocument();
+		expect(screen.getByText(/anesis-linux-aarch64\.tar\.gz/i)).toBeInTheDocument();
 	});
 
 	it("documents post-install upgrade and shell completion commands", () => {
 		render(<DocsInstallationPage />);
 
-		expect(screen.getByText("oxide upgrade", { exact: false })).toBeInTheDocument();
+		expect(screen.getByText("anesis upgrade", { exact: false })).toBeInTheDocument();
 		expect(
-			screen.getByText("oxide completions zsh", { exact: false }),
+			screen.getByText("anesis completions zsh", { exact: false }),
 		).toBeInTheDocument();
 		expect(screen.getByText(/bash, zsh, fish, powershell/i)).toBeInTheDocument();
 	});

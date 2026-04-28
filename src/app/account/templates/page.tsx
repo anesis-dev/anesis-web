@@ -235,7 +235,7 @@ export default function AccountTemplatesPage() {
 						</p>
 						<p className="text-sm text-muted-foreground">
 							{templates.length === 0
-								? "Publish your first template from a GitHub directory that contains `oxide.template.json`."
+								? "Publish your first template from a GitHub directory that contains `anesis.template.json`."
 								: "Try another search phrase or clear the current filter to see the rest of your packages."}
 						</p>
 					</div>

@@ -22,16 +22,16 @@ import {
 } from "@/components/ui/card";
 
 const installExample = `# Install a template by name from the registry
-oxide template install react-vite-ts
+anesis template install react-vite-ts
 
-# Oxide downloads the template and caches it at:
-# ~/.oxide/cache/templates/react-vite-ts/`;
+# Anesis downloads the template and caches it at:
+# ~/.anesis/cache/templates/react-vite-ts/`;
 
 const newExample = `# Create a new project from a template
-oxide new my-app react-vite-ts
+anesis new my-app react-vite-ts
 
 # Use "." to scaffold into the current directory
-oxide new . react-vite-ts`;
+anesis new . react-vite-ts`;
 
 const newSteps = [
 	{
@@ -42,7 +42,7 @@ const newSteps = [
 	{
 		step: "2",
 		title: "Ensure the template is available",
-		body: "If the template isn't already in the local cache, Oxide fetches it from the registry automatically. This step requires a valid login.",
+		body: "If the template isn't already in the local cache, Anesis fetches it from the registry automatically. This step requires a valid login.",
 	},
 	{
 		step: "3",
@@ -52,26 +52,26 @@ const newSteps = [
 	{
 		step: "4",
 		title: "Print next steps",
-		body: 'Once the project is written, Oxide prints "cd <project-name>" so you know where to go.',
+		body: 'Once the project is written, Anesis prints "cd <project-name>" so you know where to go.',
 	},
 ];
 
 const listExample = `# See every template currently cached on this machine
-oxide template list`;
+anesis template list`;
 
 const removeExample = `# Remove a template from the local cache
-oxide template remove react-vite-ts
+anesis template remove react-vite-ts
 
 # The template can be re-installed at any time`;
 
 const updateExample = `# Re-fetch a template and update the registry entry
-oxide template update https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
+anesis template update https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
 
 const cacheFacts = [
-	"Templates are stored at `~/.oxide/cache/templates/<name>/` after the first install.",
-	"A cache index at `~/.oxide/cache/templates/oxide-templates.json` tracks name, version, source, and commit SHA.",
-	"On install, Oxide compares the cached commit SHA against the latest value from the backend. If they match and the directory exists, the download is skipped.",
-	"`oxide template remove` deletes the cached directory and removes the entry from the index.",
+	"Templates are stored at `~/.anesis/cache/templates/<name>/` after the first install.",
+	"A cache index at `~/.anesis/cache/templates/anesis-templates.json` tracks name, version, source, and commit SHA.",
+	"On install, Anesis compares the cached commit SHA against the latest value from the backend. If they match and the directory exists, the download is skipped.",
+	"`anesis template remove` deletes the cached directory and removes the entry from the index.",
 ];
 
 export default function DocsTemplatesPage() {
@@ -91,19 +91,19 @@ export default function DocsTemplatesPage() {
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
 							A template is a project starter — a folder of files with an{" "}
 							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide.template.json
+								anesis.template.json
 							</code>
 							manifest. Install one, run{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide new
+								anesis new
 							</code>
-							, and Oxide writes a fully-rendered project to disk with your project
+							, and Anesis writes a fully-rendered project to disk with your project
 							name substituted throughout.
 						</p>
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Local cache under ~/.oxide
+							Local cache under ~/.anesis
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							.tera file rendering
@@ -139,7 +139,7 @@ export default function DocsTemplatesPage() {
 						<div>
 							<CardTitle>Installing a template</CardTitle>
 							<CardDescription>
-								<code>oxide template install</code> downloads the template and saves
+								<code>anesis template install</code> downloads the template and saves
 								it to your local cache. You only need to install once — subsequent
 								uses of that template are served from cache unless there's a newer
 								version.
@@ -151,7 +151,7 @@ export default function DocsTemplatesPage() {
 						<p className="text-sm text-muted-foreground">
 							Installing requires a valid login session from{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide login
+								anesis login
 							</code>{" "}
 							because the CLI looks up the template in the backend registry.
 						</p>
@@ -171,11 +171,11 @@ export default function DocsTemplatesPage() {
 							Every template in the registry has a name, description, and version.
 							The template name is what you pass to{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide template install
+								anesis template install
 							</code>{" "}
 							and{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide new
+								anesis new
 							</code>
 							.
 						</p>
@@ -194,14 +194,14 @@ export default function DocsTemplatesPage() {
 				</Card>
 			</div>
 
-			{/* oxide new */}
+			{/* anesis new */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
 						<WandSparklesIcon className="size-5" />
 					</div>
 					<div>
-						<CardTitle>Creating a new project with `oxide new`</CardTitle>
+						<CardTitle>Creating a new project with `anesis new`</CardTitle>
 						<CardDescription>
 							This is the primary command for using templates. It combines template
 							auto-install (if needed) with project generation in a single step.
@@ -299,7 +299,7 @@ export default function DocsTemplatesPage() {
 					<div>
 						<CardTitle>How the cache works</CardTitle>
 						<CardDescription>
-							Oxide caches templates locally and avoids unnecessary re-downloads using
+							Anesis caches templates locally and avoids unnecessary re-downloads using
 							commit SHAs.
 						</CardDescription>
 					</div>
@@ -322,7 +322,7 @@ export default function DocsTemplatesPage() {
 					<CardHeader>
 						<CardTitle className="text-base">Creating your own template</CardTitle>
 						<CardDescription>
-							Learn how to author an `oxide.template.json` manifest, structure your
+							Learn how to author an `anesis.template.json` manifest, structure your
 							template folder, and use Tera variables for project name rendering.
 						</CardDescription>
 					</CardHeader>
@@ -340,7 +340,7 @@ export default function DocsTemplatesPage() {
 					<CardHeader>
 						<CardTitle className="text-base">Publishing to the registry</CardTitle>
 						<CardDescription>
-							Learn how to publish and update a template in the Oxide registry using a
+							Learn how to publish and update a template in the Anesis registry using a
 							GitHub URL.
 						</CardDescription>
 					</CardHeader>

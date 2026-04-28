@@ -8,7 +8,7 @@ const footerLinks = [
 	{ title: "Addons", href: "/docs/addons" },
 	{
 		title: "GitHub",
-		href: "https://github.com/oxide-cli/oxide",
+		href: "https://github.com/anesis-dev/anesis",
 		external: true,
 	},
 ];
@@ -18,7 +18,7 @@ export default function Footer() {
 		<footer className="border-t bg-card/40">
 			<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-5 py-8 lg:flex-row lg:items-end lg:justify-between lg:px-8">
 				<div className="space-y-2">
-					<p className="font-mono text-lg font-extrabold">Oxide</p>
+					<p className="font-mono text-lg font-extrabold">Anesis</p>
 					<p className="max-w-md text-sm leading-6 text-muted-foreground">
 						Rust CLI for project scaffolding and template-driven setup.
 					</p>
@@ -67,7 +67,7 @@ export default function Footer() {
 						</p>
 						<div className="flex flex-col gap-2">
 							<Link
-								href="https://github.com/oxide-cli/oxide"
+								href="https://github.com/anesis-dev/anesis"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-sm text-muted-foreground transition-colors hover:text-foreground"

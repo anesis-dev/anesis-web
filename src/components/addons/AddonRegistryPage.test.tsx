@@ -33,7 +33,7 @@ const addons = Array.from({ length: 10 }, (_, index) =>
 			name: index === 9 ? "Special Addon" : `Addon ${index + 1}`,
 			description:
 				index === 9 ? "Contains a unique search term." : `Description ${index + 1}`,
-			author: index < 5 ? "oxide-core" : "community",
+			author: index < 5 ? "anesis-core" : "community",
 		},
 	}),
 );

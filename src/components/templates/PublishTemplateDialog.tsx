@@ -100,7 +100,7 @@ export function PublishTemplateDialog({
 					<DialogDescription>
 						Paste the GitHub URL pointing to the directory that contains your{" "}
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-							oxide.template.json
+							anesis.template.json
 						</code>{" "}
 						file.
 					</DialogDescription>

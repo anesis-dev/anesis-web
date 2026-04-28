@@ -115,7 +115,7 @@ function CommandCard({
 }
 
 function getAddonExecutionCommand(addonId: string, commandName: string) {
-  return `oxide use ${addonId} ${commandName}`;
+  return `anesis use ${addonId} ${commandName}`;
 }
 
 function getExecutionHelper(command: AddonManifestCommand) {
@@ -123,7 +123,7 @@ function getExecutionHelper(command: AddonManifestCommand) {
     return "Run this from the root of a project where the addon is already installed.";
   }
 
-  return `Run this from the project root. Oxide may prompt for: ${command.inputs
+  return `Run this from the project root. Anesis may prompt for: ${command.inputs
     .map((input) => input.name)
     .join(", ")}.`;
 }
@@ -237,8 +237,8 @@ export default function AddonDetailsPage({
 
   const addonRefValue = getAddonRef(addon);
   const source = getSourceInfo(addon.url);
-  const installCommand = `oxide addon install ${addon.addon_id}`;
-  const removeCommand = `oxide addon remove ${addon.addon_id}`;
+  const installCommand = `anesis addon install ${addon.addon_id}`;
+  const removeCommand = `anesis addon remove ${addon.addon_id}`;
 
   return (
     <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
@@ -318,7 +318,7 @@ export default function AddonDetailsPage({
             <SnapshotCard
               label="Published"
               value={formatDate(addon.created_at)}
-              helper="When this addon version first appeared in the Oxide registry."
+              helper="When this addon version first appeared in the Anesis registry."
             />
             <SnapshotCard
               label="Last Sync"
@@ -347,7 +347,7 @@ export default function AddonDetailsPage({
                 <span className="font-mono text-foreground">
                   {addonRefValue}
                 </span>
-                . It is meant to extend Oxide projects with the workflow
+                . It is meant to extend Anesis projects with the workflow
                 described in its manifest-backed package metadata.
               </p>
               <p>{addon.config.description}</p>
@@ -370,7 +370,7 @@ export default function AddonDetailsPage({
               <CommandCard
                 label="Install"
                 command={installCommand}
-                helper="Pull the addon from the registry into the local Oxide addon cache."
+                helper="Pull the addon from the registry into the local Anesis addon cache."
               />
               <CommandCard
                 label="Remove"
@@ -427,7 +427,7 @@ export default function AddonDetailsPage({
                               </p>
                               <p className="text-sm leading-6 text-muted-foreground">
                                 {command.description ||
-                                  "No description was provided in oxide.addon.json."}
+                                  "No description was provided in anesis.addon.json."}
                               </p>
                             </div>
                             <div className="flex flex-wrap gap-2">
@@ -478,7 +478,7 @@ export default function AddonDetailsPage({
                                 command.name,
                               )}
                               helper={getExecutionHelper(command)}
-                              copyLabel={`oxide use ${addon.addon_id} ${command.name}`}
+                              copyLabel={`anesis use ${addon.addon_id} ${command.name}`}
                             />
                           </div>
                         </div>

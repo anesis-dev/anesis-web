@@ -7,7 +7,7 @@ describe("DocsOverviewPage", () => {
 
 		expect(
 			screen.getByRole("heading", {
-				name: /everything you need to scaffold, extend, and publish with oxide/i,
+				name: /everything you need to scaffold, extend, and publish with anesis/i,
 			}),
 		).toBeInTheDocument();
 
@@ -28,6 +28,6 @@ describe("DocsOverviewPage", () => {
 	it("shows the quick start code block", () => {
 		render(<DocsOverviewPage />);
 
-		expect(screen.getAllByText(/oxide new my-app react-vite-ts/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis new my-app react-vite-ts/i).length).toBeGreaterThan(0);
 	});
 });

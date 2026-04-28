@@ -13,8 +13,8 @@ describe("DocsTemplatesCreatingPage", () => {
 	it("documents the manifest fields", () => {
 		render(<DocsTemplatesCreatingPage />);
 
-		expect(screen.getAllByText(/"oxideVersion": ">=0\.7\.0"/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide\.template\.json/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/"anesisVersion": ">=0\.7\.0"/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis\.template\.json/i).length).toBeGreaterThan(0);
 		expect(screen.getAllByText(/repository\.url/i).length).toBeGreaterThan(0);
 		expect(screen.getAllByText(/metadata\.displayName/i).length).toBeGreaterThan(0);
 	});

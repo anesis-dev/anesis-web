@@ -215,7 +215,7 @@ export default function AccountAddonsPage() {
 						</p>
 						<p className="text-sm text-muted-foreground">
 							{addons.length === 0
-								? "Publish your first addon from a GitHub directory that contains `oxide.addon.json`."
+								? "Publish your first addon from a GitHub directory that contains `anesis.addon.json`."
 								: "Try another search phrase or clear the current filter to see the rest of your addons."}
 						</p>
 					</div>

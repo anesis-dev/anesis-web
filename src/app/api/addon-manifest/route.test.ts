@@ -19,15 +19,15 @@ describe("GET /api/addon-manifest", () => {
     });
   });
 
-  it("returns parsed manifest content when github exposes oxide.addon.json", async () => {
+  it("returns parsed manifest content when github exposes anesis.addon.json", async () => {
     vi.spyOn(global, "fetch")
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
-            name: "oxide.addon.json",
-            path: "addons/drizzle/oxide.addon.json",
+            name: "anesis.addon.json",
+            path: "addons/drizzle/anesis.addon.json",
             download_url:
-              "https://raw.githubusercontent.com/demo/oxide.addon.json",
+              "https://raw.githubusercontent.com/demo/anesis.addon.json",
             type: "file",
           }),
           { status: 200 },
@@ -41,7 +41,7 @@ describe("GET /api/addon-manifest", () => {
             name: "Drizzle ORM",
             version: "1.0.0",
             description: "Adds Drizzle ORM scaffolding helpers.",
-            author: "oxide-addons",
+            author: "anesis-addons",
             requires: [],
             inputs: [],
             detect: [],
@@ -67,7 +67,7 @@ describe("GET /api/addon-manifest", () => {
 
     const response = await GET(
       new NextRequest(
-        "http://localhost/api/addon-manifest?url=https://github.com/oxide-addons/drizzle/tree/main/addons/drizzle",
+        "http://localhost/api/addon-manifest?url=https://github.com/anesis-addons/drizzle/tree/main/addons/drizzle",
       ),
     );
 
@@ -95,7 +95,7 @@ describe("GET /api/addon-manifest", () => {
 
     const response = await GET(
       new NextRequest(
-        "http://localhost/api/addon-manifest?url=https://github.com/oxide-addons/drizzle/tree/main/addons/drizzle",
+        "http://localhost/api/addon-manifest?url=https://github.com/anesis-addons/drizzle/tree/main/addons/drizzle",
       ),
     );
 

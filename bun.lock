@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "oxide-web",
+      "name": "anesis-web",
       "dependencies": {
         "@auth/core": "^0.41.1",
         "@tanstack/react-query": "^5.90.21",

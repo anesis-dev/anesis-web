@@ -14,7 +14,7 @@ describe("DocsAddonsCreatingPage", () => {
 		render(<DocsAddonsCreatingPage />);
 
 		expect(screen.getAllByText(/"schema_version": "1"/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide\.addon\.json/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis\.addon\.json/i).length).toBeGreaterThan(0);
 		expect(screen.getAllByText(/schema_version/i).length).toBeGreaterThan(0);
 		expect(screen.getAllByText(/requires/i).length).toBeGreaterThan(0);
 	});

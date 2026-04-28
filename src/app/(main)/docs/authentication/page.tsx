@@ -9,23 +9,23 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-const authFlow = `oxide login
-oxide account
-oxide logout`;
+const authFlow = `anesis login
+anesis account
+anesis logout`;
 
 const authRequired = [
-	"`oxide template install` always talks to the backend registry.",
-	"`oxide template publish` and `oxide template update` send authenticated mutations.",
-	"`oxide addon install`, `oxide addon publish`, and `oxide addon update` require the saved token.",
-	"`oxide account` fetches the current user from the backend.",
-	"`oxide new` and `oxide use <addon-id> <command>` require auth only when they must download an uncached template or addon first.",
+	"`anesis template install` always talks to the backend registry.",
+	"`anesis template publish` and `anesis template update` send authenticated mutations.",
+	"`anesis addon install`, `anesis addon publish`, and `anesis addon update` require the saved token.",
+	"`anesis account` fetches the current user from the backend.",
+	"`anesis new` and `anesis use <addon-id> <command>` require auth only when they must download an uncached template or addon first.",
 ];
 
 const localOnly = [
-	"`oxide template list` and `oxide template remove` operate on local cache files.",
-	"`oxide addon list` and `oxide addon remove` operate on local addon cache files.",
-	"`oxide new` can run without logging in when the template is already cached locally.",
-	"`oxide use <addon-id> <command>` can run without logging in when the addon is already cached locally.",
+	"`anesis template list` and `anesis template remove` operate on local cache files.",
+	"`anesis addon list` and `anesis addon remove` operate on local addon cache files.",
+	"`anesis new` can run without logging in when the template is already cached locally.",
+	"`anesis use <addon-id> <command>` can run without logging in when the addon is already cached locally.",
 ];
 
 export default function DocsAuthenticationPage() {
@@ -43,7 +43,7 @@ export default function DocsAuthenticationPage() {
 							Browser login, local session storage, and when auth is actually needed
 						</h1>
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
-							Oxide stores a local auth session in <code>~/.oxide/auth.json</code>,
+							Anesis stores a local auth session in <code>~/.anesis/auth.json</code>,
 							uses the backend for login initiation and account fetches, and only
 							needs that session for flows that touch the remote registry or other
 							protected endpoints.
@@ -51,13 +51,13 @@ export default function DocsAuthenticationPage() {
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							`oxide login`
+							`anesis login`
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							`oxide account`
+							`anesis account`
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							`oxide logout`
+							`anesis logout`
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							Unix auth file mode `0600`
@@ -88,7 +88,7 @@ export default function DocsAuthenticationPage() {
 							<div>
 								<CardTitle className="text-base">Switching accounts</CardTitle>
 								<CardDescription>
-									If you are already logged in, Oxide asks for confirmation before
+									If you are already logged in, Anesis asks for confirmation before
 									starting a new login flow.
 								</CardDescription>
 							</div>
@@ -103,7 +103,7 @@ export default function DocsAuthenticationPage() {
 							<div>
 								<CardTitle className="text-base">Account lookup</CardTitle>
 								<CardDescription>
-									`oxide account` uses the saved bearer token and prints the GitHub
+									`anesis account` uses the saved bearer token and prints the GitHub
 									login returned by `/user/info`.
 								</CardDescription>
 							</div>
@@ -115,7 +115,7 @@ export default function DocsAuthenticationPage() {
 			<div className="grid gap-6 lg:grid-cols-2">
 				<Card>
 					<CardHeader>
-						<CardTitle>What `oxide login` does</CardTitle>
+						<CardTitle>What `anesis login` does</CardTitle>
 						<CardDescription>
 							The login command is a browser-based flow with CSRF protection and a
 							local callback server.
@@ -136,7 +136,7 @@ export default function DocsAuthenticationPage() {
 						<p>
 							4. Serialize the returned user payload into
 							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.oxide/auth.json
+								~/.anesis/auth.json
 							</code>
 							.
 						</p>
@@ -152,14 +152,14 @@ export default function DocsAuthenticationPage() {
 
 				<Card>
 					<CardHeader>
-						<CardTitle>What `oxide logout` does</CardTitle>
+						<CardTitle>What `anesis logout` does</CardTitle>
 						<CardDescription>
 							Logout is intentionally small: it removes the local auth file.
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3 text-sm text-muted-foreground">
 						<p>
-							If <code>~/.oxide/auth.json</code> exists, Oxide deletes it and prints
+							If <code>~/.anesis/auth.json</code> exists, Anesis deletes it and prints
 							`Logout successful`.
 						</p>
 						<p>

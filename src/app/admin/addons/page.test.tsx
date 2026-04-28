@@ -28,7 +28,7 @@ describe("AdminAddonsPage", () => {
 				config: {
 					id: `addon-${index + 1}`,
 					name: `Addon ${index + 1}`,
-					author: index < 5 ? "oxide-core" : "community",
+					author: index < 5 ? "anesis-core" : "community",
 				},
 			}),
 		);
@@ -46,7 +46,7 @@ describe("AdminAddonsPage", () => {
 
 		fireEvent.change(
 			screen.getByPlaceholderText(/search by addon id, name, author or version/i),
-			{ target: { value: "oxide-core" } },
+			{ target: { value: "anesis-core" } },
 		);
 
 		await waitFor(() =>

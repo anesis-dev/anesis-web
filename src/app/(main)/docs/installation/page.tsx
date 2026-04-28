@@ -9,20 +9,20 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-const installUnix = `curl -sSL https://raw.githubusercontent.com/oxide-cli/oxide/main/install.sh | bash`;
+const installUnix = `curl -sSL https://raw.githubusercontent.com/anesis-dev/anesis/main/install.sh | bash`;
 
-const installWindows = `irm https://raw.githubusercontent.com/oxide-cli/oxide/main/install.ps1 | iex`;
+const installWindows = `irm https://raw.githubusercontent.com/anesis-dev/anesis/main/install.ps1 | iex`;
 
-const installNpm = `npm install -g @oxide-cli/oxide`;
+const installNpm = `npm install -g @anesis-cli/anesis`;
 
-const installCargo = `cargo install oxide-cli`;
+const installCargo = `cargo install anesis-cli`;
 
-const verifyInstall = `oxide --version`;
+const verifyInstall = `anesis --version`;
 
-const upgradeCommand = `oxide upgrade`;
+const upgradeCommand = `anesis upgrade`;
 
 const completionsCommand = `# Example for zsh
-oxide completions zsh
+anesis completions zsh
 
 # Supported shells:
 # bash, zsh, fish, powershell`;
@@ -34,16 +34,16 @@ const pathZsh = `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc`;
 
 const manualInstall = `# Linux x86_64
-https://github.com/oxide-cli/oxide/releases/latest/download/oxide-linux-x86_64.tar.gz
+https://github.com/anesis-dev/anesis/releases/latest/download/anesis-linux-x86_64.tar.gz
 
 # Linux ARM64
-https://github.com/oxide-cli/oxide/releases/latest/download/oxide-linux-aarch64.tar.gz
+https://github.com/anesis-dev/anesis/releases/latest/download/anesis-linux-aarch64.tar.gz
 
 # macOS Apple Silicon
-https://github.com/oxide-cli/oxide/releases/latest/download/oxide-macos-aarch64.tar.gz
+https://github.com/anesis-dev/anesis/releases/latest/download/anesis-macos-aarch64.tar.gz
 
 # Windows x86_64
-https://github.com/oxide-cli/oxide/releases/latest/download/oxide-windows-x86_64.zip`;
+https://github.com/anesis-dev/anesis/releases/latest/download/anesis-windows-x86_64.zip`;
 
 export default function DocsInstallationPage() {
 	return (
@@ -57,12 +57,12 @@ export default function DocsInstallationPage() {
 					</div>
 					<div className="max-w-3xl space-y-3">
 						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-							Install Oxide from scripts, npm, cargo, or release artifacts
+							Install Anesis from scripts, npm, cargo, or release artifacts
 						</h1>
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
 							The repository currently exposes four practical installation paths:
 							the Unix shell installer, the PowerShell installer, the npm wrapper
-							package <code>@oxide-cli/oxide</code>, and a direct cargo install for
+							package <code>@anesis-cli/anesis</code>, and a direct cargo install for
 							Rust users.
 						</p>
 					</div>
@@ -117,7 +117,7 @@ export default function DocsInstallationPage() {
 							<CardDescription>
 								The npm wrapper package defined in the repository is
 								<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									@oxide-cli/oxide
+									@anesis-cli/anesis
 								</code>
 								.
 							</CardDescription>
@@ -126,11 +126,11 @@ export default function DocsInstallationPage() {
 					<CardContent className="space-y-4">
 						<CodeBlock code={installNpm} />
 						<p className="text-sm text-muted-foreground">
-							The package downloads the matching Oxide binary during
+							The package downloads the matching Anesis binary during
 							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
 								postinstall
 							</code>
-							and then exposes the <code>oxide</code> executable.
+							and then exposes the <code>anesis</code> executable.
 						</p>
 					</CardContent>
 				</Card>
@@ -164,7 +164,7 @@ export default function DocsInstallationPage() {
 			<div className="grid gap-6 lg:grid-cols-2">
 				<Card>
 					<CardHeader>
-						<CardTitle>Upgrade Oxide</CardTitle>
+						<CardTitle>Upgrade Anesis</CardTitle>
 						<CardDescription>
 							Update the installed CLI binary from the latest GitHub Release.
 						</CardDescription>
@@ -172,7 +172,7 @@ export default function DocsInstallationPage() {
 					<CardContent className="space-y-4">
 						<CodeBlock code={upgradeCommand} />
 						<p className="text-sm text-muted-foreground">
-							After most commands, Oxide checks for a newer CLI release in the
+							After most commands, Anesis checks for a newer CLI release in the
 							background and prints a short notice when an update is available.
 						</p>
 					</CardContent>

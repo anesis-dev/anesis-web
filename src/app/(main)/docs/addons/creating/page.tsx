@@ -140,7 +140,7 @@ const stepInject = `{
   "type": "inject",
   "target": { "type": "file", "file": "src/app.module.ts" },
   "content": "import { DrizzleModule } from './db/drizzle.module';",
-  "after": "// oxide:top-imports",
+  "after": "// anesis:top-imports",
   "if_not_found": "error"
 }`;
 
@@ -170,7 +170,7 @@ const stepRename = `{
 }`;
 
 const rollbackNote = [
-	"Steps are applied in order. If any step fails, Oxide asks whether to keep the partial changes or roll back everything that ran before the failure.",
+	"Steps are applied in order. If any step fails, Anesis asks whether to keep the partial changes or roll back everything that ran before the failure.",
 	"Copy and create steps restore the original file (or delete newly created files) on rollback.",
 	"Inject, replace, and append steps restore the file content to its pre-step state on rollback.",
 	"Delete steps are not rolled back — the file is gone. Place delete steps at the end of your step list if order matters.",
@@ -199,7 +199,7 @@ export default function DocsAddonsCreatingPage() {
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
 							An addon is a directory with an{" "}
 							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide.addon.json
+								anesis.addon.json
 							</code>{" "}
 							manifest. The manifest declares who the addon is, what it depends on,
 							how to detect which variant of a project it's working with, and what
@@ -208,7 +208,7 @@ export default function DocsAddonsCreatingPage() {
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							oxide.addon.json
+							anesis.addon.json
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							Variant detection
@@ -233,7 +233,7 @@ export default function DocsAddonsCreatingPage() {
 						<div>
 							<CardTitle>The manifest at a glance</CardTitle>
 							<CardDescription>
-								`oxide.addon.json` must be at the root of your addon directory. All
+								`anesis.addon.json` must be at the root of your addon directory. All
 								top-level fields are required except `requires`.
 							</CardDescription>
 						</div>
@@ -309,7 +309,7 @@ export default function DocsAddonsCreatingPage() {
 						<CardTitle>Detection — choosing the right variant</CardTitle>
 						<CardDescription>
 							The `detect` array lets your addon behave differently depending on the
-							target project's setup. Oxide evaluates each detect block in order and
+							target project's setup. Anesis evaluates each detect block in order and
 							uses the first one that matches.
 						</CardDescription>
 					</div>
@@ -339,7 +339,7 @@ export default function DocsAddonsCreatingPage() {
 						requires every rule in the block to pass.{" "}
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">match: "any"</code>{" "}
 						(the default) requires at least one rule to pass. If no detect block matches,
-						Oxide falls back to the variant with{" "}
+						Anesis falls back to the variant with{" "}
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">when: null</code>.
 					</p>
 				</CardContent>
@@ -388,8 +388,8 @@ export default function DocsAddonsCreatingPage() {
 					<CodeBlock code={commandExample} />
 					<div className="grid gap-3 sm:grid-cols-2">
 						{[
-							{ field: "once", desc: 'When true, the command will not run if its name already appears in oxide.lock for this addon. Use this for one-time setup commands like "install".' },
-							{ field: "requires_commands", desc: "A list of command names that must have already run (appear in oxide.lock) before this command executes. Enforces ordering between commands." },
+							{ field: "once", desc: 'When true, the command will not run if its name already appears in anesis.lock for this addon. Use this for one-time setup commands like "install".' },
+							{ field: "requires_commands", desc: "A list of command names that must have already run (appear in anesis.lock) before this command executes. Enforces ordering between commands." },
 						].map((item) => (
 							<div key={item.field} className="rounded-xl border bg-muted/10 p-3 space-y-1">
 								<code className="font-mono text-xs text-foreground">{item.field}</code>
@@ -523,7 +523,7 @@ export default function DocsAddonsCreatingPage() {
 								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">replace</code>{" "}
 								are rendered through Tera. Use glob targets to apply the same
 								replacement across many files. Use{" "}
-								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">// oxide:</code>{" "}
+								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">// anesis:</code>{" "}
 								comment markers in your template source to create predictable
 								insertion points.
 							</p>
@@ -545,7 +545,7 @@ export default function DocsAddonsCreatingPage() {
 						<CardContent className="space-y-3">
 							<CodeBlock code={stepAppend} />
 							<p className="text-sm text-muted-foreground">
-								Oxide ensures the file ends with a newline before appending, so you
+								Anesis ensures the file ends with a newline before appending, so you
 								don't get content accidentally concatenated onto the last existing
 								line.
 							</p>
@@ -604,7 +604,7 @@ export default function DocsAddonsCreatingPage() {
 					<div>
 						<CardTitle>Rollback on failure</CardTitle>
 						<CardDescription>
-							If a step fails mid-run, Oxide gives the user a choice: keep the
+							If a step fails mid-run, Anesis gives the user a choice: keep the
 							partial changes as they are, or roll back all completed steps.
 						</CardDescription>
 					</div>

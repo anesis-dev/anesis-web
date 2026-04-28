@@ -22,50 +22,50 @@ import {
 } from "@/components/ui/card";
 
 const installExample = `# Install an addon by its registry ID
-oxide addon install nest-drizzle
+anesis addon install nest-drizzle
 
-# Oxide downloads the addon and caches it at:
-# ~/.oxide/cache/addons/nest-drizzle/`;
+# Anesis downloads the addon and caches it at:
+# ~/.anesis/cache/addons/nest-drizzle/`;
 
 const runCommandExample = `# Run an addon command from your project root
-oxide use nest-drizzle install
+anesis use nest-drizzle install
 
 # The general form is:
-oxide use <addon-id> <command>`;
+anesis use <addon-id> <command>`;
 
-const autoInstallNote = `# If the addon isn't cached yet, Oxide installs it automatically:
-oxide use nest-drizzle install
+const autoInstallNote = `# If the addon isn't cached yet, Anesis installs it automatically:
+anesis use nest-drizzle install
 # → addon not found locally, installing...
 # → prompting for inputs...
 # → applying steps...`;
 
 const typicalFlow = `# 1. Log in (required for registry access)
-oxide login
+anesis login
 
 # 2. Install an addon (optional — running a command auto-installs)
-oxide addon install nest-drizzle
+anesis addon install nest-drizzle
 
 # 3. Create a new project
-oxide new my-project nestjs
+anesis new my-project nestjs
 cd my-project
 
 # 4. Run addon commands from inside the project
-oxide use nest-drizzle install
-oxide use nest-drizzle generate`;
+anesis use nest-drizzle install
+anesis use nest-drizzle generate`;
 
 const listRemoveExample = `# See which addons are cached locally
-oxide addon list
+anesis addon list
 
 # Remove an addon from the local cache
-oxide addon remove nest-drizzle`;
+anesis addon remove nest-drizzle`;
 
 const updateExample = `# Re-fetch an addon from its source URL
-oxide addon update https://github.com/owner/repo`;
+anesis addon update https://github.com/owner/repo`;
 
 const lockFacts = [
-	"`oxide.lock` is created in the project root the first time an addon command runs successfully.",
+	"`anesis.lock` is created in the project root the first time an addon command runs successfully.",
 	"It records the addon id, version, chosen variant, and the names of all commands executed.",
-	'Commands marked with `"once": true` in the manifest will not run again if their name already appears in `oxide.lock`.',
+	'Commands marked with `"once": true` in the manifest will not run again if their name already appears in `anesis.lock`.',
 	"The lock file is project-specific — one per project directory. It is safe to commit to version control.",
 ];
 
@@ -103,25 +103,25 @@ export default function DocsAddonsPage() {
 						</h1>
 						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
 							An addon is a declarative package that modifies an existing project.
-							You run it from inside your project directory, and Oxide reads the
+							You run it from inside your project directory, and Anesis reads the
 							addon's manifest, detects your project setup, asks for any needed
 							inputs, and applies file operations — creating, injecting, replacing, or
 							appending content. The result is recorded in{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide.lock
+								anesis.lock
 							</code>
 							.
 						</p>
 					</div>
 					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							oxide use &lt;addon-id&gt; &lt;command&gt;
+							anesis use &lt;addon-id&gt; &lt;command&gt;
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
 							Variant detection
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							oxide.lock tracking
+							anesis.lock tracking
 						</span>
 					</div>
 					<div className="flex flex-wrap gap-3">
@@ -151,7 +151,7 @@ export default function DocsAddonsPage() {
 						<div>
 							<CardTitle>Installing an addon</CardTitle>
 							<CardDescription>
-								<code>oxide addon install</code> pre-downloads the addon and saves it
+								<code>anesis addon install</code> pre-downloads the addon and saves it
 								to the local cache. You can skip this step — running an addon command
 								will auto-install if the addon isn't cached yet.
 							</CardDescription>
@@ -177,11 +177,11 @@ export default function DocsAddonsPage() {
 						<p>
 							The addon ID is what you pass to{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide addon install
+								anesis addon install
 							</code>{" "}
 							and then to{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide use &lt;addon-id&gt; &lt;command&gt;
+								anesis use &lt;addon-id&gt; &lt;command&gt;
 							</code>
 							.
 						</p>
@@ -209,7 +209,7 @@ export default function DocsAddonsPage() {
 						<CardTitle>Running addon commands</CardTitle>
 						<CardDescription>
 							This is the primary way to use an addon. Run it from your project root —
-							Oxide handles detection, inputs, and file operations automatically.
+							Anesis handles detection, inputs, and file operations automatically.
 						</CardDescription>
 					</div>
 				</CardHeader>
@@ -228,9 +228,9 @@ export default function DocsAddonsPage() {
 						<p>
 							When you run{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide use &lt;addon-id&gt; &lt;command&gt;
+								anesis use &lt;addon-id&gt; &lt;command&gt;
 							</code>
-							, Oxide:
+							, Anesis:
 						</p>
 						<ol className="space-y-1.5 list-none">
 							{[
@@ -239,7 +239,7 @@ export default function DocsAddonsPage() {
 								"Prompts for any manifest-level inputs (asked once per run).",
 								"Prompts for any command-level inputs (specific to the command you ran).",
 								"Applies each step in order — creating files, injecting code, replacing strings, etc.",
-								"Records the result in oxide.lock.",
+								"Records the result in anesis.lock.",
 							].map((text, i) => (
 								<li key={i} className="flex gap-2">
 									<span className="mt-0.5 text-primary font-medium">{i + 1}.</span>
@@ -303,7 +303,7 @@ export default function DocsAddonsPage() {
 						<p className="text-sm text-muted-foreground">
 							Updating the cache does not affect any{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								oxide.lock
+								anesis.lock
 							</code>{" "}
 							files in your projects. Those track what was applied, not the current
 							addon version.
@@ -359,7 +359,7 @@ export default function DocsAddonsPage() {
 						<FileTextIcon className="size-5" />
 					</div>
 					<div>
-						<CardTitle>The oxide.lock file</CardTitle>
+						<CardTitle>The anesis.lock file</CardTitle>
 						<CardDescription>
 							A file in your project root that tracks which addons have been applied
 							and which commands have run.
@@ -384,7 +384,7 @@ export default function DocsAddonsPage() {
 					<CardHeader>
 						<CardTitle className="text-base">Creating your own addon</CardTitle>
 						<CardDescription>
-							Learn how to write an `oxide.addon.json` manifest with detection rules,
+							Learn how to write an `anesis.addon.json` manifest with detection rules,
 							variants, input prompts, and declarative file operation steps.
 						</CardDescription>
 					</CardHeader>
@@ -402,7 +402,7 @@ export default function DocsAddonsPage() {
 					<CardHeader>
 						<CardTitle className="text-base">Publishing to the registry</CardTitle>
 						<CardDescription>
-							Learn how to publish and update an addon in the Oxide registry using a
+							Learn how to publish and update an addon in the Anesis registry using a
 							GitHub URL.
 						</CardDescription>
 					</CardHeader>

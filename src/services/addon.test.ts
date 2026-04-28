@@ -118,13 +118,13 @@ describe("addon services", () => {
     });
 
     await expect(
-      publishAddon("https://github.com/oxide-addons/drizzle/tree/main"),
+      publishAddon("https://github.com/anesis-addons/drizzle/tree/main"),
     ).resolves.toEqual({
       message: "ok",
       addon_id: "drizzle",
     });
     expect(api.post).toHaveBeenCalledWith("/addon/publish", {
-      url: "https://github.com/oxide-addons/drizzle/tree/main",
+      url: "https://github.com/anesis-addons/drizzle/tree/main",
     });
   });
 
@@ -139,10 +139,10 @@ describe("addon services", () => {
     vi.mocked(api.patch).mockResolvedValueOnce(undefined);
 
     await expect(
-      updateAddon("https://github.com/oxide-addons/nest-drizzle/tree/main"),
+      updateAddon("https://github.com/anesis-addons/nest-drizzle/tree/main"),
     ).resolves.toBeUndefined();
     expect(api.patch).toHaveBeenCalledWith("/addon", {
-      url: "https://github.com/oxide-addons/nest-drizzle/tree/main",
+      url: "https://github.com/anesis-addons/nest-drizzle/tree/main",
     });
   });
 

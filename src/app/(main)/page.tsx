@@ -20,7 +20,7 @@ import {
   TerminalSquareIcon,
 } from "lucide-react";
 
-const installCommand = `npm install -g @oxide-cli/oxide`;
+const installCommand = `npm install -g @anesis-cli/anesis`;
 
 const features = [
   {
@@ -38,7 +38,7 @@ const features = [
   {
     title: "Rust CLI core",
     description:
-      "Oxide keeps the local developer flow fast in Rust while the web app handles discovery, docs, and publishing.",
+      "Anesis keeps the local developer flow fast in Rust while the web app handles discovery, docs, and publishing.",
     icon: ServerCogIcon,
   },
 ];
@@ -141,7 +141,7 @@ export default function Home() {
               A fast Rust CLI for templates, addons, and repeatable setup.
             </h1>
             <p className="mx-auto max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-              Oxide helps teams scaffold projects from registry templates, attach
+              Anesis helps teams scaffold projects from registry templates, attach
               reusable workflow addons, and publish both package types through one
               shared platform.
             </p>
@@ -247,8 +247,8 @@ export default function Home() {
               Installation, CLI usage, templates, and addons
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              The docs section explains how to install Oxide, use the CLI, and
-              structure both `oxide.template.json` and `oxide.addon.json`
+              The docs section explains how to install Anesis, use the CLI, and
+              structure both `anesis.template.json` and `anesis.addon.json`
               correctly.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
@@ -275,7 +275,7 @@ export default function Home() {
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
               Templates can target any stack, and addons can encapsulate repeated
               commands for setup or maintenance. The important part is shipping a
-              valid `oxide.template.json` or `oxide.addon.json` from the correct
+              valid `anesis.template.json` or `anesis.addon.json` from the correct
               GitHub directory.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
@@ -304,7 +304,7 @@ export default function Home() {
               Latest automations from the registry
             </h2>
             <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-              These packages extend Oxide with reusable commands, so the homepage
+              These packages extend Anesis with reusable commands, so the homepage
               shows live registry activity instead of only starter templates.
             </p>
           </div>

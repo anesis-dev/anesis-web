@@ -5,11 +5,11 @@ import { ThemeProvider } from "@/providers/theme-provider";
 
 export const metadata: Metadata = {
 	title: {
-		default: "Oxide",
-		template: "%s | Oxide",
+		default: "Anesis",
+		template: "%s | Anesis",
 	},
 	description:
-		"Oxide is a template-first CLI and web registry for scaffolding projects, publishing starters, and browsing reusable setups.",
+		"Anesis is a template-first CLI and web registry for scaffolding projects, publishing starters, and browsing reusable setups.",
 	icons: {
 		icon: "/logo.png",
 	},

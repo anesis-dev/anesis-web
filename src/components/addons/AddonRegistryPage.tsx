@@ -98,7 +98,7 @@ export function AddonRegistryPage() {
 				<div className="max-w-3xl space-y-2">
 					<h1 className="text-4xl font-semibold tracking-tight">Addon Registry</h1>
 					<p className="text-sm leading-6 text-muted-foreground sm:text-base">
-						Browse registry entries synced through <code>oxide-server</code>. The
+						Browse registry entries synced through <code>anesis-server</code>. The
 						CLI and backend now cover publish, update, archive lookup, and delete
 						flows; this screen stays focused on discovery and publishing.
 					</p>

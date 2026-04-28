@@ -67,7 +67,7 @@ describe("GET /api/template-readme", () => {
 			expect.objectContaining({
 				headers: expect.objectContaining({
 					Accept: "application/vnd.github+json",
-					"User-Agent": "oxide-web",
+					"User-Agent": "anesis-web",
 				}),
 			}),
 		);

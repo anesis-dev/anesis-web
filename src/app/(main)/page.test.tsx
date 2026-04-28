@@ -39,7 +39,7 @@ describe("Home", () => {
 		expect(screen.queryByText(/quick start/i)).not.toBeInTheDocument();
 		expect(screen.queryByText(/all installation options/i)).not.toBeInTheDocument();
 		expect(
-			screen.getByText("npm install -g @oxide-cli/oxide"),
+			screen.getByText("npm install -g @anesis-cli/anesis"),
 		).toBeInTheDocument();
 		expect(
 			screen.getByRole("button", { name: /copy npm install command/i }),
@@ -47,7 +47,7 @@ describe("Home", () => {
 		expect(
 			screen.getByRole("button", { name: /^copy install command$/i }),
 		).toBeInTheDocument();
-		expect(screen.queryByText("oxide login")).not.toBeInTheDocument();
+		expect(screen.queryByText("anesis login")).not.toBeInTheDocument();
 	});
 
 	it("copies the npm install command from the command text", async () => {
@@ -59,7 +59,7 @@ describe("Home", () => {
 
 		await waitFor(() =>
 			expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-				"npm install -g @oxide-cli/oxide",
+				"npm install -g @anesis-cli/anesis",
 			),
 		);
 		expect(
@@ -76,7 +76,7 @@ describe("Home", () => {
 
 		await waitFor(() =>
 			expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-				"npm install -g @oxide-cli/oxide",
+				"npm install -g @anesis-cli/anesis",
 			),
 		);
 		expect(screen.getByText("Copied")).toBeInTheDocument();
@@ -88,7 +88,7 @@ describe("Home", () => {
 				{
 					id: "addon-1",
 					owner_id: "owner-1",
-					url: "https://github.com/oxide-cli/quality-addon",
+					url: "https://github.com/anesis-dev/quality-addon",
 					addon_id: "quality-addon",
 					name: "quality-addon",
 					version: "1.0.0",
@@ -100,7 +100,7 @@ describe("Home", () => {
 						name: "Quality Addon",
 						version: "1.0.0",
 						description: "Runs repeated project checks.",
-						author: "Oxide",
+						author: "Anesis",
 					},
 					created_at: "2026-04-10T10:00:00.000Z",
 					updated_at: "2026-04-10T10:00:00.000Z",

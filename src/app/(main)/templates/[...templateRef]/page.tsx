@@ -234,8 +234,8 @@ export default function TemplateDetailsPage({
 	const source = getSourceInfo(currentTemplate.config.repository.url);
 	const availableVersions = versions.length > 0 ? versions : [currentTemplate];
 	const templateName = currentTemplate.name;
-	const createCommand = `oxide new my-app ${templateName}`;
-	const installCommand = `oxide template install ${templateName}`;
+	const createCommand = `anesis new my-app ${templateName}`;
+	const installCommand = `anesis template install ${templateName}`;
 	const keywordCount = String(currentTemplate.config.metadata.tags.length);
 	const technologyCount = String(currentTemplate.config.technologies.length);
 	const languageCount = String(currentTemplate.config.languages.length);

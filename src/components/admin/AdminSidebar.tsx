@@ -59,7 +59,7 @@ export function AdminSidebar() {
 				<div className="flex flex-col">
 					<span className="text-sm font-bold leading-none">Admin Panel</span>
 					<span className="mt-0.5 text-[11px] text-muted-foreground">
-						Oxide
+						Anesis
 					</span>
 				</div>
 			</div>

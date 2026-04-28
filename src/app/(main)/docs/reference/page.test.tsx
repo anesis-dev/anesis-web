@@ -15,7 +15,7 @@ import { fetchTemplateSchema } from "@/services/schema";
 
 describe("DocsReferencePage", () => {
 	it("renders the schema preview and current local state reference", async () => {
-		vi.mocked(fetchTemplateSchema).mockResolvedValueOnce(`{\n  "title": "oxide"\n}`);
+		vi.mocked(fetchTemplateSchema).mockResolvedValueOnce(`{\n  "title": "anesis"\n}`);
 
 		render(await DocsReferencePage());
 
@@ -24,11 +24,11 @@ describe("DocsReferencePage", () => {
 				name: /local state, validation rules, and schema links/i,
 			}),
 		).toBeInTheDocument();
-		expect(screen.getByText('{ "title": "oxide" }', { exact: false })).toBeInTheDocument();
-		expect(screen.getByText(/~\/\.oxide\/auth\.json/i)).toBeInTheDocument();
+		expect(screen.getByText('{ "title": "anesis" }', { exact: false })).toBeInTheDocument();
+		expect(screen.getByText(/~\/\.anesis\/auth\.json/i)).toBeInTheDocument();
 		expect(screen.getByRole("link", { name: /view raw schema/i })).toHaveAttribute(
 			"href",
-			"http://api.example.test/schema/oxide.template.schema.json",
+			"http://api.example.test/schema/anesis.template.schema.json",
 		);
 	});
 

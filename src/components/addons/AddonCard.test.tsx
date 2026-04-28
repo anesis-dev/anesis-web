@@ -14,7 +14,7 @@ describe("AddonCard", () => {
       screen.getByRole("link", { name: /open repository for drizzle orm/i }),
     ).toHaveAttribute(
       "href",
-      "https://github.com/oxide-addons/drizzle/tree/main",
+      "https://github.com/anesis-addons/drizzle/tree/main",
     );
   });
 });

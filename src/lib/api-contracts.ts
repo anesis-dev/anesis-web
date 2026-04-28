@@ -119,7 +119,7 @@ function parseTemplateConfig(value: unknown, path: string): ITemplateConfig {
 		$schema: expectString(config.$schema, `${path}.$schema`),
 		name: expectString(config.name, `${path}.name`),
 		version: expectString(config.version, `${path}.version`),
-		oxideVersion: expectString(config.oxideVersion, `${path}.oxideVersion`),
+		anesisVersion: expectString(config.anesisVersion, `${path}.anesisVersion`),
 		author: {
 			name: expectString(author.name, `${path}.author.name`),
 			github: expectString(author.github, `${path}.author.github`),
@@ -205,7 +205,7 @@ function buildTemplateConfig(
 		$schema: "",
 		name,
 		version,
-		oxideVersion: "",
+		anesisVersion: "",
 		author: info.author,
 		repository: {
 			type: "github",

@@ -1,6 +1,6 @@
-# Oxide Web
+# Anesis Web
 
-`oxide-web` is the Next.js frontend for the Oxide platform. It provides:
+`anesis-web` is the Next.js frontend for the Anesis platform. It provides:
 
 - the public marketing site
 - documentation pages
@@ -9,7 +9,7 @@
 - an admin area for platform management
 - CLI auth callback screens
 
-The app talks to `oxide-server` for auth, user data, and template data.
+The app talks to `anesis-server` for auth, user data, and template data.
 
 ## Stack
 
@@ -48,13 +48,13 @@ the `httpOnly` auth cookie in a first-party context:
 
 ```env
 NEXT_PUBLIC_API_URL=/api/backend
-API_PROXY_URL=https://oxide-server.onrender.com
+API_PROXY_URL=https://anesis-server.onrender.com
 ```
 
 `API_PROXY_URL` is used by `next.config.ts` to rewrite `/api/backend/*` to the
 server. The server's `WEB_CALLBACK_URL` must point at the same rewritten
 callback path, for example
-`https://oxide-cli.vercel.app/api/backend/auth/callback`.
+`https://anesis-cli.vercel.app/api/backend/auth/callback`.
 
 3. Start the frontend:
 
@@ -74,7 +74,7 @@ npm run dev:webpack
 http://localhost:3000
 ```
 
-To get full functionality, run `oxide-server` locally on port `4000`.
+To get full functionality, run `anesis-server` locally on port `4000`.
 
 ## Scripts
 
@@ -122,6 +122,6 @@ src/
 
 ## Notes
 
-- GitHub login/logout depends on `oxide-server`.
+- GitHub login/logout depends on `anesis-server`.
 - Admin moderation UI is present, but some destructive admin actions still require backend mutation endpoints.
 - `npm run dev` uses Turbopack by default. `npm run dev:webpack` remains available as a fallback if you need to compare dev-server behavior.

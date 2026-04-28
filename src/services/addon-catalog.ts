@@ -208,8 +208,8 @@ export function parseAddonManifest(
 }
 
 function getDefaultAddonsRoot(): string {
-  if (process.env.OXIDE_ADDONS_DIR) {
-    return path.resolve(process.env.OXIDE_ADDONS_DIR);
+  if (process.env.ANESIS_ADDONS_DIR) {
+    return path.resolve(process.env.ANESIS_ADDONS_DIR);
   }
 
   return path.resolve(process.cwd(), "..", "addons");
@@ -238,7 +238,7 @@ export async function getLocalAddonCatalog(
         const manifestPath = path.join(
           addonsRoot,
           entry.name,
-          "oxide.addon.json",
+          "anesis.addon.json",
         );
 
         try {

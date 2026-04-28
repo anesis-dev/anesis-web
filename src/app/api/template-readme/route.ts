@@ -84,7 +84,7 @@ async function fetchGitHubJson(url: string) {
 	return fetch(url, {
 		headers: {
 			Accept: "application/vnd.github+json",
-			"User-Agent": "oxide-web",
+			"User-Agent": "anesis-web",
 		},
 		next: { revalidate: 60 * 5 },
 	});

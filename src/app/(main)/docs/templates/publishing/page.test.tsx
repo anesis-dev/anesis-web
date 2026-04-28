@@ -13,8 +13,8 @@ describe("DocsTemplatesPublishingPage", () => {
 	it("shows publish and update commands", () => {
 		render(<DocsTemplatesPublishingPage />);
 
-		expect(screen.getAllByText(/oxide template publish https:\/\/github\.com\/owner\/repo/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/oxide template update/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis template publish https:\/\/github\.com\/owner\/repo/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis template update/i).length).toBeGreaterThan(0);
 	});
 
 	it("documents the GitHub URL rules", () => {

@@ -136,7 +136,7 @@ export default function AdminDashboard() {
 			<div>
 				<h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
 				<p className="mt-1 text-sm text-muted-foreground">
-					Overview of your Oxide platform.
+					Overview of your Anesis platform.
 				</p>
 			</div>
 
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
 				<StatCard
 					title="Official Templates"
 					value={officialTemplates}
-					description="Verified by Oxide team"
+					description="Verified by Anesis team"
 					icon={ShieldCheckIcon}
 					loading={isLoading}
 				/>

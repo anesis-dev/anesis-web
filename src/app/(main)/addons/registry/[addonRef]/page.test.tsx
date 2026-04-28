@@ -60,7 +60,7 @@ describe("AddonDetailsPage", () => {
         name: "Drizzle ORM",
         version: "1.0.0",
         description: "Adds Drizzle ORM scaffolding helpers.",
-        author: "oxide-addons",
+        author: "anesis-addons",
         requires: [],
         inputs: [],
         detect: [],
@@ -105,21 +105,21 @@ describe("AddonDetailsPage", () => {
     expect(screen.getByText("Available Commands")).toBeInTheDocument();
     expect(screen.getByText("Install Drizzle support.")).toBeInTheDocument();
     expect(
-      screen.getByText("oxide addon install drizzle", { exact: false }),
+      screen.getByText("anesis addon install drizzle", { exact: false }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("oxide addon remove drizzle", { exact: false }),
+      screen.getByText("anesis addon remove drizzle", { exact: false }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "oxide-addons/drizzle" }),
-    ).toHaveAttribute("href", "https://github.com/oxide-addons/drizzle");
+      screen.getByRole("link", { name: "anesis-addons/drizzle" }),
+    ).toHaveAttribute("href", "https://github.com/anesis-addons/drizzle");
     expect(screen.getByText("Package Metadata")).toBeInTheDocument();
     expect(screen.getByText("Source Repository")).toBeInTheDocument();
     expect(
-      screen.queryByText("oxide addon update", { exact: false }),
+      screen.queryByText("anesis addon update", { exact: false }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByText("oxide use drizzle install", { exact: false }),
+      screen.getByText("anesis use drizzle install", { exact: false }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /back to addon registry/i }),
@@ -128,12 +128,12 @@ describe("AddonDetailsPage", () => {
     expect(useAddonManifest).toHaveBeenCalledWith(mockAddon.url);
 
     fireEvent.click(
-      screen.getByRole("button", { name: /copy oxide use drizzle install/i }),
+      screen.getByRole("button", { name: /copy anesis use drizzle install/i }),
     );
 
     await waitFor(() =>
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        "oxide use drizzle install",
+        "anesis use drizzle install",
       ),
     );
   });

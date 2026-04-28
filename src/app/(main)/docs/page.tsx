@@ -20,11 +20,11 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
-const quickStart = `oxide login
-oxide new my-app react-vite-ts
+const quickStart = `anesis login
+anesis new my-app react-vite-ts
 cd my-app
-oxide addon install nest-drizzle
-oxide use nest-drizzle install`;
+anesis addon install nest-drizzle
+anesis use nest-drizzle install`;
 
 const pillars = [
 	{
@@ -51,7 +51,7 @@ const pillars = [
 	{
 		title: "Creating Templates",
 		description:
-			"Build your own template with `oxide.template.json`, Tera rendering, and the project scaffolding contract.",
+			"Build your own template with `anesis.template.json`, Tera rendering, and the project scaffolding contract.",
 		icon: PencilRulerIcon,
 		href: "/docs/templates/creating",
 	},
@@ -65,7 +65,7 @@ const pillars = [
 	{
 		title: "Creating Addons",
 		description:
-			"Author `oxide.addon.json` manifests with variant detection, inputs, and declarative file operation steps.",
+			"Author `anesis.addon.json` manifests with variant detection, inputs, and declarative file operation steps.",
 		icon: PencilRulerIcon,
 		href: "/docs/addons/creating",
 	},
@@ -91,14 +91,14 @@ export default function DocsOverviewPage() {
 				<div className="relative space-y-5">
 					<div className="flex items-center gap-2 text-sm text-muted-foreground">
 						<BookOpenIcon className="size-4" />
-						Oxide Documentation
+						Anesis Documentation
 					</div>
 					<div className="max-w-4xl space-y-3">
 						<h1 className="text-3xl font-bold tracking-tight sm:text-5xl">
-							Everything you need to scaffold, extend, and publish with Oxide
+							Everything you need to scaffold, extend, and publish with Anesis
 						</h1>
 						<p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-							Oxide is a CLI tool for creating new projects from templates and
+							Anesis is a CLI tool for creating new projects from templates and
 							extending existing ones with addons. This documentation covers
 							installation, day-to-day usage, and how to build and publish your own
 							templates and addons.
@@ -112,10 +112,10 @@ export default function DocsOverviewPage() {
 							Declarative addons
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Template + addon cache in ~/.oxide
+							Template + addon cache in ~/.anesis
 						</span>
 						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Addon runs tracked in oxide.lock
+							Addon runs tracked in anesis.lock
 						</span>
 					</div>
 					<div className="flex flex-wrap gap-3">
@@ -153,7 +153,7 @@ export default function DocsOverviewPage() {
 
 				<Card>
 					<CardHeader>
-						<CardTitle>How Oxide works</CardTitle>
+						<CardTitle>How Anesis works</CardTitle>
 						<CardDescription>
 							Two primitives — templates and addons — cover the full project lifecycle.
 						</CardDescription>
@@ -165,9 +165,9 @@ export default function DocsOverviewPage() {
 								<span className="font-medium text-foreground">Templates</span> are
 								project starters. Run{" "}
 								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									oxide new my-app react-vite-ts
+									anesis new my-app react-vite-ts
 								</code>{" "}
-								and Oxide downloads the template, renders any{" "}
+								and Anesis downloads the template, renders any{" "}
 								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
 									.tera
 								</code>{" "}
@@ -180,9 +180,9 @@ export default function DocsOverviewPage() {
 								<span className="font-medium text-foreground">Addons</span> extend an
 								existing project. Run{" "}
 								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									oxide use nest-drizzle install
+									anesis use nest-drizzle install
 								</code>{" "}
-								and Oxide reads the addon manifest, detects your project variant,
+								and Anesis reads the addon manifest, detects your project variant,
 								prompts for inputs, and applies declarative file operations.
 							</p>
 						</div>
@@ -191,12 +191,12 @@ export default function DocsOverviewPage() {
 							<p>
 								Both are cached locally under{" "}
 								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									~/.oxide
+									~/.anesis
 								</code>
-								. Oxide only re-downloads when the backend reports a new commit SHA,
+								. Anesis only re-downloads when the backend reports a new commit SHA,
 								and addon runs are recorded in{" "}
 								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									oxide.lock
+									anesis.lock
 								</code>
 								.
 							</p>

@@ -19,7 +19,7 @@ export interface ITemplateConfig {
   $schema: string;
   name: string;
   version: string;
-  oxideVersion: string;
+  anesisVersion: string;
   author: IAuthor;
   repository: IRepository;
   specialization: string;

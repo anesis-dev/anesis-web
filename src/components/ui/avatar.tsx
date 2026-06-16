@@ -1,3 +1,12 @@
+/**
+ * Avatar components — Client Component, shadcn/ui primitive.
+ *
+ * Exports `Avatar`, `AvatarImage`, `AvatarFallback`, `AvatarBadge`,
+ * `AvatarGroup`, and `AvatarGroupCount`. Three size variants are available via
+ * the `size` prop: `"sm"` (24 px), `"default"` (32 px), and `"lg"` (40 px).
+ * Sizes propagate to `AvatarBadge` and `AvatarGroupCount` via CSS group-data
+ * selectors.
+ */
 "use client";
 
 import * as React from "react";

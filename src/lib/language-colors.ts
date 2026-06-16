@@ -1,0 +1,85 @@
+/**
+ * Language color map — mirrors GitHub's language color palette.
+ *
+ * `getLanguageColor(language)` returns the hex color for the given language
+ * name (case-insensitive), or a neutral grey fallback for unknown languages.
+ * Used in the `TemplateFilters` component to show colored dots on language
+ * filter pills.
+ */
+const LANGUAGE_COLORS: Record<string, string> = {
+  // Common languages
+  javascript: "#f1e05a",
+  typescript: "#3178c6",
+  python: "#3572a5",
+  rust: "#dea584",
+  go: "#00add8",
+  ruby: "#701516",
+  java: "#b07219",
+  "c#": "#178600",
+  csharp: "#178600",
+  "c++": "#f34b7d",
+  cpp: "#f34b7d",
+  c: "#555555",
+  php: "#4f5d95",
+  swift: "#f05138",
+  kotlin: "#a97bff",
+  scala: "#c22d40",
+  html: "#e34c26",
+  css: "#563d7c",
+  scss: "#c6538c",
+  sass: "#a53b70",
+  shell: "#89e051",
+  bash: "#89e051",
+  sh: "#89e051",
+  powershell: "#012456",
+  dockerfile: "#384d54",
+  vue: "#41b883",
+  svelte: "#ff3e00",
+  elixir: "#6e4a7e",
+  erlang: "#b83998",
+  haskell: "#5e5086",
+  lua: "#000080",
+  dart: "#00b4ab",
+  r: "#198ce7",
+  zig: "#ec915c",
+  nix: "#7e7eff",
+  markdown: "#083fa1",
+  yaml: "#cb171e",
+  toml: "#9c4221",
+  json: "#292929",
+  graphql: "#e10098",
+  sql: "#e38c00",
+  perl: "#0298c3",
+  clojure: "#db5855",
+  "f#": "#b845fc",
+  fsharp: "#b845fc",
+  ocaml: "#ef7a08",
+  nim: "#ffc200",
+  crystal: "#000100",
+  julia: "#a270ba",
+  groovy: "#4298b8",
+  "objective-c": "#438eff",
+  objc: "#438eff",
+  assembly: "#6e4c13",
+  asm: "#6e4c13",
+  makefile: "#427819",
+  cmake: "#da3434",
+  terraform: "#844fba",
+  hcl: "#844fba",
+  solidity: "#aa6746",
+  vala: "#fbe5cd",
+  coffeescript: "#244776",
+  elm: "#60b5cc",
+  purescript: "#1d222d",
+  reason: "#ff5847",
+  rescript: "#ed5051",
+  wasm: "#04133b",
+  gleam: "#ffaff3",
+  odin: "#60AAFA",
+};
+
+const DEFAULT_COLOR = "#8b949e";
+
+export function getLanguageColor(language: string): string {
+  return LANGUAGE_COLORS[language.toLowerCase()] ?? DEFAULT_COLOR;
+}

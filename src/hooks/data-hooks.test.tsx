@@ -9,18 +9,21 @@ import {
 
 vi.mock("@/services/template", () => ({
   fetchTemplates: vi.fn(),
+  fetchAllTemplates: vi.fn(),
   fetchMyTemplates: vi.fn(),
   fetchTemplate: vi.fn(),
 }));
 
 vi.mock("@/services/addon", () => ({
   fetchAddons: vi.fn(),
+  fetchAllAddons: vi.fn(),
   fetchAddon: vi.fn(),
   fetchMyAddons: vi.fn(),
 }));
 
 vi.mock("@/services/user", () => ({
   fetchAllUsers: vi.fn(),
+  fetchUserByLogin: vi.fn(),
 }));
 
 vi.mock("@/services/github", () => ({
@@ -29,21 +32,30 @@ vi.mock("@/services/github", () => ({
 }));
 
 import { fetchGitHubUser, fetchTemplateReadme } from "@/services/github";
-import { fetchAddon, fetchAddons, fetchMyAddons } from "@/services/addon";
+import {
+  fetchAddon,
+  fetchAddons,
+  fetchAllAddons,
+  fetchMyAddons,
+} from "@/services/addon";
 import { useAddon } from "@/hooks/useAddon";
 import {
+  fetchAllTemplates,
   fetchMyTemplates,
   fetchTemplate,
   fetchTemplates,
 } from "@/services/template";
-import { fetchAllUsers } from "@/services/user";
+import { fetchAllUsers, fetchUserByLogin } from "@/services/user";
 import { useAddons } from "@/hooks/useAddons";
+import { useAllAddons } from "@/hooks/useAllAddons";
+import { useAllTemplates } from "@/hooks/useAllTemplates";
 import { useGitHubUser } from "@/hooks/useGitHubUser";
 import { useMyAddons } from "@/hooks/useMyAddons";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
 import { useTemplate } from "@/hooks/useTemplate";
 import { useTemplateReadme } from "@/hooks/useTemplateReadme";
 import { useTemplates } from "@/hooks/useTemplates";
+import { useUserByLogin } from "@/hooks/useUserByLogin";
 import { useUsers } from "@/hooks/useUsers";
 
 function getWrapper() {
@@ -100,6 +112,31 @@ describe("data hooks", () => {
     expect(fetchAddons).toHaveBeenCalledWith({ page: 3, pageSize: 9 });
   });
 
+  it("loads every public template page", async () => {
+    vi.mocked(fetchAllTemplates).mockResolvedValueOnce([mockTemplate]);
+
+    const { result } = renderHook(() => useAllTemplates(), {
+      wrapper: getWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.templates).toEqual([mockTemplate]);
+    expect(fetchAllTemplates).toHaveBeenCalledWith();
+  });
+
+  it("loads every public addon page", async () => {
+    const addon = createAddon();
+    vi.mocked(fetchAllAddons).mockResolvedValueOnce([addon]);
+
+    const { result } = renderHook(() => useAllAddons(), {
+      wrapper: getWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.addons).toEqual([addon]);
+    expect(fetchAllAddons).toHaveBeenCalledWith();
+  });
+
   it("loads a single addon by ref when a ref is provided", async () => {
     const addon = createAddon();
     vi.mocked(fetchAddon).mockResolvedValueOnce(addon);
@@ -121,6 +158,18 @@ describe("data hooks", () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.users).toEqual([]);
+  });
+
+  it("loads a public user by login", async () => {
+    vi.mocked(fetchUserByLogin).mockResolvedValueOnce(mockUser);
+
+    const { result } = renderHook(() => useUserByLogin("octocat"), {
+      wrapper: getWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.user).toEqual(mockUser);
+    expect(fetchUserByLogin).toHaveBeenCalledWith("octocat");
   });
 
   it("does not load my templates when disabled", async () => {

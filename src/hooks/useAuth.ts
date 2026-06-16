@@ -1,3 +1,14 @@
+/**
+ * Authentication hook — provides the currently signed-in user and helpers
+ * to trigger login/logout.
+ *
+ * - Calls `GET /user/info` (cache key `["me"]`) to populate `user`.
+ * - 4xx responses are not retried because they indicate unauthenticated or
+ *   forbidden states, not transient network errors.
+ * - `login()` redirects the browser to the GitHub OAuth entry point.
+ * - `logout()` clears all TanStack Query caches before calling the server
+ *   logout endpoint, so a subsequent user cannot see private cached data.
+ */
 import { fetchMe } from "@/services/user";
 import { getLoginUrl, logoutRequest } from "@/services/auth";
 import { ApiError } from "@/api/client";
@@ -22,8 +33,10 @@ export function useAuth() {
 	}
 
 	async function logout() {
-		// Always clear local state regardless of whether the server request succeeds
-		queryClient.removeQueries({ queryKey: ["me"] });
+		// Always clear all cached data so the next user does not see the previous
+		// user's private queries (my-templates, notifications, organizations, etc.)
+		queryClient.cancelQueries();
+		queryClient.clear();
 		try {
 			await logoutRequest();
 		} catch {

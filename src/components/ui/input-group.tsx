@@ -1,3 +1,21 @@
+/**
+ * Input group components — Client Component.
+ *
+ * Composes an `Input` or `Textarea` with leading/trailing addons (icons,
+ * text, buttons) inside a single visually-unified container.
+ *
+ * Exports:
+ * - `InputGroup` — outer container; adapts layout to addon `align` values.
+ * - `InputGroupAddon` — addon wrapper with `align` prop (`inline-start`,
+ *   `inline-end`, `block-start`, `block-end`).
+ * - `InputGroupButton` — ghost button sized for use inside an addon.
+ * - `InputGroupText` — plain text/icon span for addons.
+ * - `InputGroupInput` — borderless `Input` for use inside the group.
+ * - `InputGroupTextarea` — borderless `Textarea` for use inside the group.
+ *
+ * Clicking an `InputGroupAddon` focuses the inner input unless a button
+ * was the target.
+ */
 "use client"
 
 import * as React from "react"

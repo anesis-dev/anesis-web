@@ -1,3 +1,9 @@
+/**
+ * GitHub API types.
+ *
+ * `IGitHubUser` — subset of the GitHub REST API user object used to populate
+ * public profile pages (`GET /users/{username}`).
+ */
 export interface IGitHubUser {
   login: string;
   id: number;

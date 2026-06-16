@@ -1,3 +1,11 @@
+/**
+ * Hook — fetches templates owned by the authenticated user.
+ *
+ * Endpoint: GET /template/my?page=&page_size=
+ * Cache key: ["my-templates", page, pageSize]
+ *
+ * Requires the user to be logged in; the server returns 401 otherwise.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { fetchMyTemplates } from "@/services/template";
 import {

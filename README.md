@@ -37,10 +37,14 @@ cp .env .env.local
 Current local API target:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_API_URL=/api/backend
+API_PROXY_URL=http://localhost:4000
 ```
 
-`NEXT_PUBLIC_API_URL` is recommended, but the app also falls back to `http://localhost:4000` in local development if the variable is missing or invalid.
+`NEXT_PUBLIC_API_URL` points browser requests at the frontend proxy, while
+`API_PROXY_URL` tells Next.js where to rewrite `/api/backend/*` requests. This
+matches the local server callback URL
+`http://localhost:3000/api/backend/auth/callback`.
 
 For production deployments where the browser app and API live on different
 sites, route browser API traffic through the frontend origin so Safari can keep

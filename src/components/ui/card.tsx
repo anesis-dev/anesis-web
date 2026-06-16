@@ -1,3 +1,10 @@
+/**
+ * Card components — shadcn/ui primitive.
+ *
+ * Exports `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`,
+ * `CardContent`, and `CardFooter`. Compose them to build a standard card
+ * layout. `CardAction` auto-positions to the header's trailing column.
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

@@ -1,6 +1,31 @@
-import { IAddon, IAddonConfig, IAddonUrlResponse } from "@/types/addon";
+/**
+ * API response parsers / contracts.
+ *
+ * Every function in this module accepts an `unknown` value (the raw JSON from
+ * the server) and returns a strongly-typed TypeScript object. If the shape
+ * doesn't match what is expected, an `Error` is thrown with a human-readable
+ * path (e.g. `"template.config.version must be a string"`).
+ *
+ * This approach lets us catch API shape mismatches early — at the boundary
+ * between the network and the application — rather than propagating `any`
+ * types deep into the UI.
+ *
+ * The server has gone through a schema migration, so some parsers handle
+ * two payload shapes:
+ * - "legacy" templates — have a `config` field directly on the record.
+ * - "current" templates — have an `info` field instead of `config`.
+ * `parseTemplate` auto-detects the shape and dispatches accordingly.
+ *
+ * Similarly `parseTemplateVersionsResponse` handles both an array-of-groups
+ * response and a single-group object response.
+ */
+import { IAddon, IAddonConfig, IAddonUrlResponse, IStarResponse } from "@/types/addon";
+import { INotification, INotificationsResponse } from "@/types/notification";
+import { IAddonAccess, ITemplateAccess } from "@/types/access-control";
 import { IGitHubUser } from "@/types/github";
+import { IInvitationStatus, IOrganization, IOrganizationInvitation, IOrganizationMember, IOrgRole } from "@/types/organization";
 import { IPaginatedResponse } from "@/types/pagination";
+import { IRepoCredential } from "@/types/repo-credential";
 import { ITemplate, ITemplateConfig, ITemplateUrlResponse } from "@/types/template";
 import { IUser } from "@/types/user";
 
@@ -48,6 +73,14 @@ function expectStringArray(value: unknown, path: string): string[] {
 	return value;
 }
 
+function optionalStringArray(value: unknown, path: string): string[] {
+	if (value === undefined || value === null) {
+		return [];
+	}
+
+	return expectStringArray(value, path);
+}
+
 function expectStringFromKeys(
 	record: Record<string, unknown>,
 	keys: string[],
@@ -73,6 +106,17 @@ function expectOptionalString(value: unknown, path: string): string | undefined 
 	}
 
 	return expectString(value, path);
+}
+
+function optionalNumber(value: unknown, path: string): number {
+	if (value === undefined || value === null) return 0;
+	return expectNumber(value, path);
+}
+
+function optionalBoolean(value: unknown): boolean | undefined {
+	if (value === undefined || value === null) return undefined;
+	if (typeof value !== "boolean") return undefined;
+	return value;
 }
 
 function parseUser(value: unknown, path: string): IUser {
@@ -140,7 +184,7 @@ function parseTemplateConfig(value: unknown, path: string): ITemplateConfig {
 		metadata: {
 			displayName: expectString(metadata.displayName, `${path}.metadata.displayName`),
 			description: expectString(metadata.description, `${path}.metadata.description`),
-			tags: expectStringArray(metadata.tags, `${path}.metadata.tags`),
+			tags: optionalStringArray(metadata.tags, `${path}.metadata.tags`),
 		},
 	};
 }
@@ -151,6 +195,7 @@ function parseLegacyTemplate(value: unknown, path: string): ITemplate {
 	return {
 		id: expectString(template.id, `${path}.id`),
 		owner_id: expectString(template.owner_id, `${path}.owner_id`),
+		organization_id: expectOptionalString(template.organization_id, `${path}.organization_id`) ?? null,
 		url: expectString(template.url, `${path}.url`),
 		official: expectBoolean(template.official, `${path}.official`),
 		commit_sha: expectString(template.commit_sha, `${path}.commit_sha`),
@@ -159,6 +204,12 @@ function parseLegacyTemplate(value: unknown, path: string): ITemplate {
 		updated_at: expectString(template.updated_at, `${path}.updated_at`),
 		config: parseTemplateConfig(template.config, `${path}.config`),
 		name: expectString(template.name, `${path}.name`),
+		download_count: optionalNumber(template.download_count, `${path}.download_count`),
+		unique_downloaders: optionalNumber(template.unique_downloaders, `${path}.unique_downloaders`),
+		use_count: optionalNumber(template.use_count, `${path}.use_count`),
+		star_count: optionalNumber(template.star_count, `${path}.star_count`),
+		is_starred: optionalBoolean(template.is_starred),
+		visibility: expectOptionalString(template.visibility, `${path}.visibility`),
 	};
 }
 
@@ -192,7 +243,7 @@ function parseTemplateInfo(value: unknown, path: string): ParsedTemplateInfo {
 		type: expectStringFromKeys(info, ["type", "template_type"], path),
 		displayName: expectStringFromKeys(info, ["displayName", "display_name"], path),
 		description: expectString(info.description, `${path}.description`),
-		tags: expectStringArray(info.tags, `${path}.tags`),
+		tags: optionalStringArray(info.tags, `${path}.tags`),
 	};
 }
 
@@ -243,6 +294,7 @@ function parseCurrentTemplate(value: unknown, path: string): ITemplate {
 	return {
 		id,
 		owner_id: expectString(template.owner_id, `${path}.owner_id`),
+		organization_id: expectOptionalString(template.organization_id, `${path}.organization_id`) ?? null,
 		url: info.repoUrl,
 		official: expectBoolean(template.official, `${path}.official`),
 		commit_sha: "",
@@ -252,6 +304,12 @@ function parseCurrentTemplate(value: unknown, path: string): ITemplate {
 			expectOptionalString(template.updated_at, `${path}.updated_at`) ?? createdAt,
 		config: buildTemplateConfig(name, version, info),
 		name,
+		download_count: optionalNumber(template.download_count, `${path}.download_count`),
+		unique_downloaders: optionalNumber(template.unique_downloaders, `${path}.unique_downloaders`),
+		use_count: optionalNumber(template.use_count, `${path}.use_count`),
+		star_count: optionalNumber(template.star_count, `${path}.star_count`),
+		is_starred: optionalBoolean(template.is_starred),
+		visibility: expectOptionalString(template.visibility, `${path}.visibility`),
 	};
 }
 
@@ -286,6 +344,10 @@ function parseLatestTemplateGroup(value: unknown, path: string): ITemplate {
 			version: latest.version,
 		},
 		versionCount,
+		download_count: optionalNumber(group.download_count, `${path}.download_count`),
+		unique_downloaders: optionalNumber(group.unique_downloaders, `${path}.unique_downloaders`),
+		use_count: optionalNumber(group.use_count, `${path}.use_count`),
+		star_count: optionalNumber(group.star_count, `${path}.star_count`),
 	};
 }
 
@@ -321,6 +383,7 @@ function parseAddon(value: unknown, path: string): IAddon {
 	return {
 		id: expectString(addon.id, `${path}.id`),
 		owner_id: expectString(addon.owner_id, `${path}.owner_id`),
+		organization_id: expectOptionalString(addon.organization_id, `${path}.organization_id`),
 		url: expectString(addon.url, `${path}.url`),
 		addon_id: expectString(addon.addon_id, `${path}.addon_id`),
 		name: expectString(addon.name, `${path}.name`),
@@ -330,6 +393,11 @@ function parseAddon(value: unknown, path: string): IAddon {
 		config: parseAddonConfig(addon.config, `${path}.config`),
 		created_at: expectString(addon.created_at, `${path}.created_at`),
 		updated_at: expectString(addon.updated_at, `${path}.updated_at`),
+		download_count: optionalNumber(addon.download_count, `${path}.download_count`),
+		unique_downloaders: optionalNumber(addon.unique_downloaders, `${path}.unique_downloaders`),
+		star_count: optionalNumber(addon.star_count, `${path}.star_count`),
+		is_starred: optionalBoolean(addon.is_starred),
+		visibility: expectOptionalString(addon.visibility, `${path}.visibility`),
 	};
 }
 
@@ -482,6 +550,195 @@ export function parseAddonUrlResponse(value: unknown): IAddonUrlResponse {
 	return {
 		archive_url: expectString(payload.archive_url, "addonUrl.archive_url"),
 		commit_sha: expectString(payload.commit_sha, "addonUrl.commit_sha"),
+	};
+}
+
+export function parseStarResponse(value: unknown): IStarResponse {
+	const payload = expectRecord(value, "star");
+
+	return {
+		is_starred: expectBoolean(payload.is_starred, "star.is_starred"),
+		star_count: expectNumber(payload.star_count, "star.star_count"),
+	};
+}
+
+function parseOrganization(value: unknown, path: string): IOrganization {
+	const org = expectRecord(value, path);
+
+	return {
+		id: expectString(org.id, `${path}.id`),
+		name: expectString(org.name, `${path}.name`),
+		slug: expectString(org.slug, `${path}.slug`),
+		description: expectOptionalString(org.description, `${path}.description`),
+		avatar_url: expectOptionalString(org.avatar_url, `${path}.avatar_url`),
+		owner_id: expectString(org.owner_id, `${path}.owner_id`),
+		created_at: expectString(org.created_at, `${path}.created_at`),
+		updated_at: expectString(org.updated_at, `${path}.updated_at`),
+	};
+}
+
+function parseOrgMember(value: unknown, path: string): IOrganizationMember {
+	const member = expectRecord(value, path);
+	const role = expectString(member.role, `${path}.role`);
+
+	if (role !== "member" && role !== "admin" && role !== "owner") {
+		throw new Error(`Invalid API response: ${path}.role must be "member", "admin", or "owner".`);
+	}
+
+	return {
+		id: expectString(member.id, `${path}.id`),
+		organization_id: expectString(member.organization_id, `${path}.organization_id`),
+		user_id: expectString(member.user_id, `${path}.user_id`),
+		role: role as IOrgRole,
+		invited_by: expectOptionalString(member.invited_by, `${path}.invited_by`),
+		joined_at: expectString(member.joined_at, `${path}.joined_at`),
+		user_login: expectOptionalString(member.user_login, `${path}.user_login`),
+		user_avatar_url: expectOptionalString(member.user_avatar_url, `${path}.user_avatar_url`),
+	};
+}
+
+function parseOrgInvitation(value: unknown, path: string): IOrganizationInvitation {
+	const inv = expectRecord(value, path);
+	const role = expectString(inv.role, `${path}.role`);
+	const status = expectString(inv.status, `${path}.status`);
+
+	if (role !== "member" && role !== "admin" && role !== "owner") {
+		throw new Error(`Invalid API response: ${path}.role must be "member", "admin", or "owner".`);
+	}
+
+	if (status !== "pending" && status !== "accepted" && status !== "declined" && status !== "expired") {
+		throw new Error(`Invalid API response: ${path}.status must be "pending", "accepted", "declined", or "expired".`);
+	}
+
+	return {
+		id: expectString(inv.id, `${path}.id`),
+		organization_id: expectString(inv.organization_id, `${path}.organization_id`),
+		email: expectOptionalString(inv.email, `${path}.email`),
+		user_id: expectOptionalString(inv.user_id, `${path}.user_id`),
+		token: expectString(inv.token, `${path}.token`),
+		role: role as IOrgRole,
+		status: status as IInvitationStatus,
+		expires_at: expectString(inv.expires_at, `${path}.expires_at`),
+		invited_by: expectOptionalString(inv.invited_by, `${path}.invited_by`),
+		created_at: expectString(inv.created_at, `${path}.created_at`),
+	};
+}
+
+function parseRepoCredential(value: unknown, path: string): IRepoCredential {
+	const cred = expectRecord(value, path);
+
+	return {
+		id: expectString(cred.id, `${path}.id`),
+		name: expectString(cred.name, `${path}.name`),
+		provider: expectString(cred.provider, `${path}.provider`),
+		credential_type: expectString(cred.credential_type, `${path}.credential_type`),
+		organization_id: expectOptionalString(cred.organization_id, `${path}.organization_id`),
+		created_by: expectString(cred.created_by, `${path}.created_by`),
+		created_at: expectString(cred.created_at, `${path}.created_at`),
+	};
+}
+
+function parseTemplateAccess(value: unknown, path: string): ITemplateAccess {
+	const access = expectRecord(value, path);
+
+	return {
+		id: expectString(access.id, `${path}.id`),
+		template_id: expectString(access.template_id, `${path}.template_id`),
+		grantee_type: expectString(access.grantee_type, `${path}.grantee_type`),
+		grantee_id: expectString(access.grantee_id, `${path}.grantee_id`),
+		granted_by: expectString(access.granted_by, `${path}.granted_by`),
+		created_at: expectString(access.created_at, `${path}.created_at`),
+	};
+}
+
+function parseAddonAccess(value: unknown, path: string): IAddonAccess {
+	const access = expectRecord(value, path);
+
+	return {
+		id: expectString(access.id, `${path}.id`),
+		addon_id: expectString(access.addon_id, `${path}.addon_id`),
+		grantee_type: expectString(access.grantee_type, `${path}.grantee_type`),
+		grantee_id: expectString(access.grantee_id, `${path}.grantee_id`),
+		granted_by: expectString(access.granted_by, `${path}.granted_by`),
+		created_at: expectString(access.created_at, `${path}.created_at`),
+	};
+}
+
+export function parseOrganizationsResponse(value: unknown): IOrganization[] {
+	if (!Array.isArray(value)) {
+		throw new Error("Invalid API response: organizations payload must be an array.");
+	}
+
+	return value.map((org, index) => parseOrganization(org, `organizations[${index}]`));
+}
+
+export function parseOrganizationResponse(value: unknown): IOrganization {
+	return parseOrganization(value, "organization");
+}
+
+export function parseOrgMembersResponse(value: unknown): IOrganizationMember[] {
+	if (!Array.isArray(value)) {
+		throw new Error("Invalid API response: org members payload must be an array.");
+	}
+
+	return value.map((member, index) => parseOrgMember(member, `members[${index}]`));
+}
+
+export function parseOrgInvitationsResponse(value: unknown): IOrganizationInvitation[] {
+	if (!Array.isArray(value)) {
+		throw new Error("Invalid API response: org invitations payload must be an array.");
+	}
+
+	return value.map((inv, index) => parseOrgInvitation(inv, `invitations[${index}]`));
+}
+
+export function parseInvitationResponse(value: unknown): IOrganizationInvitation {
+	return parseOrgInvitation(value, "invitation");
+}
+
+export function parseRepoCredentialsResponse(value: unknown): IRepoCredential[] {
+	if (!Array.isArray(value)) {
+		throw new Error("Invalid API response: repo credentials payload must be an array.");
+	}
+
+	return value.map((cred, index) => parseRepoCredential(cred, `credentials[${index}]`));
+}
+
+export function parseTemplateAccessListResponse(value: unknown): ITemplateAccess[] {
+	if (!Array.isArray(value)) {
+		throw new Error("Invalid API response: template access payload must be an array.");
+	}
+
+	return value.map((access, index) => parseTemplateAccess(access, `templateAccess[${index}]`));
+}
+
+export function parseAddonAccessListResponse(value: unknown): IAddonAccess[] {
+	if (!Array.isArray(value)) {
+		throw new Error("Invalid API response: addon access payload must be an array.");
+	}
+
+	return value.map((access, index) => parseAddonAccess(access, `addonAccess[${index}]`));
+}
+
+function parseNotification(value: unknown, path: string): INotification {
+	const n = expectRecord(value, path);
+	return {
+		id: expectString(n.id, `${path}.id`),
+		type: expectString(n.type, `${path}.type`),
+		payload: expectRecord(n.payload, `${path}.payload`) as INotification["payload"],
+		read_at: n.read_at === null ? null : expectString(n.read_at, `${path}.read_at`),
+		created_at: expectString(n.created_at, `${path}.created_at`),
+	};
+}
+
+export function parseNotificationsResponse(value: unknown): INotificationsResponse {
+	const resp = expectRecord(value, "notifications");
+	const items = Array.isArray(resp.items)
+		? resp.items.map((item, i) => parseNotification(item, `notifications.items[${i}]`))
+		: [];
+	return {
+		items,
+		unread_count: expectNumber(resp.unread_count, "notifications.unread_count"),
 	};
 }
 

@@ -1,3 +1,23 @@
+/**
+ * Next.js route handler: GET /api/template-readme
+ *
+ * Fetches the README file from a GitHub repository or sub-directory.
+ * This runs on the server so that we can talk to the GitHub API without
+ * CORS restrictions and without exposing a GitHub token to the browser.
+ *
+ * Query params:
+ *   - `url` — a GitHub tree URL pointing to the template directory
+ *             (e.g. `https://github.com/owner/repo/tree/main/my-template`)
+ *
+ * Response:
+ *   - 200 `{ content: string, fileName: string, path: string }` on success.
+ *   - 200 `{ content: null }` if no README exists in the directory.
+ *   - 4xx / 5xx on error with a `{ message }` body.
+ *
+ * File priority: `README.md` > `README.md.tera` > `README` > `README.tera`
+ * > any other file matching `readme*`.
+ * Caches GitHub API responses for 5 minutes (`next: { revalidate: 300 }`).
+ */
 import { NextRequest, NextResponse } from "next/server";
 import {
 	getGitHubContentsApiUrl,

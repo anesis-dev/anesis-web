@@ -14,7 +14,6 @@ const templates = [
 			metadata: {
 				displayName: "Backend Starter",
 				description: "Backend-focused starter template.",
-				tags: ["api", "server"],
 			},
 		},
 	}),
@@ -39,7 +38,7 @@ describe("TemplateFilters", () => {
 		);
 
 		fireEvent.change(
-			screen.getByPlaceholderText(/search by name, description or tag/i),
+			screen.getByPlaceholderText(/search by name or description/i),
 			{ target: { value: "demo" } },
 		);
 		expect(onChange).toHaveBeenCalledWith(
@@ -68,6 +67,8 @@ describe("TemplateFilters", () => {
 				onChange={onChange}
 			/>,
 		);
+
+		fireEvent.click(screen.getByRole("button", { name: /filters/i }));
 
 		expect(screen.getByRole("button", { name: "frontend" })).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "backend" })).toBeInTheDocument();

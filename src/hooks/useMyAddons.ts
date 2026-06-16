@@ -1,3 +1,11 @@
+/**
+ * Hook — fetches addons owned by the authenticated user (paginated).
+ *
+ * Endpoint: GET /addon/my?page=&page_size=
+ * Cache key: ["addons", "my", page, pageSize]
+ *
+ * Requires authentication; the server returns 401 otherwise.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { fetchMyAddons } from "@/services/addon";
 import {

@@ -1,3 +1,9 @@
+/**
+ * Test fixtures.
+ *
+ * Exports pre-built mock objects (`mockTemplate`, `mockAddon`, `mockUser`,
+ * `mockGitHubUser`) for use in Vitest unit and integration tests.
+ */
 import { IAddon } from "@/types/addon";
 import { IGitHubUser } from "@/types/github";
 import { ITemplate } from "@/types/template";
@@ -34,10 +40,15 @@ export const mockTemplate: ITemplate = {
 		metadata: {
 			displayName: "Demo Next Template",
 			description: "Template used for UI verification.",
-			tags: ["demo", "next", "responsive"],
+			tags: ["next", "react", "typescript"],
 		},
 	},
 	name: "demo-repo",
+	download_count: 0,
+	unique_downloaders: 0,
+	use_count: 0,
+	star_count: 0,
+	is_starred: undefined,
 };
 
 export const mockUser: IUser = {
@@ -68,6 +79,10 @@ export const mockAddon: IAddon = {
 	},
 	created_at: "2026-04-05T10:00:00Z",
 	updated_at: "2026-04-06T10:00:00Z",
+	download_count: 0,
+	unique_downloaders: 0,
+	star_count: 0,
+	is_starred: undefined,
 };
 
 export const mockGitHubUser: IGitHubUser = {

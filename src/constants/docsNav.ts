@@ -1,3 +1,10 @@
+/**
+ * Documentation navigation structure.
+ *
+ * Ordered list of all docs pages used by `DocsSidebar` and `DocsPagination`.
+ * Items with `indent: true` are rendered as visually indented sub-items in the
+ * desktop sidebar.
+ */
 export interface DocsNavItem {
 	title: string;
 	href: string;

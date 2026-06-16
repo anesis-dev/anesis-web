@@ -1,3 +1,9 @@
+/**
+ * Keyboard shortcut components — shadcn/ui primitive.
+ *
+ * `Kbd` — renders a single key in a pill-shaped `<kbd>` element.
+ * `KbdGroup` — renders a sequence of keys inline with consistent spacing.
+ */
 import { cn } from "@/lib/utils"
 
 function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {

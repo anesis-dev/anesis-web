@@ -76,11 +76,7 @@ describe("AddonRegistryPage", () => {
 		expect(
 			screen.getByText((_, element) => element?.textContent === "Showing 10 addons"),
 		).toBeInTheDocument();
-		expect(screen.getAllByTestId("addon-card")).toHaveLength(9);
-
-		fireEvent.click(screen.getByRole("button", { name: "Next" }));
-		expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
-		expect(screen.getAllByTestId("addon-card")).toHaveLength(1);
+		expect(screen.getAllByTestId("addon-card")).toHaveLength(10);
 		expect(screen.getByText("Special Addon")).toBeInTheDocument();
 
 		fireEvent.change(

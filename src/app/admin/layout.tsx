@@ -1,3 +1,10 @@
+/**
+ * Admin section layout — Server Component.
+ *
+ * Wraps all `/admin/*` pages with `AdminGuard` (which redirects non-admin
+ * users) and the `AdminSidebar`. The main content area fills the remaining
+ * horizontal space on large screens.
+ */
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 

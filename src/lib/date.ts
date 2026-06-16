@@ -1,3 +1,13 @@
+/**
+ * Date utility helpers.
+ *
+ * `getDateTimestamp` converts an ISO date string to a Unix millisecond
+ * timestamp, returning `0` for null/undefined/invalid values. Used when
+ * comparing dates for sorting without throwing on bad data.
+ *
+ * `formatDate` renders a date string as a human-readable short date
+ * (e.g. "Jan 3, 2025"). Returns `fallback` (default "—") for invalid dates.
+ */
 export function getDateTimestamp(value: string | null | undefined): number {
 	if (!value) {
 		return 0;

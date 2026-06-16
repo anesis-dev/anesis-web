@@ -39,6 +39,25 @@ describe("github services", () => {
 		);
 	});
 
+	it("falls back to the public github api when the backend proxy requires auth", async () => {
+		vi.mocked(api.get).mockRejectedValueOnce(
+			new ApiError(401, "Unauthorized"),
+		);
+		vi.spyOn(global, "fetch").mockResolvedValueOnce(
+			new Response(JSON.stringify(mockGitHubUser), { status: 200 }),
+		);
+
+		await expect(fetchGitHubUser("octocat")).resolves.toEqual(mockGitHubUser);
+		expect(global.fetch).toHaveBeenCalledWith(
+			"https://api.github.com/users/octocat",
+			{
+				headers: {
+					Accept: "application/vnd.github+json",
+				},
+			},
+		);
+	});
+
 	it("fetches template readme through the internal api route", async () => {
 		vi.spyOn(global, "fetch").mockResolvedValueOnce(
 			new Response(

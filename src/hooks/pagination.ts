@@ -1,3 +1,17 @@
+/**
+ * Shared pagination utilities for TanStack Query hooks.
+ *
+ * `PaginatedQueryOptions` is the standard options bag accepted by paginated
+ * hooks — it extends the raw pagination params with an `enabled` flag that
+ * can be used to defer the query.
+ *
+ * `normalizePaginatedQueryOptions` clamps `page` and `pageSize` to valid
+ * ranges so that callers don't need to guard against bad values. It also
+ * accepts a plain `boolean` as a shorthand for `{ enabled }`.
+ *
+ * `getEmptyPagination` provides a safe default value so hooks can use it
+ * as the query fallback and avoid null-checks on every call site.
+ */
 import { IPaginatedResponse, IPaginationParams } from "@/types/pagination";
 
 export type PaginatedQueryOptions = IPaginationParams & {

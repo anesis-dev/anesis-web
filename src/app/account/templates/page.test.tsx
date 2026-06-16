@@ -46,7 +46,6 @@ const myTemplates = Array.from({ length: 7 }, (_, index) =>
 				displayName:
 					index === 6 ? "Special Personal Template" : `My Template ${index + 1}`,
 				description: `Owned template ${index + 1}`,
-				tags: [`mine-${index + 1}`],
 			},
 		},
 	}),

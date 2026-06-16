@@ -1,3 +1,17 @@
+/**
+ * Site-wide sticky header — Server Component.
+ *
+ * Renders:
+ * - Logo (links to home)
+ * - Desktop navigation links (Nav)
+ * - Search button / command palette trigger (Search)
+ * - Auth button / avatar dropdown (AuthButton)
+ * - Mobile-only hamburger menu (MobileHeaderMenu) that replaces Nav + AuthButton
+ *   on small screens.
+ *
+ * Layout breakpoint: below `xl` the desktop nav is hidden and the mobile
+ * menu icon is shown instead.
+ */
 import Logo from "./Logo";
 import { MobileHeaderMenu } from "./MobileHeaderMenu";
 import Nav from "./Nav";
@@ -6,8 +20,8 @@ import AuthButton from "./AuthButton";
 
 export default function Header() {
 	return (
-		<header className="w-full border-b bg-background">
-			<div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-4 sm:px-5">
+		<header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/78 backdrop-blur-2xl">
+			<div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-3 sm:px-5">
 				<div className="flex items-center justify-between gap-3">
 					<div className="flex min-w-0 items-center gap-4 xl:flex-1">
 						<Logo />

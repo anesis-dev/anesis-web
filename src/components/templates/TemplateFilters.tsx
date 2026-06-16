@@ -1,11 +1,31 @@
+/**
+ * Template filter panel — Client Component.
+ *
+ * Props:
+ * - `templates` — the full list of templates used to derive available filter
+ *   options (languages, technologies, specializations).
+ * - `filters` — the current `TemplateFiltersState` (controlled by the parent).
+ * - `onChange` — called with the updated filters on every change.
+ *
+ * UI:
+ * - Always-visible: text search input, "Official only" toggle, "Filters"
+ *   expand button, and a "Clear" button when any filter is active.
+ * - Collapsible section: specialization, technologies, and language pills.
+ *   Each pill is a toggle; multiple selections in the same category require
+ *   a template to match ALL selected values (AND logic).
+ *
+ * Filter options are derived from the provided template list via `useMemo`
+ * so they update reactively when the parent query refreshes.
+ */
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ShieldCheckIcon, SearchIcon, XIcon } from "lucide-react";
+import { ShieldCheckIcon, SearchIcon, XIcon, ChevronDownIcon } from "lucide-react";
 import { ITemplate } from "@/types/template";
 import { cn } from "@/lib/utils";
+import { getLanguageColor } from "@/lib/language-colors";
 
 export interface TemplateFiltersState {
 	search: string;
@@ -38,22 +58,30 @@ function FilterPill({
 	label,
 	active,
 	onClick,
+	dotColor,
 }: {
 	label: string;
 	active: boolean;
 	onClick: () => void;
+	dotColor?: string;
 }) {
 	return (
 		<button
 			type="button"
 			onClick={onClick}
 			className={cn(
-				"inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors cursor-pointer",
+				"inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors cursor-pointer",
 				active
 					? "border-foreground bg-foreground text-background"
 					: "border-border bg-transparent text-muted-foreground hover:border-foreground/40 hover:text-foreground",
 			)}
 		>
+			{dotColor && (
+				<span
+					className="size-2 shrink-0 rounded-full"
+					style={{ backgroundColor: dotColor }}
+				/>
+			)}
 			{label}
 		</button>
 	);
@@ -99,6 +127,7 @@ export function TemplateFilters({
 	filters,
 	onChange,
 }: TemplateFiltersProps) {
+	const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 	const specializations = useMemo(() => deriveSpecializations(templates), [templates]);
 	const allLanguages = useMemo(() => deriveUnique(templates, "languages"), [templates]);
 	const allTechnologies = useMemo(() => deriveUnique(templates, "technologies"), [templates]);
@@ -130,12 +159,11 @@ export function TemplateFilters({
 
 	return (
 		<div className="flex flex-col gap-4 rounded-xl border bg-card px-4 py-4 sm:px-5">
-			{/* Search row */}
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-center">
 				<div className="relative flex-1">
 					<SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
 					<Input
-						placeholder="Search by name, description or tag…"
+						placeholder="Search by name or description…"
 						value={filters.search}
 						onChange={(e) => set("search", e.target.value)}
 						className="pl-8"
@@ -154,6 +182,17 @@ export function TemplateFilters({
 						Official only
 					</Button>
 
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+						className="w-full gap-1.5 sm:w-auto"
+					>
+						<ChevronDownIcon className={cn("size-3.5 transition-transform", showAdvancedFilters && "rotate-180")} />
+						Filters
+					</Button>
+
 					{dirty && (
 						<Button
 							type="button"
@@ -169,46 +208,48 @@ export function TemplateFilters({
 				</div>
 			</div>
 
-			{/* Specialization */}
-			{specializations.length > 0 && (
-				<FilterSection label="Specialization">
-					{specializations.map((s) => (
-						<FilterPill
-							key={s}
-							label={s}
-							active={filters.specialization === s}
-							onClick={() => toggleSpecialization(s)}
-						/>
-					))}
-				</FilterSection>
-			)}
+			{showAdvancedFilters && (
+				<div className="flex flex-col gap-4 border-t pt-4">
+					{specializations.length > 0 && (
+						<FilterSection label="Specialization">
+							{specializations.map((s) => (
+								<FilterPill
+									key={s}
+									label={s}
+									active={filters.specialization === s}
+									onClick={() => toggleSpecialization(s)}
+								/>
+							))}
+						</FilterSection>
+					)}
 
-			{/* Technologies */}
-			{allTechnologies.length > 0 && (
-				<FilterSection label="Technologies">
-					{allTechnologies.map((tech) => (
-						<FilterPill
-							key={tech}
-							label={tech}
-							active={filters.technologies.includes(tech)}
-							onClick={() => toggleList("technologies", tech)}
-						/>
-					))}
-				</FilterSection>
-			)}
+					{allTechnologies.length > 0 && (
+						<FilterSection label="Technologies">
+							{allTechnologies.map((tech) => (
+								<FilterPill
+									key={tech}
+									label={tech}
+									active={filters.technologies.includes(tech)}
+									onClick={() => toggleList("technologies", tech)}
+								/>
+							))}
+						</FilterSection>
+					)}
 
-			{/* Languages */}
-			{allLanguages.length > 0 && (
-				<FilterSection label="Languages">
-					{allLanguages.map((lang) => (
-						<FilterPill
-							key={lang}
-							label={lang}
-							active={filters.languages.includes(lang)}
-							onClick={() => toggleList("languages", lang)}
-						/>
-					))}
-				</FilterSection>
+					{allLanguages.length > 0 && (
+						<FilterSection label="Languages">
+							{allLanguages.map((lang) => (
+								<FilterPill
+									key={lang}
+									label={lang}
+									active={filters.languages.includes(lang)}
+									onClick={() => toggleList("languages", lang)}
+									dotColor={getLanguageColor(lang)}
+								/>
+							))}
+						</FilterSection>
+					)}
+				</div>
 			)}
 		</div>
 	);

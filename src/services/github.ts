@@ -1,3 +1,15 @@
+/**
+ * GitHub service — functions that interact with GitHub data.
+ *
+ * `fetchGitHubUser` proxies the request through the backend
+ * (`GET /github/proxy`) when the user is authenticated, which benefits from
+ * a server-side GitHub token for higher rate limits. On 401/403 it falls
+ * back to calling the GitHub API directly from the browser.
+ *
+ * `fetchTemplateReadme` calls the Next.js proxy route `/api/template-readme`
+ * (which runs on the server) to avoid CORS restrictions when fetching from
+ * the GitHub Contents API.
+ */
 import { api, ApiError } from "@/api/client";
 import { parseGitHubUserResponse } from "@/lib/api-contracts";
 import { IGitHubUser } from "@/types/github";
@@ -6,6 +18,24 @@ export interface TemplateReadmePayload {
 	content: string | null;
 	fileName?: string;
 	path?: string;
+}
+
+async function fetchPublicGitHubUser(login: string): Promise<IGitHubUser> {
+	const response = await fetch(`https://api.github.com/users/${login}`, {
+		headers: {
+			Accept: "application/vnd.github+json",
+		},
+	});
+
+	if (response.status === 404) {
+		throw new Error(`GitHub user not found: ${login}`);
+	}
+
+	if (!response.ok) {
+		throw new Error("Unable to reach GitHub right now. Please try again later.");
+	}
+
+	return parseGitHubUserResponse(await response.json());
 }
 
 export async function fetchGitHubUser(login: string): Promise<IGitHubUser> {
@@ -17,6 +47,13 @@ export async function fetchGitHubUser(login: string): Promise<IGitHubUser> {
 	} catch (error) {
 		if (error instanceof ApiError && error.status === 404) {
 			throw new Error(`GitHub user not found: ${login}`);
+		}
+
+		if (
+			error instanceof ApiError &&
+			(error.status === 401 || error.status === 403)
+		) {
+			return fetchPublicGitHubUser(login);
 		}
 
 		if (error instanceof Error) {

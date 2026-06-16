@@ -1,6 +1,16 @@
 vi.mock("@/api/client", () => ({
+	ApiError: class ApiError extends Error {
+		constructor(
+			public readonly status: number,
+			message: string,
+		) {
+			super(message);
+			this.name = "ApiError";
+		}
+	},
 	api: {
 		get: vi.fn(),
+		post: vi.fn(),
 		patch: vi.fn(),
 		delete: vi.fn(),
 	},
@@ -11,12 +21,13 @@ vi.mock("@/lib/api-contracts", () => ({
 	parseUsersResponse: vi.fn(),
 }));
 
-import { api } from "@/api/client";
+import { ApiError, api } from "@/api/client";
 import { parseMeResponse, parseUsersResponse } from "@/lib/api-contracts";
 import {
 	deleteUser,
 	fetchAllUsers,
 	fetchMe,
+	fetchUserByLogin,
 	updateUserRole,
 } from "@/services/user";
 
@@ -37,6 +48,26 @@ describe("user services", () => {
 		await expect(fetchAllUsers()).resolves.toEqual([{ id: "u1" }]);
 		expect(api.get).toHaveBeenCalledWith("/user/all");
 		expect(parseUsersResponse).toHaveBeenCalledWith({ data: [] });
+	});
+
+	it("fetches a public user by login", async () => {
+		vi.mocked(api.get).mockResolvedValueOnce({ data: { id: "u1" } });
+		vi.mocked(parseMeResponse).mockReturnValueOnce({ id: "u1" } as never);
+
+		await expect(fetchUserByLogin("Octo Cat")).resolves.toEqual({ id: "u1" });
+		expect(api.get).toHaveBeenCalledWith("/user/by-login/Octo%20Cat");
+		expect(parseMeResponse).toHaveBeenCalledWith({ data: { id: "u1" } });
+	});
+
+	it("falls back to post when the backend registered user lookup with a non-get method", async () => {
+		vi.mocked(api.get).mockRejectedValueOnce(new ApiError(405, "Method Not Allowed"));
+		vi.mocked(api.post).mockResolvedValueOnce({ data: { id: "u1" } });
+		vi.mocked(parseMeResponse).mockReturnValueOnce({ id: "u1" } as never);
+
+		await expect(fetchUserByLogin("octocat")).resolves.toEqual({ id: "u1" });
+		expect(api.get).toHaveBeenCalledWith("/user/by-login/octocat");
+		expect(api.post).toHaveBeenCalledWith("/user/by-login/octocat");
+		expect(parseMeResponse).toHaveBeenCalledWith({ data: { id: "u1" } });
 	});
 
 	it("deletes a user for admin pages", async () => {

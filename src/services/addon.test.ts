@@ -23,6 +23,7 @@ import {
   deleteAddon,
   fetchAddon,
   fetchAddonUrl,
+  fetchAllAddons,
   fetchAddons,
   fetchMyAddons,
   publishAddon,
@@ -50,6 +51,34 @@ describe("addon services", () => {
     });
     expect(api.get).toHaveBeenCalledWith("/addon/all?page=2&page_size=9");
     expect(parseAddonsPageResponse).toHaveBeenCalledWith({ data: [] });
+  });
+
+  it("fetches every public addon page for profile filtering", async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({ data: ["page-1"] })
+      .mockResolvedValueOnce({ data: ["page-2"] });
+    vi.mocked(parseAddonsPageResponse)
+      .mockReturnValueOnce({
+        data: [{ id: "addon-1" }],
+        total: 2,
+        page: 1,
+        pageSize: 100,
+        totalPages: 2,
+      } as never)
+      .mockReturnValueOnce({
+        data: [{ id: "addon-2" }],
+        total: 2,
+        page: 2,
+        pageSize: 100,
+        totalPages: 2,
+      } as never);
+
+    await expect(fetchAllAddons()).resolves.toEqual([
+      { id: "addon-1" },
+      { id: "addon-2" },
+    ]);
+    expect(api.get).toHaveBeenNthCalledWith(1, "/addon/all?page=1&page_size=100");
+    expect(api.get).toHaveBeenNthCalledWith(2, "/addon/all?page=2&page_size=100");
   });
 
   it("fetches the authenticated user's addons", async () => {
@@ -125,6 +154,8 @@ describe("addon services", () => {
     });
     expect(api.post).toHaveBeenCalledWith("/addon/publish", {
       url: "https://github.com/anesis-addons/drizzle/tree/main",
+      organization_id: null,
+      visibility: "public",
     });
   });
 
@@ -143,6 +174,7 @@ describe("addon services", () => {
     ).resolves.toBeUndefined();
     expect(api.patch).toHaveBeenCalledWith("/addon", {
       url: "https://github.com/anesis-addons/nest-drizzle/tree/main",
+      organization_id: null,
     });
   });
 

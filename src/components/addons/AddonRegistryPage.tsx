@@ -1,3 +1,15 @@
+/**
+ * Addon registry listing page — Client Component.
+ *
+ * Full-page component for `/addons/registry`. Uses `useAddons` to load addons
+ * (server-paginated). When a search query is active, fetches up to 100 addons
+ * at once and filters client-side; otherwise uses server pagination at
+ * `PAGE_SIZE` (24) per page.
+ *
+ * Features: text search (across id, name, description, author), "Official
+ * only" filter toggle, paginated grid, and a "Publish addon" button for
+ * authenticated users.
+ */
 "use client";
 
 import Link from "next/link";
@@ -14,10 +26,11 @@ import {
 	AlertCircleIcon,
 	BookOpenIcon,
 	BoxesIcon,
-	UsersIcon,
+	SearchIcon,
+	ShieldCheckIcon,
 } from "lucide-react";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 24;
 
 function AddonSkeleton() {
 	return (
@@ -44,6 +57,7 @@ export function AddonRegistryPage() {
 	const { user, login } = useAuth();
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
+	const [officialOnly, setOfficialOnly] = useState(false);
 	const searchActive = search.trim().length > 0;
 	const { addons, isLoading, isError, pagination } = useAddons({
 		page: searchActive ? 1 : page,
@@ -62,11 +76,17 @@ export function AddonRegistryPage() {
 			);
 		});
 
-		if (!query) {
-			return sorted;
+		let result = sorted;
+
+		if (officialOnly) {
+			result = result.filter((addon) => addon.official);
 		}
 
-		return sorted.filter((addon) =>
+		if (!query) {
+			return result;
+		}
+
+		return result.filter((addon) =>
 			[
 				addon.addon_id,
 				addon.name,
@@ -77,7 +97,7 @@ export function AddonRegistryPage() {
 				.toLowerCase()
 				.includes(query),
 		);
-	}, [addons, search]);
+	}, [addons, search, officialOnly]);
 
 	const totalCount = pagination?.total ?? addons.length;
 	const localPagination = searchActive || !pagination;
@@ -93,14 +113,12 @@ export function AddonRegistryPage() {
 		: filtered;
 
 	return (
-		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-5 lg:px-8">
-			<div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-				<div className="max-w-3xl space-y-2">
-					<h1 className="text-4xl font-semibold tracking-tight">Addon Registry</h1>
-					<p className="text-sm leading-6 text-muted-foreground sm:text-base">
-						Browse registry entries synced through <code>anesis-server</code>. The
-						CLI and backend now cover publish, update, archive lookup, and delete
-						flows; this screen stays focused on discovery and publishing.
+		<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8 sm:px-5 lg:px-8">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+				<div className="flex flex-col gap-1">
+					<h1 className="text-2xl font-bold tracking-tight">Addons</h1>
+					<p className="text-sm text-muted-foreground">
+						Browse and install workflow addons published by the community.
 					</p>
 				</div>
 
@@ -122,21 +140,27 @@ export function AddonRegistryPage() {
 				</div>
 			</div>
 
-			<div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-				<Input
-					value={search}
-					onChange={(event) => {
-						setSearch(event.target.value);
-						setPage(1);
-					}}
-					placeholder="Search by addon id, name, description or author"
-					className="w-full sm:max-w-md"
-				/>
-				<Button variant="outline" asChild>
-					<Link href="/account/addons">
-						<UsersIcon className="size-4" />
-						My addons
-					</Link>
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<div className="relative flex-1 sm:max-w-md">
+					<SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+					<Input
+						value={search}
+						onChange={(event) => {
+							setSearch(event.target.value);
+							setPage(1);
+						}}
+						placeholder="Search by addon id, name, description or author"
+						className="pl-10"
+					/>
+				</div>
+				<Button
+					type="button"
+					variant={officialOnly ? "default" : "outline"}
+					onClick={() => setOfficialOnly(!officialOnly)}
+					className="w-full gap-1.5 sm:w-auto"
+				>
+					<ShieldCheckIcon className="size-4" />
+					Official only
 				</Button>
 			</div>
 
@@ -163,8 +187,8 @@ export function AddonRegistryPage() {
 			)}
 
 			{isLoading && (
-				<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-					{Array.from({ length: 6 }).map((_, index) => (
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+					{Array.from({ length: 12 }).map((_, index) => (
 						<AddonSkeleton key={index} />
 					))}
 				</div>
@@ -198,7 +222,7 @@ export function AddonRegistryPage() {
 
 			{!isLoading && !isError && filtered.length > 0 && (
 				<>
-					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 						{visibleAddons.map((addon) => (
 							<AddonCard key={addon.id} addon={addon} />
 						))}

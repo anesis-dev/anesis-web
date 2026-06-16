@@ -1,4 +1,29 @@
+/**
+ * Template card — Client Component.
+ *
+ * Renders a compact card for a template in grid listings.
+ *
+ * Props:
+ * - `template` — the full `ITemplate` object from the API.
+ * - `versionCount` — number of published versions; shown alongside the version
+ *   badge when > 1.
+ * - `linkToLatest` — when `true`, the card links to the latest-version page
+ *   (`/templates/:name/latest`) instead of the exact version URL.
+ * - `visibility` — override the template's own visibility field (e.g. from a
+ *   parent component that already knows the effective visibility).
+ *
+ * The entire card is clickable via an absolutely-positioned `<Link>` overlay.
+ * Interactive elements inside the card (star button, author link) use
+ * `relative z-10` to sit above the overlay and receive their own clicks.
+ *
+ * Star state is managed locally with `useState` and synced from props via
+ * `useEffect` so that external query invalidations are reflected.
+ */
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { getTemplateHref, getTemplateLatestHref } from "@/lib/template-ref";
 import { ITemplate } from "@/types/template";
 import {
@@ -9,25 +34,21 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
-import {
-  ShieldCheckIcon,
-  TagIcon,
-  CodeIcon,
-  GlobeIcon,
-  ExternalLinkIcon,
-  PackageIcon,
-} from "lucide-react";
+import { LockIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { StarButton } from "@/components/StarButton";
+import { starTemplate } from "@/services/template";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TemplateCardProps {
   template: ITemplate;
   versionCount?: number;
   linkToLatest?: boolean;
+  visibility?: string;
 }
 
-function Badge({
+function Tag({
   children,
   className,
 }: {
@@ -37,7 +58,7 @@ function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium bg-muted text-muted-foreground",
         className,
       )}
     >
@@ -50,6 +71,7 @@ export function TemplateCard({
   template,
   versionCount = 1,
   linkToLatest = false,
+  visibility,
 }: TemplateCardProps) {
   const { config } = template;
   const { metadata, author, technologies, languages } = config;
@@ -57,122 +79,101 @@ export function TemplateCard({
     ? getTemplateLatestHref(template.name)
     : getTemplateHref(template);
 
+  const tags = [...technologies, ...languages];
+
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [isStarred, setIsStarred] = useState(template.is_starred ?? false);
+  const [starCount, setStarCount] = useState(template.star_count ?? 0);
+  const [starring, setStarring] = useState(false);
+
+  useEffect(() => {
+    setIsStarred(template.is_starred ?? false);
+    setStarCount(template.star_count ?? 0);
+  }, [template.is_starred, template.star_count]);
+
+  async function handleStar() {
+    if (starring) return;
+    setStarring(true);
+    try {
+      const result = await starTemplate(template.name);
+      setIsStarred(result.is_starred);
+      setStarCount(result.star_count);
+      await queryClient.invalidateQueries({ queryKey: ["templates"] });
+    } finally {
+      setStarring(false);
+    }
+  }
+
   return (
-    <Card className="gap-4 py-5 h-full transition-colors hover:border-foreground/30">
-      <CardHeader className="gap-1.5 pb-0">
-        <div className="flex flex-col items-start gap-2 sm:flex-row sm:justify-between">
-          <CardTitle className="text-base leading-snug">
-            <Link
-              href={detailsHref}
-              className="transition-colors hover:text-primary"
-            >
-              {metadata.displayName}
-            </Link>
+    <Card className="relative gap-3 py-4 h-full transition-colors hover:border-foreground/30">
+      <Link href={detailsHref} className="absolute inset-0 rounded-[inherit]" aria-label={metadata.displayName} />
+
+      <CardHeader className="gap-1 pb-0">
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="text-sm font-semibold leading-snug">
+            {metadata.displayName}
           </CardTitle>
-          {template.official && (
-            <span className="flex items-center gap-1 shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
-              <ShieldCheckIcon className="size-3" />
-              Official
-            </span>
-          )}
+          <div className="flex items-center gap-1 shrink-0">
+            {template.official && (
+              <span className="flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                <ShieldCheckIcon className="size-2.5" />
+                Official
+              </span>
+            )}
+            {(visibility ?? template.visibility) === "private" && (
+              <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                <LockIcon className="size-2.5" />
+                Private
+              </span>
+            )}
+            {(visibility ?? template.visibility) === "org_private" && (
+              <span className="flex items-center gap-1 rounded-full bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400">
+                <UsersIcon className="size-2.5" />
+                Members only
+              </span>
+            )}
+          </div>
         </div>
         <CardDescription className="line-clamp-2 text-xs leading-relaxed">
           {metadata.description}
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-3">
-        {/* Technologies */}
-        {technologies.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <CodeIcon className="size-3.5 shrink-0 text-muted-foreground" />
-            {technologies.map((tech) => (
-              <Badge
-                key={tech}
-                className="border-orange-500/20 bg-orange-500/6 text-orange-700/85 dark:text-orange-300/90"
-              >
-                {tech}
-              </Badge>
+      {tags.length > 0 && (
+        <CardContent>
+          <div className="flex flex-wrap gap-1">
+            {tags.map((tag) => (
+              <Tag key={tag}>{tag}</Tag>
             ))}
           </div>
-        )}
+        </CardContent>
+      )}
 
-        {/* Languages */}
-        {languages.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <GlobeIcon className="size-3.5 shrink-0 text-muted-foreground" />
-            {languages.map((lang) => (
-              <Badge
-                key={lang}
-                className="border-amber-500/20 bg-amber-500/6 text-amber-700/85 dark:text-amber-300/90"
-              >
-                {lang}
-              </Badge>
-            ))}
-          </div>
-        )}
+      <CardFooter className="mt-auto flex items-center justify-between gap-3 border-t pt-3">
+        <Link
+          href={`/user/${author.github}`}
+          className="relative z-10 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <GitHubIcon className="size-3 shrink-0" />
+          <span className="truncate">@{author.github}</span>
+        </Link>
 
-        {/* Tags */}
-        {metadata.tags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <TagIcon className="size-3.5 shrink-0 text-muted-foreground" />
-            {metadata.tags.map((tag) => (
-              <Badge
-                key={tag}
-                className="border-border bg-muted/40 text-muted-foreground"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </CardContent>
-
-      <CardFooter className="mt-auto flex flex-col gap-3 border-t pt-4">
-        <div className="flex w-full items-center justify-between gap-3">
-          <Link
-            href={`/user/${author.github}`}
-            className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <GitHubIcon className="size-3.5 shrink-0" />
-            <span className="truncate">@{author.github}</span>
-          </Link>
-
-          <div className="flex shrink-0 items-center gap-1.5">
+        <div className="flex items-center gap-2 shrink-0">
+          <StarButton
+            isStarred={isStarred}
+            starCount={starCount}
+            onToggle={handleStar}
+            loading={starring}
+            disabled={!user}
+            variant="icon"
+          />
+          <span className="font-mono text-[11px] text-muted-foreground">
+            v{config.version}
             {versionCount > 1 && (
-              <span className="rounded-full border bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                {versionCount} versions
-              </span>
+              <span className="ml-1 text-muted-foreground/60">({versionCount})</span>
             )}
-            <span className="font-mono text-[11px] text-muted-foreground">
-              v{config.version}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex w-full items-center gap-2">
-          <Button asChild size="icon-xs" variant="ghost" className="shrink-0">
-            <Link
-              href={config.repository.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Open repository for ${metadata.displayName}`}
-            >
-              <ExternalLinkIcon />
-            </Link>
-          </Button>
-
-          <Button
-            asChild
-            size="sm"
-            variant="outline"
-            className="min-w-0 flex-1 justify-center gap-1.5"
-          >
-            <Link href={detailsHref}>
-              <PackageIcon className="size-3.5" />
-              Open package
-            </Link>
-          </Button>
+          </span>
         </div>
       </CardFooter>
     </Card>

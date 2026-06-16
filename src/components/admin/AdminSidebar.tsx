@@ -1,3 +1,11 @@
+/**
+ * Admin sidebar navigation — Client Component.
+ *
+ * Renders a vertical navigation rail (desktop) / horizontal scroll bar
+ * (mobile) with links to all admin sections. Uses `usePathname` to highlight
+ * the active item. Displays the current admin user's avatar and login at the
+ * bottom alongside a "Back to site" link.
+ */
 "use client";
 
 import Link from "next/link";
@@ -7,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import {
 	LayoutDashboardIcon,
+	BarChart2Icon,
 	BoxesIcon,
 	PackageIcon,
 	UsersIcon,
@@ -15,30 +24,11 @@ import {
 } from "lucide-react";
 
 const navItems = [
-	{
-		title: "Dashboard",
-		href: "/admin",
-		icon: LayoutDashboardIcon,
-		exact: true,
-	},
-	{
-		title: "Templates",
-		href: "/admin/templates",
-		icon: PackageIcon,
-		exact: false,
-	},
-	{
-		title: "Addons",
-		href: "/admin/addons",
-		icon: BoxesIcon,
-		exact: false,
-	},
-	{
-		title: "Users",
-		href: "/admin/users",
-		icon: UsersIcon,
-		exact: false,
-	},
+	{ title: "Dashboard", href: "/admin", icon: LayoutDashboardIcon, exact: true },
+	{ title: "Templates", href: "/admin/templates", icon: PackageIcon, exact: false },
+	{ title: "Addons", href: "/admin/addons", icon: BoxesIcon, exact: false },
+	{ title: "Analytics", href: "/admin/analytics", icon: BarChart2Icon, exact: false },
+	{ title: "Users", href: "/admin/users", icon: UsersIcon, exact: false },
 ];
 
 export function AdminSidebar() {
@@ -104,7 +94,7 @@ export function AdminSidebar() {
 								alt={user.login}
 								fill
 								sizes="24px"
-								className="object-cover grayscale"
+								className="object-cover"
 							/>
 						</div>
 						<span className="truncate font-mono text-xs text-muted-foreground">

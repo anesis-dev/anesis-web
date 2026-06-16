@@ -1,3 +1,11 @@
+/**
+ * Hook — fetches all registered users (admin only).
+ *
+ * Endpoint: GET /user/all
+ * Cache key: ["admin", "users"]
+ *
+ * The server enforces admin authorization; a 403 is returned for non-admins.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllUsers } from "@/services/user";
 import { IUser } from "@/types/user";

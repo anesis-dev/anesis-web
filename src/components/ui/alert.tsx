@@ -1,3 +1,10 @@
+/**
+ * Alert components — shadcn/ui primitive.
+ *
+ * Exports `Alert`, `AlertTitle`, and `AlertDescription`. Supports `default`
+ * and `destructive` variants. When an `<svg>` child is present the grid
+ * automatically gains a dedicated icon column.
+ */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 

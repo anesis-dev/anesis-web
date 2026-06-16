@@ -1,3 +1,11 @@
+/**
+ * Addon reference / URL helpers.
+ *
+ * An "addon ref" is the canonical identifier: `"<addonId>@<version>"`
+ * (e.g. `"my-linter@0.2.0"`).
+ *
+ * `getAddonHref` builds the detail URL (`/addons/<addonId>@<version>`).
+ */
 import { IAddon } from "@/types/addon";
 
 export function getAddonRef(

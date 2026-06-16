@@ -1,3 +1,23 @@
+/**
+ * Addon catalog service — Node.js / server-side only.
+ *
+ * Reads `anesis.addon.json` manifest files from the local `registry/addons/`
+ * directory on disk and returns parsed, validated `LocalAddonCatalogEntry`
+ * objects sorted by name.
+ *
+ * Exports:
+ * - `parseAddonManifest(value, location)` — validates an `unknown` object
+ *   against the addon manifest schema; throws descriptive errors on failure.
+ *   Also used by the `/api/addon-manifest` route handler to validate manifests
+ *   fetched from GitHub.
+ * - `getLocalAddonCatalog([addonsRoot])` — walks the addons directory, parses
+ *   each manifest, and pre-computes `commandNames`, `stepTypes`, and
+ *   `inputNames` index fields. Returns an empty array if the directory does
+ *   not exist.
+ *
+ * The addons root defaults to `$ANESIS_ADDONS_DIR` or `../addons` relative to
+ * `process.cwd()`.
+ */
 import { Dirent, promises as fs } from "node:fs";
 import path from "node:path";
 import {

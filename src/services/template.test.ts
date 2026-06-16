@@ -25,6 +25,7 @@ import {
 } from "@/lib/api-contracts";
 import {
 	deleteTemplate,
+	fetchAllTemplates,
 	fetchMyTemplates,
 	fetchTemplate,
 	fetchTemplateUrl,
@@ -56,6 +57,40 @@ describe("template services", () => {
 		});
 		expect(api.get).toHaveBeenCalledWith("/template/all?page=2&page_size=12");
 		expect(parseTemplatesPageResponse).toHaveBeenCalledWith({ data: [] });
+	});
+
+	it("fetches every public template page for profile filtering", async () => {
+		vi.mocked(api.get)
+			.mockResolvedValueOnce({ data: ["page-1"] })
+			.mockResolvedValueOnce({ data: ["page-2"] });
+		vi.mocked(parseTemplatesPageResponse)
+			.mockReturnValueOnce({
+				data: [{ id: "template-1" }],
+				total: 2,
+				page: 1,
+				pageSize: 100,
+				totalPages: 2,
+			} as never)
+			.mockReturnValueOnce({
+				data: [{ id: "template-2" }],
+				total: 2,
+				page: 2,
+				pageSize: 100,
+				totalPages: 2,
+			} as never);
+
+		await expect(fetchAllTemplates()).resolves.toEqual([
+			{ id: "template-1" },
+			{ id: "template-2" },
+		]);
+		expect(api.get).toHaveBeenNthCalledWith(
+			1,
+			"/template/all?page=1&page_size=100",
+		);
+		expect(api.get).toHaveBeenNthCalledWith(
+			2,
+			"/template/all?page=2&page_size=100",
+		);
 	});
 
 	it("fetches the authenticated user's templates", async () => {
@@ -191,6 +226,8 @@ describe("template services", () => {
 		});
 		expect(api.post).toHaveBeenCalledWith("/template/publish", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
+			organization_id: null,
+			visibility: "public",
 		});
 	});
 
@@ -202,6 +239,7 @@ describe("template services", () => {
 		).resolves.toBeUndefined();
 		expect(api.patch).toHaveBeenCalledWith("/template", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
+			organization_id: null,
 		});
 	});
 
@@ -215,6 +253,7 @@ describe("template services", () => {
 		).resolves.toBeUndefined();
 		expect(api.patch).toHaveBeenCalledWith("/template/official", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
+			organization_id: null,
 		});
 	});
 

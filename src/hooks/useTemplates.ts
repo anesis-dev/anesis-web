@@ -1,3 +1,12 @@
+/**
+ * Hook — fetches a paginated page of public templates.
+ *
+ * Endpoint: GET /template/all?page=&page_size=
+ * Cache key: ["templates", page, pageSize]
+ *
+ * Returns `{ templates, pagination, isLoading, isError }`.
+ * Defaults to page 1, pageSize 20 when options are omitted.
+ */
 import { useQuery } from "@tanstack/react-query";
 import { fetchTemplates } from "@/services/template";
 import {

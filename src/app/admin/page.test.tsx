@@ -2,20 +2,20 @@ import { render, screen } from "@testing-library/react";
 import AdminDashboard from "@/app/admin/page";
 import { createAddon, createTemplate, createUser } from "@/test/fixtures";
 
-vi.mock("@/hooks/useTemplates", () => ({
-	useTemplates: vi.fn(),
+vi.mock("@/hooks/useAllTemplates", () => ({
+	useAllTemplates: vi.fn(),
 }));
 
-vi.mock("@/hooks/useAddons", () => ({
-	useAddons: vi.fn(),
+vi.mock("@/hooks/useAllAddons", () => ({
+	useAllAddons: vi.fn(),
 }));
 
 vi.mock("@/hooks/useUsers", () => ({
 	useUsers: vi.fn(),
 }));
 
-import { useAddons } from "@/hooks/useAddons";
-import { useTemplates } from "@/hooks/useTemplates";
+import { useAllAddons } from "@/hooks/useAllAddons";
+import { useAllTemplates } from "@/hooks/useAllTemplates";
 import { useUsers } from "@/hooks/useUsers";
 
 describe("AdminDashboard", () => {
@@ -29,18 +29,17 @@ describe("AdminDashboard", () => {
 					metadata: {
 						displayName: `Dashboard Template ${index + 1}`,
 						description: `Description ${index + 1}`,
-						tags: [`tag-${index + 1}`],
 					},
 				},
 			}),
 		);
 
-		vi.mocked(useTemplates).mockReturnValue({
+		vi.mocked(useAllTemplates).mockReturnValue({
 			templates,
 			isLoading: false,
 			isError: false,
 		});
-		vi.mocked(useAddons).mockReturnValue({
+		vi.mocked(useAllAddons).mockReturnValue({
 			addons: [createAddon(), createAddon({ id: "addon-2", addon_id: "eslint" })],
 			isLoading: false,
 			isError: false,

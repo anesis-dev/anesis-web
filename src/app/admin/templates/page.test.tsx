@@ -63,7 +63,6 @@ describe("AdminTemplatesPage", () => {
 					metadata: {
 						displayName: `Admin Template ${index + 1}`,
 						description: `Description ${index + 1}`,
-						tags: [`tag-${index + 1}`],
 					},
 					author: {
 						github: index < 5 ? "api-dev" : "ui-dev",

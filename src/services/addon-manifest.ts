@@ -1,3 +1,10 @@
+/**
+ * Addon manifest client service.
+ *
+ * Fetches a parsed `AddonManifest` via the `/api/addon-manifest` Next.js route
+ * handler, which proxies the GitHub Contents API to avoid CORS restrictions.
+ * Returns `null` when the manifest file is not found (HTTP 404).
+ */
 import { AddonManifest } from "@/types/addon-manifest";
 
 export async function fetchAddonManifest(

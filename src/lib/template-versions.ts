@@ -1,3 +1,21 @@
+/**
+ * Template version utilities.
+ *
+ * `compareTemplateVersionsDesc` — comparator for descending semver order.
+ * Falls back to `localeCompare` for non-semver strings, and then to
+ * timestamp comparison when versions are equal.
+ *
+ * `sortTemplateVersions` — sorts a template array newest-first without
+ * mutating the original.
+ *
+ * `groupTemplatesByName` — groups flat template records into version groups,
+ * each containing the `latest` record and the full sorted `versions` array.
+ * Useful when the API returns a flat list and the UI needs to show the latest
+ * per template name.
+ *
+ * `getLatestTemplates` — convenience wrapper that returns only the latest
+ * version from each group.
+ */
 import { ITemplate } from "@/types/template";
 
 export interface TemplateVersionGroup {

@@ -1,3 +1,9 @@
+/**
+ * Label component — Client Component, shadcn/ui primitive.
+ *
+ * Wraps Radix UI `Label` with consistent typography and disabled-state opacity.
+ * Pairs with `peer` inputs: when the sibling is `disabled`, the label fades.
+ */
 "use client"
 
 import * as React from "react"

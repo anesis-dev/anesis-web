@@ -1,3 +1,18 @@
+/**
+ * Templates listing page — Client Component (`/templates`).
+ *
+ * Displays all published templates with search and filter controls.
+ *
+ * Pagination strategy:
+ * - When no filters are active, server-side pagination is used (fetching one
+ *   page at a time from the API).
+ * - When any filter is active, the full template list (up to 100 per page) is
+ *   fetched so that client-side filtering and pagination can work over the
+ *   entire dataset without additional round-trips.
+ *
+ * Authenticated users see a "Publish Template" button that opens the
+ * `PublishTemplateDialog`.
+ */
 "use client";
 
 import { useState, useMemo } from "react";
@@ -21,7 +36,7 @@ const DEFAULT_FILTERS: TemplateFiltersState = {
 	technologies: [],
 };
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 24;
 
 function applyFilters(
 	templates: ITemplate[],
@@ -59,7 +74,6 @@ function applyFilters(
 				t.name,
 				metadata.displayName,
 				metadata.description,
-				...metadata.tags,
 				config.name,
 				config.specialization,
 				...config.technologies,
@@ -188,7 +202,7 @@ export default function Templates() {
 			{/* Loading skeletons */}
 			{isLoading && (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{Array.from({ length: 8 }).map((_, i) => (
+					{Array.from({ length: 12 }).map((_, i) => (
 						<SkeletonCard key={i} />
 					))}
 				</div>

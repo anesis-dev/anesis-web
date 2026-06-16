@@ -86,7 +86,6 @@ describe("api-contracts", () => {
 				displayName: "Next",
 				description:
 					"A modern fullstack Next.js template, ready for scalable web applications.",
-				tags: ["next", "nextjs", "react", "typescript", "fullstack", "ssr", "web"],
 			},
 			created_at: "2026-04-23T14:51:29.355675Z",
 		};
@@ -101,6 +100,11 @@ describe("api-contracts", () => {
 			version: "0.3.1",
 			created_at: "2026-04-23T14:51:29.355675Z",
 			updated_at: "2026-04-23T14:51:29.355675Z",
+			download_count: 0,
+			unique_downloaders: 0,
+			use_count: 0,
+			star_count: 0,
+			is_starred: undefined,
 			config: {
 				$schema: "",
 				name: "next",
@@ -124,7 +128,6 @@ describe("api-contracts", () => {
 					displayName: "Next",
 					description:
 						"A modern fullstack Next.js template, ready for scalable web applications.",
-					tags: ["next", "nextjs", "react", "typescript", "fullstack", "ssr", "web"],
 				},
 			},
 		});

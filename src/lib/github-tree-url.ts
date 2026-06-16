@@ -1,3 +1,14 @@
+/**
+ * GitHub URL parsing utilities used by the server-side route handlers.
+ *
+ * `parseGitHubTreeUrl` deconstructs a GitHub URL into its constituent parts
+ * (owner, repo, branch, path). Supports:
+ *   - Root repo URLs: `https://github.com/owner/repo`
+ *   - Tree URLs:      `https://github.com/owner/repo/tree/branch/path/to/dir`
+ *
+ * `getGitHubContentsApiUrl` converts a `GitHubRepoPath` into the GitHub
+ * Contents API URL (`https://api.github.com/repos/.../contents/...`).
+ */
 export interface GitHubRepoPath {
 	owner: string;
 	repo: string;

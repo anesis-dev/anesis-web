@@ -1,3 +1,22 @@
+/**
+ * Owned template card — Client Component.
+ *
+ * A management card shown in the account templates page and the admin
+ * templates panel. In addition to the template's metadata it exposes:
+ * - "Change visibility" dialog (public / private / org_private).
+ * - "Update template" — re-fetches metadata from GitHub and saves it.
+ * - "Update as official" — same as update but also marks the template as
+ *   official (admin-only action, shown when `isAdmin` is `true`).
+ * - "Delete template" — with a confirmation dialog.
+ *
+ * All mutations invalidate the relevant TanStack Query cache keys so that
+ * other pages (e.g. the public templates listing) are kept consistent.
+ *
+ * Props:
+ * - `template` — the template record to display / manage.
+ * - `versionCount` — number of published versions shown as a badge.
+ * - `isAdmin` — enables the "Update as official" action.
+ */
 "use client";
 
 import Link from "next/link";
@@ -6,11 +25,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
 	AlertCircleIcon,
 	ExternalLinkIcon,
+	GlobeIcon,
 	LoaderIcon,
+	LockIcon,
 	PackageIcon,
 	RefreshCcwIcon,
 	ShieldCheckIcon,
 	Trash2Icon,
+	UsersIcon,
 } from "lucide-react";
 import { formatDate } from "@/lib/date";
 import {
@@ -22,6 +44,7 @@ import {
 	updateTemplate,
 	updateTemplateAsOfficial,
 } from "@/services/template";
+import { updateTemplateVisibility } from "@/services/access-control";
 import { ITemplate } from "@/types/template";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -85,6 +108,9 @@ export function OwnedTemplateCard({
 	const [isRefreshingOfficial, setIsRefreshingOfficial] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+	const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
+	const [isChangingVisibility, setIsChangingVisibility] = useState(false);
+	const [pendingVisibility, setPendingVisibility] = useState(template.visibility ?? "public");
 	const publishedAt = formatDate(template.created_at);
 
 	async function refreshTemplateQueries() {
@@ -143,6 +169,25 @@ export function OwnedTemplateCard({
 		}
 	}
 
+	async function changeVisibility() {
+		setIsChangingVisibility(true);
+		setNotice(null);
+
+		try {
+			await updateTemplateVisibility(template.id, pendingVisibility);
+			await refreshTemplateQueries();
+			setNotice({ type: "success", message: `Visibility changed to "${pendingVisibility}".` });
+			setIsVisibilityOpen(false);
+		} catch (error) {
+			setNotice({
+				type: "error",
+				message: error instanceof Error ? error.message : "Failed to update visibility.",
+			});
+		} finally {
+			setIsChangingVisibility(false);
+		}
+	}
+
 	async function removeTemplate() {
 		setIsDeleting(true);
 		setNotice(null);
@@ -170,7 +215,7 @@ export function OwnedTemplateCard({
 
 	return (
 		<Card className="h-full gap-0 overflow-hidden py-0 shadow-sm transition-colors hover:border-foreground/30">
-			<CardHeader className="flex min-h-[13.5rem] flex-col justify-between gap-4 border-b bg-[linear-gradient(135deg,rgba(245,158,11,0.08),transparent_38%),linear-gradient(315deg,rgba(16,185,129,0.06),transparent_42%)] px-5 py-5">
+			<CardHeader className="flex min-h-[13.5rem] flex-col justify-between gap-4 border-b px-5 py-5">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 					<div className="flex min-w-0 flex-1 flex-col gap-3">
 						<div className="flex flex-wrap items-center gap-2">
@@ -184,6 +229,26 @@ export function OwnedTemplateCard({
 									Community
 								</Badge>
 							)}
+							<Badge
+								className={cn(
+									"border-border/70 bg-background/80",
+									template.visibility === "private" &&
+										"border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+									template.visibility === "org_private" &&
+										"border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+									(!template.visibility || template.visibility === "public") &&
+										"text-muted-foreground",
+								)}
+							>
+								{template.visibility === "private" ? (
+									<LockIcon className="mr-1 size-3" />
+								) : template.visibility === "org_private" ? (
+									<UsersIcon className="mr-1 size-3" />
+								) : (
+									<GlobeIcon className="mr-1 size-3" />
+								)}
+								{template.visibility ?? "public"}
+							</Badge>
 							<Badge className="border-border/70 bg-background/80 font-mono text-muted-foreground">
 								v{template.version}
 							</Badge>
@@ -271,6 +336,71 @@ export function OwnedTemplateCard({
 
 			<CardFooter className="flex flex-col items-stretch gap-2 border-t px-5 py-5">
 				<div className="flex flex-col gap-2">
+					<Dialog open={isVisibilityOpen} onOpenChange={setIsVisibilityOpen}>
+						<DialogTrigger asChild>
+							<Button
+								type="button"
+								size="sm"
+								variant="outline"
+								className="h-11 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
+								disabled={isRefreshing || isRefreshingOfficial || isDeleting}
+							>
+								{template.visibility === "private" ? (
+									<LockIcon className="size-3.5" />
+								) : template.visibility === "org_private" ? (
+									<UsersIcon className="size-3.5" />
+								) : (
+									<GlobeIcon className="size-3.5" />
+								)}
+								Change visibility
+							</Button>
+						</DialogTrigger>
+						<DialogContent className="sm:max-w-sm">
+							<DialogHeader>
+								<DialogTitle>Change visibility</DialogTitle>
+								<DialogDescription>
+									Control who can access{" "}
+									<span className="font-mono text-foreground">{template.name}</span>.
+								</DialogDescription>
+							</DialogHeader>
+							<div className="py-2">
+								<select
+									value={pendingVisibility}
+									onChange={(e) => setPendingVisibility(e.target.value)}
+									className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+								>
+									<option value="public">public — anyone can access</option>
+									<option value="private">private — only you</option>
+									<option value="org_private">org_private — granted organizations</option>
+								</select>
+							</div>
+							<DialogFooter>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setIsVisibilityOpen(false)}
+									disabled={isChangingVisibility}
+								>
+									Cancel
+								</Button>
+								<Button
+									type="button"
+									onClick={changeVisibility}
+									disabled={isChangingVisibility}
+								>
+									{isChangingVisibility ? (
+										<>
+											<LoaderIcon className="size-3.5 animate-spin" />
+											Saving...
+										</>
+									) : (
+										"Save"
+									)}
+								</Button>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
+
 					<div
 						className={cn(
 							"grid gap-2",

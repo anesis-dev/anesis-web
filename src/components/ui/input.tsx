@@ -1,3 +1,9 @@
+/**
+ * Input component — shadcn/ui primitive.
+ *
+ * Styled `<input>` element. Applies focus ring, error border (`aria-invalid`),
+ * and file-input normalization. Accepts all standard HTML input props.
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

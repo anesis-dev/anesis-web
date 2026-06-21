@@ -1,9 +1,3 @@
-/**
- * Separator component — Client Component, shadcn/ui primitive.
- *
- * Thin `<hr>`-like divider backed by Radix UI. Supports `orientation`
- * (`"horizontal"` | `"vertical"`) and defaults to decorative (no ARIA role).
- */
 "use client"
 
 import * as React from "react"

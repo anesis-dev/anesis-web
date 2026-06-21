@@ -1,9 +1,3 @@
-/**
- * Test fixtures.
- *
- * Exports pre-built mock objects (`mockTemplate`, `mockAddon`, `mockUser`,
- * `mockGitHubUser`) for use in Vitest unit and integration tests.
- */
 import { IAddon } from "@/types/addon";
 import { IGitHubUser } from "@/types/github";
 import { ITemplate } from "@/types/template";
@@ -12,6 +6,7 @@ import { IUser } from "@/types/user";
 export const mockTemplate: ITemplate = {
 	id: "11111111-1111-1111-1111-111111111111",
 	owner_id: "22222222-2222-2222-2222-222222222222",
+	organization_id: null,
 	url: "https://github.com/demo-owner/demo-repo/tree/main/template",
 	official: true,
 	commit_sha: "abcdef1234567890abcdef1234567890abcdef12",

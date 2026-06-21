@@ -1,11 +1,3 @@
-/**
- * Hook — fetches addons owned by an organization (paginated).
- *
- * Endpoint: GET /organizations/:orgId/addons?page=&limit=
- * Cache key: ["org-addons", orgId, page, limit]
- *
- * Pass `null` as `orgId` to skip the query.
- */
 import { useQuery } from "@tanstack/react-query";
 import { fetchOrgAddons } from "@/services/organization";
 import { IPaginatedResponse } from "@/types/pagination";

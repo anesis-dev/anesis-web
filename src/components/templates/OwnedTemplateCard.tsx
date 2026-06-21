@@ -1,22 +1,3 @@
-/**
- * Owned template card — Client Component.
- *
- * A management card shown in the account templates page and the admin
- * templates panel. In addition to the template's metadata it exposes:
- * - "Change visibility" dialog (public / private / org_private).
- * - "Update template" — re-fetches metadata from GitHub and saves it.
- * - "Update as official" — same as update but also marks the template as
- *   official (admin-only action, shown when `isAdmin` is `true`).
- * - "Delete template" — with a confirmation dialog.
- *
- * All mutations invalidate the relevant TanStack Query cache keys so that
- * other pages (e.g. the public templates listing) are kept consistent.
- *
- * Props:
- * - `template` — the template record to display / manage.
- * - `versionCount` — number of published versions shown as a badge.
- * - `isAdmin` — enables the "Update as official" action.
- */
 "use client";
 
 import Link from "next/link";

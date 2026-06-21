@@ -22,7 +22,6 @@ describe("DocsAddonsCreatingPage", () => {
 	it("documents all input types", () => {
 		render(<DocsAddonsCreatingPage />);
 
-		// Input types appear in the JSON code block and descriptions
 		expect(screen.getAllByText(/"type": "text"/i).length).toBeGreaterThan(0);
 		expect(screen.getAllByText(/"type": "boolean"/i).length).toBeGreaterThan(0);
 		expect(screen.getAllByText(/"type": "select"/i).length).toBeGreaterThan(0);

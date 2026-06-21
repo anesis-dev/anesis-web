@@ -1,576 +1,391 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  AlertCircleIcon,
-  ArrowLeftIcon,
-  BoxesIcon,
-  CheckIcon,
-  CopyIcon,
-  ExternalLinkIcon,
-  FileCode2Icon,
-  FolderGit2Icon,
-  GitCommitHorizontalIcon,
-  Layers3Icon,
-  PackageIcon,
-  ShieldCheckIcon,
-  TerminalSquareIcon,
-  UserIcon,
+	AlertCircleIcon,
+	ArrowLeftIcon,
+	BadgeInfoIcon,
+	BarChart3Icon,
+	BookOpenTextIcon,
+	BoxesIcon,
+	CalendarDaysIcon,
+	DownloadIcon,
+	ExternalLinkIcon,
+	GitBranchIcon,
+	GitCommitHorizontalIcon,
+	InfoIcon,
+	Layers3Icon,
+	SettingsIcon,
+	ShieldCheckIcon,
+	StarIcon,
+	UserIcon,
+	UsersIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAddon } from "@/hooks/useAddon";
 import { useAddonManifest } from "@/hooks/useAddonManifest";
+import { useAuth } from "@/hooks/useAuth";
+import { useTemplateReadme } from "@/hooks/useTemplateReadme";
 import { formatDate } from "@/lib/date";
 import { parseGitHubTreeUrl } from "@/lib/github-tree-url";
 import { getAddonRef } from "@/lib/addon-ref";
-import { AddonManifestCommand } from "@/types/addon-manifest";
+import { starAddon } from "@/services/addon";
+import { TemplateReadme } from "@/components/templates/TemplateReadme";
+import { AddonCommands } from "@/components/addons/AddonCommands";
+import { AddonSettings } from "@/components/addons/AddonSettings";
+import { RepoTabs, RepoTab } from "@/components/RepoTabs";
+import { StatCard } from "@/components/StatCard";
+import { StarButton } from "@/components/StarButton";
+import { CommandCard } from "@/components/CommandCard";
 
 function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex max-w-full items-center justify-center rounded-full border bg-background/75 px-2.5 py-1 text-center text-xs font-medium text-muted-foreground backdrop-blur-sm break-words dark:bg-background/20">
-      {children}
-    </span>
-  );
+	return (
+		<span className="inline-flex max-w-full items-center justify-center rounded-full border bg-background/75 px-2.5 py-1 text-center text-xs font-medium text-muted-foreground break-words dark:bg-background/20">
+			{children}
+		</span>
+	);
 }
 
-function MetaItem({
-  label,
-  value,
-  icon: Icon,
+function InfoCard({
+	title,
+	children,
 }: {
-  label: string;
-  value: React.ReactNode;
-  icon: React.ElementType;
+	title: string;
+	children: React.ReactNode;
 }) {
-  return (
-    <div className="min-w-0 rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
-      <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-        <Icon className="size-3.5" />
-        <span>{label}</span>
-      </div>
-      <div className="mt-3 min-w-0 break-words text-sm text-foreground">
-        {value}
-      </div>
-    </div>
-  );
-}
-
-function CommandCard({
-  label,
-  command,
-  helper,
-  copyLabel,
-}: {
-  label: string;
-  command: string;
-  helper: string;
-  copyLabel?: string;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleCopy() {
-    if (!navigator.clipboard?.writeText) {
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(command);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
-    } catch {}
-  }
-
-  return (
-    <div className="rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            {label}
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">{helper}</p>
-        </div>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          onClick={handleCopy}
-          aria-label={copied ? `Copied ${copyLabel ?? command}` : `Copy ${copyLabel ?? command}`}
-          className="w-full shrink-0 sm:w-auto"
-        >
-          {copied ? (
-            <CheckIcon className="size-3.5" />
-          ) : (
-            <CopyIcon className="size-3.5" />
-          )}
-          {copied ? "Copied" : "Copy"}
-        </Button>
-      </div>
-      <pre className="mt-4 overflow-x-auto rounded-2xl border bg-muted/35 p-4 text-sm leading-6">
-        <code>{command}</code>
-      </pre>
-    </div>
-  );
-}
-
-function getAddonExecutionCommand(addonId: string, commandName: string) {
-  return `anesis use ${addonId} ${commandName}`;
-}
-
-function getExecutionHelper(command: AddonManifestCommand) {
-  if (command.inputs.length === 0) {
-    return "Run this from the root of a project where the addon is already installed.";
-  }
-
-  return `Run this from the project root. Anesis may prompt for: ${command.inputs
-    .map((input) => input.name)
-    .join(", ")}.`;
-}
-
-function SnapshotCard({
-  label,
-  value,
-  helper,
-}: {
-  label: string;
-  value: string;
-  helper: string;
-}) {
-  return (
-    <div className="rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30">
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
-        {value}
-      </p>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">{helper}</p>
-    </div>
-  );
-}
-
-function SmallBadge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border bg-background/75 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-      {children}
-    </span>
-  );
-}
-
-function getCommandStepTypes(command: AddonManifestCommand) {
-  return Array.from(new Set(command.steps.map((step) => step.type)));
-}
-
-function formatVariantLabel(when: string | null) {
-  return when ?? "default";
+	return (
+		<section className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+			<p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+				{title}
+			</p>
+			{children}
+		</section>
+	);
 }
 
 function getSourceInfo(url: string) {
-  try {
-    const repo = parseGitHubTreeUrl(url);
+	try {
+		const repo = parseGitHubTreeUrl(url);
 
-    return {
-      repositoryUrl: `https://github.com/${repo.owner}/${repo.repo}`,
-      repositoryLabel: `${repo.owner}/${repo.repo}`,
-      branch: repo.branch ?? null,
-      path: repo.path ?? null,
-    };
-  } catch {
-    return {
-      repositoryUrl: url,
-      repositoryLabel: url,
-      branch: null,
-      path: null,
-    };
-  }
+		return {
+			repositoryUrl: `https://github.com/${repo.owner}/${repo.repo}`,
+			repositoryLabel: `${repo.owner}/${repo.repo}`,
+			branch: repo.branch ?? null,
+			path: repo.path ?? null,
+		};
+	} catch {
+		return { repositoryUrl: url, repositoryLabel: url, branch: null, path: null };
+	}
 }
 
 export default function AddonDetailsPage({
-  params,
+	params,
 }: {
-  params: Promise<{ addonRef: string }>;
+	params: Promise<{ addonRef: string }>;
 }) {
-  const { addonRef } = use(params);
-  const decodedRef = decodeURIComponent(addonRef);
-  const { addon, isLoading, isError } = useAddon(decodedRef);
-  const {
-    manifest,
-    isLoading: isManifestLoading,
-    isError: isManifestError,
-  } = useAddonManifest(addon?.url ?? "");
+	const { addonRef } = use(params);
+	const decodedRef = decodeURIComponent(addonRef);
+	const { user } = useAuth();
+	const queryClient = useQueryClient();
+	const { addon, isLoading, isError } = useAddon(decodedRef);
+	const {
+		manifest,
+		isLoading: isManifestLoading,
+		isError: isManifestError,
+	} = useAddonManifest(addon?.url ?? "");
+	const {
+		readme,
+		fileName,
+		path,
+		isLoading: isReadmeLoading,
+		isError: isReadmeError,
+	} = useTemplateReadme(addon?.url);
 
-  if (isLoading) {
-    return (
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-10 sm:px-5 lg:px-8">
-        <div className="h-4 w-40 animate-pulse rounded bg-muted" />
-        <div className="h-40 animate-pulse rounded-3xl border bg-card" />
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="h-48 animate-pulse rounded-2xl border bg-card" />
-          <div className="h-48 animate-pulse rounded-2xl border bg-card" />
-        </div>
-      </div>
-    );
-  }
+	const [activeTab, setActiveTab] = useState("readme");
+	const [isStarred, setIsStarred] = useState(false);
+	const [starCount, setStarCount] = useState(0);
+	const [starring, setStarring] = useState(false);
 
-  if (isError || !addon) {
-    return (
-      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-4 py-20 text-center sm:px-5">
-        <AlertCircleIcon className="size-10 text-muted-foreground" />
-        <div>
-          <p className="text-lg font-semibold">Addon not found</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            The addon reference{" "}
-            <span className="font-mono text-foreground">{decodedRef}</span>{" "}
-            could not be loaded.
-          </p>
-        </div>
-        <Button asChild variant="outline">
-          <Link href="/addons">
-            <ArrowLeftIcon className="size-4" />
-            Back to addon registry
-          </Link>
-        </Button>
-      </div>
-    );
-  }
+	useEffect(() => {
+		setIsStarred(addon?.is_starred ?? false);
+		setStarCount(addon?.star_count ?? 0);
+	}, [addon?.is_starred, addon?.star_count]);
 
-  const addonRefValue = getAddonRef(addon);
-  const source = getSourceInfo(addon.url);
-  const installCommand = `anesis addon install ${addon.addon_id}`;
-  const removeCommand = `anesis addon remove ${addon.addon_id}`;
+	if (isLoading) {
+		return (
+			<div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-5 lg:px-8">
+				<div className="h-4 w-40 animate-pulse rounded bg-muted" />
+				<div className="h-40 animate-pulse rounded-3xl border bg-card" />
+				<div className="h-10 w-full animate-pulse rounded bg-muted" />
+				<div className="h-72 animate-pulse rounded-3xl border bg-card" />
+			</div>
+		);
+	}
 
-  return (
-    <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-8 px-4 py-8 sm:px-5 lg:px-8 lg:py-10">
-      <div>
-        <Link
-          href="/addons"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeftIcon className="size-4" />
-          Back to addon registry
-        </Link>
-      </div>
+	if (isError || !addon) {
+		return (
+			<div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-4 py-20 text-center sm:px-5">
+				<AlertCircleIcon className="size-10 text-muted-foreground" />
+				<div>
+					<p className="text-lg font-semibold">Addon not found</p>
+					<p className="mt-1 text-sm text-muted-foreground">
+						The addon reference{" "}
+						<span className="font-mono text-foreground">{decodedRef}</span> could not be loaded.
+					</p>
+				</div>
+				<Button asChild variant="outline">
+					<Link href="/addons">
+						<ArrowLeftIcon className="size-4" />
+						Back to addon registry
+					</Link>
+				</Button>
+			</div>
+		);
+	}
 
-      <section className="relative overflow-hidden rounded-[2rem] border bg-card shadow-sm">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(248,250,252,0.8))] dark:bg-[linear-gradient(180deg,rgba(23,23,23,0.48),rgba(23,23,23,0.18))]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-        <div className="relative flex flex-col gap-8 p-6 sm:p-8 lg:p-10">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-            <div className="max-w-4xl space-y-5">
-              <div className="flex flex-wrap items-center gap-2">
-                {addon.official ? (
-                  <Pill>
-                    <ShieldCheckIcon className="mr-1 size-3.5" />
-                    Official
-                  </Pill>
-                ) : (
-                  <Pill>Community</Pill>
-                )}
-                <Pill>{addon.addon_id}</Pill>
-                <Pill>schema {addon.config.schema_version}</Pill>
-                <Pill>v{addon.version}</Pill>
-              </div>
+	const addonRefValue = getAddonRef(addon);
+	const source = getSourceInfo(addon.url);
+	const installCommand = `anesis addon install ${addon.addon_id}`;
+	const removeCommand = `anesis addon remove ${addon.addon_id}`;
+	const isAdmin = user?.role === "admin";
+	const isOwner = !!user && user.id === addon.owner_id;
+	const canManage = isOwner || isAdmin;
+	const commandCount =
+		manifest?.variants.reduce((sum, variant) => sum + variant.commands.length, 0) ?? 0;
 
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground">
-                  Addon Package
-                </p>
-                <h1 className="mt-3 break-words text-4xl font-black tracking-tight sm:text-5xl">
-                  {addon.config.name}
-                </h1>
-                <p className="mt-4 max-w-3xl break-words text-base leading-7 text-muted-foreground">
-                  {addon.config.description}
-                </p>
-              </div>
-            </div>
+	const tabs: RepoTab[] = [
+		{ id: "readme", label: "Readme", icon: BookOpenTextIcon },
+		{ id: "about", label: "About", icon: InfoIcon },
+		{ id: "statistics", label: "Statistics", icon: BarChart3Icon },
+		{
+			id: "commands",
+			label: "Commands",
+			icon: Layers3Icon,
+			count: commandCount > 0 ? commandCount : undefined,
+		},
+		...(canManage ? [{ id: "settings", label: "Settings", icon: SettingsIcon }] : []),
+	];
 
-            <div className="grid w-full gap-3 sm:max-w-sm">
-              <Button asChild className="w-full justify-center gap-2">
-                <Link
-                  href={addon.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLinkIcon className="size-4" />
-                  Open repository
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="w-full justify-center gap-2"
-              >
-                <Link href="/docs/addons">
-                  <FileCode2Icon className="size-4" />
-                  Read addon docs
-                </Link>
-              </Button>
-            </div>
-          </div>
+	async function handleStar() {
+		if (starring || !user || !addon) return;
+		setStarring(true);
+		try {
+			const result = await starAddon(addon.addon_id);
+			setIsStarred(result.is_starred);
+			setStarCount(result.star_count);
+			await queryClient.invalidateQueries({ queryKey: ["addon", decodedRef] });
+			await queryClient.invalidateQueries({ queryKey: ["addons"] });
+		} finally {
+			setStarring(false);
+		}
+	}
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <SnapshotCard
-              label="Registry Ref"
-              value={addonRefValue}
-              helper="Use this pinned reference when you need to identify the exact published package."
-            />
-            <SnapshotCard
-              label="Published"
-              value={formatDate(addon.created_at)}
-              helper="When this addon version first appeared in the Anesis registry."
-            />
-            <SnapshotCard
-              label="Last Sync"
-              value={formatDate(addon.updated_at)}
-              helper="Latest metadata refresh pulled from the linked GitHub source."
-            />
-          </div>
-        </div>
-      </section>
+	return (
+		<div className="mx-auto flex w-full max-w-6xl min-w-0 flex-col gap-6 px-4 py-8 sm:px-5 lg:px-8">
+			<Link
+				href="/addons"
+				className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+			>
+				<ArrowLeftIcon className="size-4" />
+				Back to addon registry
+			</Link>
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.9fr]">
-        <div className="space-y-6">
-          <Card className="rounded-[1.75rem] border shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <PackageIcon className="size-5 text-primary" />
-                What This Addon Covers
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
-              <p>
-                <span className="font-medium text-foreground">
-                  {addon.config.name}
-                </span>{" "}
-                is published in the registry as{" "}
-                <span className="font-mono text-foreground">
-                  {addonRefValue}
-                </span>
-                . It is meant to extend Anesis projects with the workflow
-                described in its manifest-backed package metadata.
-              </p>
-              <p>{addon.config.description}</p>
-              <p>
-                The source of truth stays in GitHub, while this page gives the
-                registry-facing view: identity, install commands, publishing
-                timestamps, and repository linkage.
-              </p>
-            </CardContent>
-          </Card>
+			<header className="flex flex-col gap-5">
+				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+					<div className="min-w-0 space-y-3">
+						<div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xl font-semibold">
+							<BoxesIcon className="size-5 text-muted-foreground" />
+							<span className="text-muted-foreground">{addon.config.author}</span>
+							<span className="text-muted-foreground">/</span>
+							<span className="break-all text-foreground">{addon.addon_id}</span>
+							<span className="ml-1">
+								{addon.official ? (
+									<Pill>
+										<ShieldCheckIcon className="mr-1 size-3.5" />
+										Official
+									</Pill>
+								) : (
+									<Pill>Community</Pill>
+								)}
+							</span>
+						</div>
 
-          <Card className="rounded-[1.75rem] border shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <TerminalSquareIcon className="size-5 text-primary" />
-                Quick Start
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <CommandCard
-                label="Install"
-                command={installCommand}
-                helper="Pull the addon from the registry into the local Anesis addon cache."
-              />
-              <CommandCard
-                label="Remove"
-                command={removeCommand}
-                helper="Unregister the addon from your local machine when you no longer need it."
-              />
-            </CardContent>
-          </Card>
+						<h1 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">
+							{addon.config.name}
+						</h1>
+						<p className="max-w-2xl break-words text-sm leading-7 text-muted-foreground">
+							{addon.config.description}
+						</p>
 
-          <Card className="rounded-[1.75rem] border shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Layers3Icon className="size-5 text-primary" />
-                Available Commands
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {isManifestLoading ? (
-                <div className="grid gap-3">
-                  <div className="h-28 animate-pulse rounded-2xl border bg-muted/30" />
-                  <div className="h-28 animate-pulse rounded-2xl border bg-muted/30" />
-                </div>
-              ) : manifest &&
-                manifest.variants.some(
-                  (variant) => variant.commands.length > 0,
-                ) ? (
-                manifest.variants.map((variant) => (
-                  <div
-                    key={formatVariantLabel(variant.when)}
-                    className="rounded-2xl border bg-background/80 p-4 backdrop-blur-sm dark:bg-background/30"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-foreground">
-                        {variant.when
-                          ? `Variant: ${variant.when}`
-                          : "Default variant"}
-                      </p>
-                      <SmallBadge>
-                        {variant.commands.length}{" "}
-                        {variant.commands.length === 1 ? "command" : "commands"}
-                      </SmallBadge>
-                    </div>
+						<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+							<span className="inline-flex items-center gap-1.5 rounded-full border bg-background/80 px-2.5 py-1 font-mono">
+								<BadgeInfoIcon className="size-3.5" />
+								{addonRefValue}
+							</span>
+							<span className="inline-flex items-center gap-1.5 rounded-full border bg-background/80 px-2.5 py-1">
+								<CalendarDaysIcon className="size-3.5" />
+								Published {formatDate(addon.created_at)}
+							</span>
+							{addon.visibility && addon.visibility !== "public" ? (
+								<span className="inline-flex items-center gap-1.5 rounded-full border bg-background/80 px-2.5 py-1">
+									<UsersIcon className="size-3.5" />
+									{addon.visibility}
+								</span>
+							) : null}
+						</div>
+					</div>
 
-                    <div className="mt-4 space-y-3">
-                      {variant.commands.map((command) => (
-                        <div
-                          key={`${formatVariantLabel(variant.when)}-${command.name}`}
-                          className="rounded-2xl border bg-card/70 p-4"
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-3">
-                            <div className="space-y-1">
-                              <p className="font-medium text-foreground">
-                                {command.name}
-                              </p>
-                              <p className="text-sm leading-6 text-muted-foreground">
-                                {command.description ||
-                                  "No description was provided in anesis.addon.json."}
-                              </p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {command.once ? (
-                                <SmallBadge>once</SmallBadge>
-                              ) : null}
-                              <SmallBadge>
-                                {command.steps.length}{" "}
-                                {command.steps.length === 1 ? "step" : "steps"}
-                              </SmallBadge>
-                            </div>
-                          </div>
+					<div className="flex flex-wrap items-center gap-2 lg:justify-end">
+						<Button asChild>
+							<Link href={addon.url} target="_blank" rel="noopener noreferrer">
+								<ExternalLinkIcon className="size-4" />
+								Open source
+							</Link>
+						</Button>
+						<StarButton
+							isStarred={isStarred}
+							starCount={starCount}
+							onToggle={handleStar}
+							loading={starring}
+							disabled={!user}
+							variant="button"
+						/>
+					</div>
+				</div>
 
-                          {command.requires_commands.length > 0 ? (
-                            <p className="mt-3 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                              Requires: {command.requires_commands.join(", ")}
-                            </p>
-                          ) : null}
+				<RepoTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
+			</header>
 
-                          {command.inputs.length > 0 ? (
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {command.inputs.map((input) => (
-                                <SmallBadge
-                                  key={`${command.name}-${input.name}`}
-                                >
-                                  {input.name}
-                                  <span className="ml-1 font-mono text-[10px] uppercase tracking-[0.14em]">
-                                    {input.type}
-                                  </span>
-                                </SmallBadge>
-                              ))}
-                            </div>
-                          ) : null}
+			{activeTab === "readme" ? (
+				<div className="min-w-0">
+					<TemplateReadme
+						content={readme}
+						fileName={fileName}
+						sourceUrl={addon.url}
+						sourcePath={path}
+						isLoading={isReadmeLoading}
+						isError={isReadmeError}
+					/>
+				</div>
+			) : null}
 
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {getCommandStepTypes(command).map((stepType) => (
-                              <SmallBadge key={`${command.name}-${stepType}`}>
-                                {stepType}
-                              </SmallBadge>
-                            ))}
-                          </div>
+			{activeTab === "about" ? (
+				<div className="grid min-w-0 items-start gap-6 lg:grid-cols-2">
+					<div className="flex flex-col gap-6">
+						<InfoCard title="About">
+							<p className="text-sm leading-6 text-muted-foreground">
+								{addon.config.description}
+							</p>
+						</InfoCard>
 
-                          <div className="mt-4">
-                            <CommandCard
-                              label="Run in project"
-                              command={getAddonExecutionCommand(
-                                addon.addon_id,
-                                command.name,
-                              )}
-                              helper={getExecutionHelper(command)}
-                              copyLabel={`anesis use ${addon.addon_id} ${command.name}`}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="rounded-2xl border bg-background/80 p-4 text-sm leading-6 text-muted-foreground dark:bg-background/30">
-                  {isManifestError
-                    ? "Command details could not be loaded from this addon's manifest."
-                    : "This addon's manifest commands are not available on the page yet."}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+						<InfoCard title="Quick start">
+							<div className="space-y-3">
+								<CommandCard label="Install" command={installCommand} copyLabel={installCommand} />
+								<CommandCard label="Remove" command={removeCommand} copyLabel={removeCommand} />
+							</div>
+						</InfoCard>
+					</div>
 
-        <div className="self-start space-y-6 xl:sticky xl:top-24">
-          <Card className="rounded-[1.75rem] border shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <BoxesIcon className="size-5 text-primary" />
-                Package Metadata
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              <MetaItem
-                label="Addon Id"
-                value={<span className="font-mono">{addon.addon_id}</span>}
-                icon={PackageIcon}
-              />
-              <MetaItem
-                label="Author"
-                value={addon.config.author}
-                icon={UserIcon}
-              />
-              <MetaItem
-                label="Schema"
-                value={`v${addon.config.schema_version}`}
-                icon={FileCode2Icon}
-              />
-              <MetaItem
-                label="Commit"
-                value={<span className="font-mono">{addon.commit_sha}</span>}
-                icon={GitCommitHorizontalIcon}
-              />
-            </CardContent>
-          </Card>
+					<div className="flex flex-col gap-6">
+						<InfoCard title="Details">
+							<dl className="space-y-2 text-sm">
+								<div className="flex items-center justify-between gap-3">
+									<dt className="text-muted-foreground">Addon ID</dt>
+									<dd className="break-all text-right font-mono font-medium text-foreground">
+										{addon.addon_id}
+									</dd>
+								</div>
+								<div className="flex items-center justify-between gap-3">
+									<dt className="text-muted-foreground">Version</dt>
+									<dd className="font-mono font-medium text-foreground">v{addon.version}</dd>
+								</div>
+								<div className="flex items-center justify-between gap-3">
+									<dt className="text-muted-foreground">Schema</dt>
+									<dd className="font-medium text-foreground">v{addon.config.schema_version}</dd>
+								</div>
+								<div className="flex items-center justify-between gap-3">
+									<dt className="text-muted-foreground">Published</dt>
+									<dd className="font-medium text-foreground">{formatDate(addon.created_at)}</dd>
+								</div>
+								<div className="flex items-center justify-between gap-3">
+									<dt className="text-muted-foreground">Last sync</dt>
+									<dd className="font-medium text-foreground">{formatDate(addon.updated_at)}</dd>
+								</div>
+							</dl>
+						</InfoCard>
 
-          <Card className="rounded-[1.75rem] border shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <FolderGit2Icon className="size-5 text-primary" />
-                Source Repository
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              <MetaItem
-                label="Repository"
-                value={
-                  <Link
-                    href={source.repositoryUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="break-all text-primary underline-offset-4 hover:underline"
-                  >
-                    {source.repositoryLabel}
-                  </Link>
-                }
-                icon={ExternalLinkIcon}
-              />
-              <MetaItem
-                label="Branch"
-                value={source.branch ?? "Not specified"}
-                icon={FolderGit2Icon}
-              />
-              <MetaItem
-                label="Path"
-                value={
-                  source.path ? (
-                    <span className="font-mono">{source.path}</span>
-                  ) : (
-                    "Repository root"
-                  )
-                }
-                icon={FileCode2Icon}
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
+						<InfoCard title="Source">
+							<div className="space-y-2 text-sm">
+								<Link
+									href={source.repositoryUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-flex items-center gap-1.5 break-all font-mono text-xs text-primary hover:underline"
+								>
+									<GitBranchIcon className="size-3.5 shrink-0" />
+									{source.repositoryLabel}
+								</Link>
+								<p className="break-all font-mono text-xs text-muted-foreground">
+									{source.path ? `/${source.path}` : "/"}
+									{source.branch ? ` · ${source.branch}` : ""}
+								</p>
+								<p className="inline-flex items-center gap-1.5 break-all font-mono text-xs text-muted-foreground">
+									<GitCommitHorizontalIcon className="size-3.5 shrink-0" />
+									{addon.commit_sha}
+								</p>
+								<p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+									<UserIcon className="size-3.5" />
+									{addon.config.author}
+								</p>
+							</div>
+						</InfoCard>
+					</div>
+				</div>
+			) : null}
+
+			{activeTab === "statistics" ? (
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<StatCard
+						label="Downloads"
+						value={(addon.download_count ?? 0).toLocaleString()}
+						helper="Total archive downloads of this addon."
+						icon={DownloadIcon}
+					/>
+					<StatCard
+						label="Unique downloaders"
+						value={(addon.unique_downloaders ?? 0).toLocaleString()}
+						helper="Distinct users who downloaded this addon."
+						icon={UsersIcon}
+					/>
+					<StatCard
+						label="Stars"
+						value={starCount.toLocaleString()}
+						helper="Users who starred this addon."
+						icon={StarIcon}
+					/>
+					<StatCard
+						label="Commands"
+						value={commandCount.toLocaleString()}
+						helper="Commands declared in the addon manifest."
+						icon={Layers3Icon}
+					/>
+				</div>
+			) : null}
+
+			{activeTab === "commands" ? (
+				<AddonCommands
+					addonId={addon.addon_id}
+					manifest={manifest}
+					isLoading={isManifestLoading}
+					isError={isManifestError}
+				/>
+			) : null}
+
+			{activeTab === "settings" && canManage ? (
+				<AddonSettings addon={addon} isAdmin={isAdmin} />
+			) : null}
+		</div>
+	);
 }

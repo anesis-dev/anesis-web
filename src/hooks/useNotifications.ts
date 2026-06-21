@@ -1,13 +1,3 @@
-/**
- * Hook — fetches in-app notifications for the authenticated user and
- * provides mutation helpers to mark them as read.
- *
- * Endpoint: GET /notifications
- * Cache key: ["notifications"]
- *
- * The query is only enabled when the user is signed in and polls every
- * 30 seconds via `refetchInterval` to keep the unread badge current.
- */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	fetchNotifications,

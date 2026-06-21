@@ -1,12 +1,3 @@
-/**
- * Access-control service — API calls for managing visibility and per-entity
- * access grants on templates and addons.
- *
- * Visibility values: `"public"` | `"private"` | `"org_private"`.
- *
- * Access grants let a template/addon owner share a private resource with
- * specific users or organizations without making it fully public.
- */
 import { api } from "@/api/client";
 import {
 	parseAddonAccessListResponse,

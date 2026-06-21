@@ -94,6 +94,7 @@ describe("api-contracts", () => {
 			id: "5a4564c0-a749-4e5b-91d8-6812d17dcb8b",
 			name: "next",
 			owner_id: "6ffde3a6-e277-4559-9e94-bcd4765a8d1f",
+			organization_id: null,
 			url: "https://github.com/anesis-dev/templates/tree/main/ts/next",
 			official: true,
 			commit_sha: "",
@@ -128,6 +129,7 @@ describe("api-contracts", () => {
 					displayName: "Next",
 					description:
 						"A modern fullstack Next.js template, ready for scalable web applications.",
+					tags: [],
 				},
 			},
 		});

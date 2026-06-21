@@ -1,12 +1,3 @@
-/**
- * Hook — fetches a paginated page of public addons.
- *
- * Endpoint: GET /addon/all?page=&page_size=
- * Cache key: ["addons", page, pageSize]
- *
- * Accepts either a `PaginatedQueryOptions` object or a plain `boolean`
- * (shorthand for `{ enabled }`).
- */
 import { useQuery } from "@tanstack/react-query";
 import { fetchAddons } from "@/services/addon";
 import {

@@ -1,11 +1,3 @@
-/**
- * Command palette components — Client Component, shadcn/ui primitive.
- *
- * Thin wrappers over the `cmdk` library. Exports `Command`, `CommandDialog`,
- * `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`,
- * `CommandShortcut`, and `CommandSeparator`. Used by the global Search
- * component.
- */
 "use client"
 
 import * as React from "react"

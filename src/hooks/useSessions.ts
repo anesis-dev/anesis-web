@@ -1,15 +1,3 @@
-/**
- * Hook — manages multi-account sessions.
- *
- * Fetches all active sessions for the current browser, then provides
- * `switchAccount` and `removeSession` mutations.
- *
- * Cache key: ["sessions"]
- *
- * `switchAccount` performs a full page reload after switching so that all
- * cached queries are invalidated and the UI reflects the new active account.
- * `removeSession` only invalidates the sessions query; no reload is needed.
- */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchSessions } from "@/services/sessions";
 import { switchAccountRequest, removeSessionRequest } from "@/services/auth";

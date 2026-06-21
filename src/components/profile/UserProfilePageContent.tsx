@@ -1,19 +1,3 @@
-/**
- * User profile page content — Client Component.
- *
- * Shared presentational component used by both the logged-in account page and
- * public user profile pages. Renders the GitHub avatar, display name, bio,
- * follower/following stats, and two package grids (templates + addons).
- *
- * Each grid shows up to `PROFILE_PREVIEW_LIMIT` (3) items by default, with an
- * expand/collapse toggle (or a "View all" link when `viewAllTemplatesHref` /
- * `viewAllAddonsHref` is provided).
- *
- * Exported helpers:
- * - `ProfileSkeleton` — animated placeholder for the profile header.
- * - `PackageSkeleton` — animated placeholder for a single package card.
- * - `PROFILE_PREVIEW_LIMIT` — number of items shown before the toggle.
- */
 "use client";
 
 import Image from "next/image";

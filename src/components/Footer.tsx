@@ -1,9 +1,3 @@
-/**
- * Site-wide footer — Server Component.
- *
- * Renders three link columns: Product (main nav), Docs (documentation pages),
- * and Links (external resources like the GitHub repo).
- */
 
 import Link from "next/link";
 import Logo from "./Logo";

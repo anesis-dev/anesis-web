@@ -1,13 +1,3 @@
-/**
- * Addon manifest types (`anesis.addon.json`).
- *
- * Represents the full schema for a published addon's manifest file. Used by
- * the `/api/addon-manifest` route handler and the addon detail page to display
- * commands, inputs, detect rules, and variants.
- *
- * `LocalAddonCatalogEntry` extends the manifest with pre-computed index fields
- * used internally by the CLI's local addon catalog.
- */
 export type AddonInputType = "text" | "boolean" | "select";
 
 export interface AddonManifestInput {

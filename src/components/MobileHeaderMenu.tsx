@@ -1,12 +1,3 @@
-/**
- * Mobile header menu — Client Component.
- *
- * Hamburger-triggered Dialog providing mobile-friendly access to navigation,
- * account details, multi-session management, and logout. Rendered in the
- * header at small breakpoints. Uses `useAuth` for user state and `useSessions`
- * for multi-account sessions. Switching accounts triggers a full page reload
- * to flush server-state.
- */
 "use client";
 
 import Link from "next/link";

@@ -1,11 +1,3 @@
-/**
- * Admin sidebar navigation — Client Component.
- *
- * Renders a vertical navigation rail (desktop) / horizontal scroll bar
- * (mobile) with links to all admin sections. Uses `usePathname` to highlight
- * the active item. Displays the current admin user's avatar and login at the
- * bottom alongside a "Back to site" link.
- */
 "use client";
 
 import Link from "next/link";
@@ -41,7 +33,6 @@ export function AdminSidebar() {
 
 	return (
 		<aside className="w-full border-b bg-card lg:flex lg:w-60 lg:shrink-0 lg:self-stretch lg:flex-col lg:border-r lg:border-b-0 lg:min-h-dvh">
-			{/* Header */}
 			<div className="flex items-center gap-2.5 border-b px-4 py-4 lg:px-5">
 				<div className="flex size-7 items-center justify-center rounded-md bg-primary">
 					<ShieldIcon className="size-4 text-primary-foreground" />
@@ -54,7 +45,6 @@ export function AdminSidebar() {
 				</div>
 			</div>
 
-			{/* Nav */}
 			<nav className="flex gap-2 overflow-x-auto p-3 lg:flex-1 lg:flex-col lg:overflow-visible">
 				{navItems.map((item) => {
 					const active = isActive(item.href, item.exact);
@@ -76,7 +66,6 @@ export function AdminSidebar() {
 				})}
 			</nav>
 
-			{/* Footer */}
 			<div className="flex flex-col gap-2 border-t p-3 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch">
 				<Link
 					href="/"

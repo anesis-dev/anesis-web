@@ -1,18 +1,3 @@
-/**
- * Templates listing page — Client Component (`/templates`).
- *
- * Displays all published templates with search and filter controls.
- *
- * Pagination strategy:
- * - When no filters are active, server-side pagination is used (fetching one
- *   page at a time from the API).
- * - When any filter is active, the full template list (up to 100 per page) is
- *   fetched so that client-side filtering and pagination can work over the
- *   entire dataset without additional round-trips.
- *
- * Authenticated users see a "Publish Template" button that opens the
- * `PublishTemplateDialog`.
- */
 "use client";
 
 import { useState, useMemo } from "react";
@@ -151,7 +136,6 @@ export default function Templates() {
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8 sm:px-5 lg:px-8">
-			{/* Page header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 				<div className="flex flex-col gap-1">
 					<h1 className="text-2xl font-bold tracking-tight">Templates</h1>
@@ -162,7 +146,6 @@ export default function Templates() {
 				{user && <PublishTemplateDialog className="w-full gap-1.5 sm:w-auto" />}
 			</div>
 
-			{/* Filters */}
 			<TemplateFilters
 				templates={templates}
 				filters={filters}
@@ -172,7 +155,6 @@ export default function Templates() {
 				}}
 			/>
 
-			{/* Result count */}
 			{!isLoading && !isError && (
 				<p className="text-xs text-muted-foreground">
 					{filtered.length === totalCount ? (
@@ -199,7 +181,6 @@ export default function Templates() {
 				</p>
 			)}
 
-			{/* Loading skeletons */}
 			{isLoading && (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{Array.from({ length: 12 }).map((_, i) => (
@@ -208,7 +189,6 @@ export default function Templates() {
 				</div>
 			)}
 
-			{/* Error state */}
 			{isError && (
 				<div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 py-16 text-center">
 					<AlertCircleIcon className="size-8 text-destructive" />
@@ -221,7 +201,6 @@ export default function Templates() {
 				</div>
 			)}
 
-			{/* Empty state */}
 			{!isLoading && !isError && filtered.length === 0 && (
 				<div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-16 text-center">
 					<PackageIcon className="size-8 text-muted-foreground" />
@@ -236,7 +215,6 @@ export default function Templates() {
 				</div>
 			)}
 
-			{/* Grid */}
 			{!isLoading && !isError && filtered.length > 0 && (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{visibleTemplates.map((template) => (

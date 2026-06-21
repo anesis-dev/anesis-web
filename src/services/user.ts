@@ -1,14 +1,3 @@
-/**
- * User service — API calls related to user accounts.
- *
- * `fetchMe` loads the authenticated user's own profile (`GET /user/info`).
- *
- * `fetchUserByLogin` first tries GET; if the server returns 404 or 405
- * (older server versions only exposed POST for this endpoint) it retries
- * with POST. This makes the client compatible with both server versions.
- *
- * `updateUserRole` and `deleteUser` are admin-only operations.
- */
 import { ApiError, api } from "@/api/client";
 import { parseMeResponse, parseUsersResponse } from "@/lib/api-contracts";
 import { IUser } from "@/types/user";

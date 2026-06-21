@@ -2,20 +2,20 @@ import { render, screen } from "@testing-library/react";
 import AdminDashboard from "@/app/admin/page";
 import { createAddon, createTemplate, createUser } from "@/test/fixtures";
 
-vi.mock("@/hooks/useAllTemplates", () => ({
-	useAllTemplates: vi.fn(),
+vi.mock("@/hooks/useTemplates", () => ({
+	useTemplates: vi.fn(),
 }));
 
-vi.mock("@/hooks/useAllAddons", () => ({
-	useAllAddons: vi.fn(),
+vi.mock("@/hooks/useAddons", () => ({
+	useAddons: vi.fn(),
 }));
 
 vi.mock("@/hooks/useUsers", () => ({
 	useUsers: vi.fn(),
 }));
 
-import { useAllAddons } from "@/hooks/useAllAddons";
-import { useAllTemplates } from "@/hooks/useAllTemplates";
+import { useAddons } from "@/hooks/useAddons";
+import { useTemplates } from "@/hooks/useTemplates";
 import { useUsers } from "@/hooks/useUsers";
 
 describe("AdminDashboard", () => {
@@ -34,16 +34,18 @@ describe("AdminDashboard", () => {
 			}),
 		);
 
-		vi.mocked(useAllTemplates).mockReturnValue({
+		vi.mocked(useTemplates).mockReturnValue({
 			templates,
+			pagination: undefined,
 			isLoading: false,
 			isError: false,
-		});
-		vi.mocked(useAllAddons).mockReturnValue({
+		} as unknown as ReturnType<typeof useTemplates>);
+		vi.mocked(useAddons).mockReturnValue({
 			addons: [createAddon(), createAddon({ id: "addon-2", addon_id: "eslint" })],
+			pagination: undefined,
 			isLoading: false,
 			isError: false,
-		});
+		} as unknown as ReturnType<typeof useAddons>);
 		vi.mocked(useUsers).mockReturnValue({
 			users: [
 				createUser({ created_at: "2026-03-20T08:30:00Z" }),

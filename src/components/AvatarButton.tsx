@@ -1,19 +1,3 @@
-/**
- * Avatar dropdown button — Client Component.
- *
- * Props:
- * - `user` — the currently authenticated user (for the avatar image / initials).
- * - `logout` — callback invoked when the user clicks "Log out".
- *
- * Renders an avatar that opens a dropdown containing:
- * - Admin panel link (admin users only).
- * - Account menu items (dashboard, templates, etc.).
- * - Multi-account section: the current account (non-interactive), other
- *   sessions that can be switched to or removed, and an "Add account" option.
- * - A destructive "Log out" item.
- *
- * Session management is handled by `useSessions`.
- */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {

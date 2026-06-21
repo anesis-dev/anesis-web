@@ -1,15 +1,3 @@
-/**
- * Root layout — Server Component.
- *
- * The outermost layout for the entire Next.js app. Wraps every page with:
- * - `ThemeProvider` (next-themes) — supports system/light/dark themes via
- *   the "class" attribute strategy.
- * - `ClientProvider` — sets up TanStack Query and the language context for
- *   all Client Components down the tree.
- *
- * Also declares the global <Metadata> that serves as the default title/
- * description when individual pages do not override it.
- */
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientProvider from "@/providers/ClientProvider";

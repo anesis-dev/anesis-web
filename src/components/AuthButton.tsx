@@ -1,11 +1,3 @@
-/**
- * Auth button — Client Component.
- *
- * Renders one of three states:
- * 1. Loading skeleton — shown while the `["me"]` query is in flight.
- * 2. Authenticated — notification bell + avatar dropdown (`AvatarButton`).
- * 3. Guest — "Sign in with GitHub" button.
- */
 "use client";
 import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/useAuth";

@@ -1,10 +1,3 @@
-/**
- * Notification service — API calls for in-app notifications.
- *
- * `fetchNotifications` returns all notifications along with an unread count.
- * `markNotificationRead` marks a single notification as read by its ID.
- * `markAllNotificationsRead` marks all current notifications as read.
- */
 import { api } from "@/api/client";
 import { parseNotificationsResponse } from "@/lib/api-contracts";
 import { INotificationsResponse } from "@/types/notification";

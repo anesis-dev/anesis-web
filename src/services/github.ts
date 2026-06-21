@@ -1,15 +1,3 @@
-/**
- * GitHub service — functions that interact with GitHub data.
- *
- * `fetchGitHubUser` proxies the request through the backend
- * (`GET /github/proxy`) when the user is authenticated, which benefits from
- * a server-side GitHub token for higher rate limits. On 401/403 it falls
- * back to calling the GitHub API directly from the browser.
- *
- * `fetchTemplateReadme` calls the Next.js proxy route `/api/template-readme`
- * (which runs on the server) to avoid CORS restrictions when fetching from
- * the GitHub Contents API.
- */
 import { api, ApiError } from "@/api/client";
 import { parseGitHubUserResponse } from "@/lib/api-contracts";
 import { IGitHubUser } from "@/types/github";

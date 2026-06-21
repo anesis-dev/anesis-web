@@ -1,22 +1,3 @@
-/**
- * Template filter panel — Client Component.
- *
- * Props:
- * - `templates` — the full list of templates used to derive available filter
- *   options (languages, technologies, specializations).
- * - `filters` — the current `TemplateFiltersState` (controlled by the parent).
- * - `onChange` — called with the updated filters on every change.
- *
- * UI:
- * - Always-visible: text search input, "Official only" toggle, "Filters"
- *   expand button, and a "Clear" button when any filter is active.
- * - Collapsible section: specialization, technologies, and language pills.
- *   Each pill is a toggle; multiple selections in the same category require
- *   a template to match ALL selected values (AND logic).
- *
- * Filter options are derived from the provided template list via `useMemo`
- * so they update reactively when the parent query refreshes.
- */
 "use client";
 
 import { useMemo, useState } from "react";

@@ -1,12 +1,3 @@
-/**
- * Hook — fetches an Anesis user by their GitHub login handle.
- *
- * Endpoint: GET /user/by-login/:login (falls back to POST if the route
- * returns 404/405, which handles older server versions that only exposed POST).
- * Cache key: ["user", "by-login", login.toLowerCase()]
- *
- * 4xx errors are not retried. The query is disabled when `login` is blank.
- */
 import { ApiError } from "@/api/client";
 import { fetchUserByLogin } from "@/services/user";
 import { IUser } from "@/types/user";

@@ -1,17 +1,3 @@
-/**
- * Site-wide sticky header — Server Component.
- *
- * Renders:
- * - Logo (links to home)
- * - Desktop navigation links (Nav)
- * - Search button / command palette trigger (Search)
- * - Auth button / avatar dropdown (AuthButton)
- * - Mobile-only hamburger menu (MobileHeaderMenu) that replaces Nav + AuthButton
- *   on small screens.
- *
- * Layout breakpoint: below `xl` the desktop nav is hidden and the mobile
- * menu icon is shown instead.
- */
 import Logo from "./Logo";
 import { MobileHeaderMenu } from "./MobileHeaderMenu";
 import Nav from "./Nav";

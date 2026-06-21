@@ -1,20 +1,3 @@
-/**
- * Vitest global test setup.
- *
- * Runs before every test file (configured via `vitest.config.ts`
- * `setupFiles`). Installs the following mocks and utilities:
- * - `next/link` — renders as a plain `<a>` tag.
- * - `next/image` — renders as a plain `<img>` tag.
- * - `window.matchMedia` — returns a no-op stub.
- * - `localStorage` — in-memory implementation via vi.fn().
- * - `navigator.clipboard.writeText` — vi.fn() stub.
- * - `ResizeObserver` — no-op mock class.
- * - `PointerEvent` — aliased to `MouseEvent`.
- * - `HTMLElement.prototype.scrollIntoView` — vi.fn() stub.
- *
- * After each test: calls `cleanup()`, clears `localStorage`, and resets all
- * mocks.
- */
 import React from "react";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, vi } from "vitest";

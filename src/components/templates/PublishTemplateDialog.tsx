@@ -1,21 +1,3 @@
-/**
- * Publish template dialog — Client Component.
- *
- * A modal form that lets an authenticated user publish a new template to the
- * registry by pasting the GitHub URL that points to the directory containing
- * `anesis.template.json`.
- *
- * Props:
- * - `label` — button label (default: "Publish Template").
- * - `size` / `variant` — forwarded to the trigger button.
- * - `className` — forwarded to the trigger button.
- *
- * State machine: idle → loading → success | error.
- * On success, the `["templates"]` and `["my-templates"]` queries are
- * invalidated so the registry listings update immediately.
- * The form state is reset after the dialog closes (with a short delay to
- * avoid a visible flash during the close animation).
- */
 "use client";
 
 import { useState } from "react";

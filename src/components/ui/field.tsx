@@ -1,18 +1,3 @@
-/**
- * Form field components — Client Component.
- *
- * A composable form-field primitive set. Exports:
- * - `FieldSet` / `FieldLegend` — for grouping related fields.
- * - `FieldGroup` — layout wrapper for multiple `Field` elements.
- * - `Field` — individual field wrapper with `orientation` prop (`vertical`,
- *   `horizontal`, `responsive`); marks invalid state for styling.
- * - `FieldLabel` / `FieldTitle` — label elements linked to the field.
- * - `FieldDescription` — helper text below the control.
- * - `FieldContent` — supplementary content slot (e.g. character count).
- * - `FieldSeparator` — horizontal divider with optional text.
- * - `FieldError` — shows validation error messages; deduplicates multiple
- *   error objects by message.
- */
 "use client"
 
 import { useMemo } from "react"

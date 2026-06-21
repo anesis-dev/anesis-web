@@ -126,12 +126,10 @@ export default function AccountPage() {
 
 	return (
 		<div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-10 sm:px-5">
-			{/* Profile header */}
 			{githubLoading ? (
 				<ProfileSkeleton />
 			) : (
 				<div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-					{/* Avatar */}
 					<div className="relative size-24 shrink-0 overflow-hidden rounded-full border">
 						<Image
 							src={user.avatar_url}
@@ -142,7 +140,6 @@ export default function AccountPage() {
 						/>
 					</div>
 
-					{/* Info */}
 					<div className="flex flex-1 flex-col items-center gap-3 sm:items-start">
 						<div className="flex flex-col items-center gap-0.5 sm:items-start">
 							{githubUser?.name && (
@@ -161,7 +158,6 @@ export default function AccountPage() {
 							</p>
 						)}
 
-						{/* Stats */}
 						{githubUser && (
 							<div className="grid w-full max-w-sm grid-cols-3 gap-4 sm:w-auto sm:max-w-none sm:flex sm:items-center sm:gap-6">
 								<Stat label="Followers" value={githubUser.followers} />
@@ -170,7 +166,6 @@ export default function AccountPage() {
 							</div>
 						)}
 
-						{/* Actions */}
 						<div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-start">
 							{user.role === "admin" && (
 								<Link href="/admin" className="w-full sm:w-auto">
@@ -207,10 +202,8 @@ export default function AccountPage() {
 				</div>
 			)}
 
-			{/* Divider */}
 			<div className="h-px w-full bg-border" />
 
-			{/* My templates */}
 			<div className="flex flex-col gap-5">
 				<div className="flex items-center gap-2">
 					<PackageIcon className="size-4 text-muted-foreground" />

@@ -1,22 +1,3 @@
-/**
- * GitHub OAuth callback page — Client Component (`/auth/callback`).
- *
- * Handles two distinct callback flows initiated from the server:
- *
- * 1. Server-cookie sign-in (`?signed_in=1`): The server has already set the
- *    session cookie. We just clear the TanStack Query cache (to prevent
- *    showing data from a previous session) and redirect home.
- *
- * 2. Legacy code-exchange (`?code=<code>`): The browser was redirected here
- *    with a GitHub OAuth code. We call `POST /auth/exchange` to let the server
- *    validate the code and set a session cookie, then redirect home.
- *
- * Additional flags handled: `account_added`, `account_already_active`,
- * `account_already_added` (multi-account flow).
- *
- * Shows a loading spinner while the exchange is in progress and an error
- * card if anything goes wrong.
- */
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -35,8 +16,6 @@ export default function AuthCallbackPage() {
     const params = new URLSearchParams(window.location.search);
     const signedIn = params.get("signed_in") === "1";
     if (signedIn) {
-      // Clear all cached queries so we don't show stale data from a previous
-      // authenticated session belonging to a different user.
       queryClient.clear();
       router.replace("/");
       return;

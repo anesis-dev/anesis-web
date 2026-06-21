@@ -1,15 +1,3 @@
-/**
- * Dropdown menu components — Client Component, shadcn/ui primitive.
- *
- * Radix UI DropdownMenu wrappers. Exports the full set: `DropdownMenu`,
- * `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`,
- * `DropdownMenuCheckboxItem`, `DropdownMenuRadioGroup`, `DropdownMenuRadioItem`,
- * `DropdownMenuLabel`, `DropdownMenuSeparator`, `DropdownMenuShortcut`,
- * `DropdownMenuSub`, `DropdownMenuSubTrigger`, `DropdownMenuSubContent`,
- * `DropdownMenuGroup`, and `DropdownMenuPortal`.
- *
- * `DropdownMenuItem` supports a `variant` prop (`"default"` | `"destructive"`).
- */
 "use client"
 
 import * as React from "react"

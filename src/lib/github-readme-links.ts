@@ -1,19 +1,3 @@
-/**
- * GitHub README link resolver.
- *
- * When a README is fetched from a sub-directory of a GitHub repo, relative
- * links and image paths need to be resolved against the correct base URL.
- *
- * `createGitHubReadmeResolver` returns a `GitHubReadmeResolver` object with
- * two methods:
- * - `resolveLink(target)` — turns relative paths into absolute `github.com`
- *   blob URLs (suitable for `<a href>`).
- * - `resolveImage(target)` — turns relative paths into raw `githubusercontent`
- *   URLs (suitable for `<img src>`).
- *
- * External URLs, anchor-only links (`#section`), and data URIs are passed
- * through unchanged. Returns `null` when `sourceUrl` is absent or unparseable.
- */
 import { parseGitHubTreeUrl } from "@/lib/github-tree-url";
 
 function isExternalUrl(value: string): boolean {

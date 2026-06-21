@@ -32,7 +32,10 @@ vi.mock("@/components/templates/PublishTemplateDialog", () => ({
 import { useAuth } from "@/hooks/useAuth";
 import { useTemplates } from "@/hooks/useTemplates";
 
-const templates = Array.from({ length: 13 }, (_, index) =>
+const TEMPLATE_COUNT = 25;
+const SPECIAL_INDEX = TEMPLATE_COUNT - 1;
+
+const templates = Array.from({ length: TEMPLATE_COUNT }, (_, index) =>
 	createTemplate({
 		id: `template-${index + 1}`,
 		name: `demo-${index + 1}`,
@@ -40,10 +43,14 @@ const templates = Array.from({ length: 13 }, (_, index) =>
 		config: {
 			metadata: {
 				displayName:
-					index === 12 ? "Special Template 13" : `Template ${index + 1}`,
+					index === SPECIAL_INDEX
+						? "Special Template 25"
+						: `Template ${index + 1}`,
 				description:
-					index === 12 ? "Contains a unique search term." : `Description ${index + 1}`,
-				tags: [index === 12 ? "special" : `tag-${index + 1}`],
+					index === SPECIAL_INDEX
+						? "Contains a unique search term."
+						: `Description ${index + 1}`,
+				tags: [index === SPECIAL_INDEX ? "special" : `tag-${index + 1}`],
 			},
 		},
 	}),
@@ -85,30 +92,30 @@ describe("TemplatesPage", () => {
 		expect(screen.getByText("Publish Template")).toBeInTheDocument();
 		expect(
 			screen.getByText((_, element) =>
-				element?.textContent === "Showing 13 templates",
+				element?.textContent === "Showing 25 templates",
 			),
 		).toBeInTheDocument();
-		expect(screen.getAllByTestId("template-card")).toHaveLength(12);
+		expect(screen.getAllByTestId("template-card")).toHaveLength(24);
 
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
 		expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
 		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
-		expect(screen.getByText("Special Template 13")).toBeInTheDocument();
+		expect(screen.getByText("Special Template 25")).toBeInTheDocument();
 
 		fireEvent.change(
-			screen.getByPlaceholderText(/search by name, description or tag/i),
+			screen.getByPlaceholderText(/search by name or description/i),
 			{ target: { value: "special" } },
 		);
 
 		await waitFor(() =>
 			expect(
 				screen.getByText(
-					(_, element) => element?.textContent === "Showing 1 of 13 templates",
+					(_, element) => element?.textContent === "Showing 1 of 25 templates",
 				),
 			).toBeInTheDocument(),
 		);
 		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
-		expect(screen.getByText("Special Template 13")).toBeInTheDocument();
+		expect(screen.getByText("Special Template 25")).toBeInTheDocument();
 		expect(screen.queryByText("Page 2 of 2")).not.toBeInTheDocument();
 	});
 

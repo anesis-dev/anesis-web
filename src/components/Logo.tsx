@@ -1,11 +1,3 @@
-/**
- * Anesis logo — Server Component.
- *
- * Renders the `/Logo.png` image next to the "Anesis" wordmark, wrapped in a
- * link to "/". Supports two visual variants:
- * - `"mark"` (default) — smaller logo used in the header.
- * - `"full"` — larger version for landing / auth pages.
- */
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";

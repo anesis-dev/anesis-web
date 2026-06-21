@@ -1,15 +1,3 @@
-/**
- * Test render helpers.
- *
- * Utilities for rendering components under a fresh `QueryClient` in Vitest
- * tests. Retry is disabled by default to prevent test timeouts.
- *
- * Exports:
- * - `createTestQueryClient()` — creates a `QueryClient` with retry disabled.
- * - `createQueryClientWrapper(queryClient)` — returns a JSX wrapper component.
- * - `renderWithQueryClient(ui, options)` — renders UI with a fresh client and
- *   returns both the render result and the `queryClient` instance.
- */
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, RenderOptions } from "@testing-library/react";

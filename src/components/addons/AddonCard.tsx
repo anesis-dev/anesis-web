@@ -1,16 +1,3 @@
-/**
- * Addon card — Client Component.
- *
- * Renders a compact card for an addon in grid listings. Structure mirrors
- * `TemplateCard`: an absolutely-positioned link overlay covers the card,
- * while the star button and author link sit above it via `z-10`.
- *
- * Props:
- * - `addon` — the full `IAddon` object from the API.
- * - `visibility` — optional override for the visibility badge.
- *
- * `AddonStatusBadge` is also exported for reuse in detail pages.
- */
 "use client";
 
 import Link from "next/link";

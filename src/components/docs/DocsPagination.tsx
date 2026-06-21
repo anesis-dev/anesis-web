@@ -1,10 +1,3 @@
-/**
- * Docs prev / next pagination — Server Component.
- *
- * Looks up `currentHref` in the `docsNav` array and renders "← Previous" and
- * "Next →" buttons for adjacent items. Returns `null` if the current href is
- * not found in the nav (e.g. unlisted pages).
- */
 import Link from "next/link";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";

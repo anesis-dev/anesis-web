@@ -1,13 +1,3 @@
-/**
- * Code block with copy button — Client Component.
- *
- * Renders a styled `<pre><code>` block with a "Copy" / "Copied" toggle button.
- * Uses the Clipboard API; silently no-ops when unavailable (e.g. insecure
- * contexts). The "Copied" state resets after 1.6 s.
- *
- * Props:
- * - `code` — the plain-text string to display and copy.
- */
 "use client";
 
 import { useState } from "react";

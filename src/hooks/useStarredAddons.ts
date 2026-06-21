@@ -1,9 +1,3 @@
-/**
- * Hook — fetches the authenticated user's starred addons (paginated).
- *
- * Endpoint: GET /addon/starred?page=&page_size=
- * Cache key: ["addons", "starred", page, pageSize]
- */
 import { useQuery } from "@tanstack/react-query";
 import { fetchStarredAddons } from "@/services/addon";
 import {

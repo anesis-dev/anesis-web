@@ -1,9 +1,3 @@
-/**
- * Account navigation menu items.
- *
- * Links rendered in the authenticated user's account dropdown and the mobile
- * menu "Account" section. Maps to routes under `/account/`.
- */
 import { INav } from "@/types/nav";
 
 export const accountMenu: INav[] = [

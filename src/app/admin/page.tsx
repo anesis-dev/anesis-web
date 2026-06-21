@@ -132,7 +132,6 @@ export default function AdminDashboard() {
 
 	return (
 		<div className="flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
-			{/* Header */}
 			<div>
 				<h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
 				<p className="mt-1 text-sm text-muted-foreground">
@@ -140,7 +139,6 @@ export default function AdminDashboard() {
 				</p>
 			</div>
 
-			{/* Stats */}
 			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
 				<StatCard
 					title="Total Templates"

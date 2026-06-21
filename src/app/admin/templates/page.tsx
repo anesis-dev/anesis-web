@@ -373,7 +373,6 @@ export default function AdminTemplatesPage() {
 				)}
 			</div>
 
-			{/* Search */}
 			<Input
 				placeholder="Search by name, author or specialization…"
 				value={search}

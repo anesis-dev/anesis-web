@@ -39,7 +39,7 @@ describe("Home", () => {
 		expect(screen.queryByText(/quick start/i)).not.toBeInTheDocument();
 		expect(screen.queryByText(/all installation options/i)).not.toBeInTheDocument();
 		expect(
-			screen.getByText("npm install -g @anesis-cli/anesis"),
+			screen.getByText("npm install -g anesis-cli"),
 		).toBeInTheDocument();
 		expect(
 			screen.getByRole("button", { name: /copy npm install command/i }),
@@ -59,7 +59,7 @@ describe("Home", () => {
 
 		await waitFor(() =>
 			expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-				"npm install -g @anesis-cli/anesis",
+				"npm install -g anesis-cli",
 			),
 		);
 		expect(
@@ -76,10 +76,12 @@ describe("Home", () => {
 
 		await waitFor(() =>
 			expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-				"npm install -g @anesis-cli/anesis",
+				"npm install -g anesis-cli",
 			),
 		);
-		expect(screen.getByText("Copied")).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /install command copied/i }),
+		).toBeInTheDocument();
 	});
 
 	it("surfaces recent addons on the homepage", () => {

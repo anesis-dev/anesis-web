@@ -1,15 +1,3 @@
-/**
- * Home page — Client Component (`/`).
- *
- * Landing page for the Anesis registry. Composed of four sections:
- * 1. Hero — install command snippet with a one-click copy button.
- * 2. Features — three feature highlight cards.
- * 3. Recent addons — up to 3 featured addons sorted by official-first, then newest.
- * 4. Featured templates — up to 4 templates using the same sort order.
- *
- * Data is fetched client-side via `useTemplates` and `useAddons` with a large
- * page size so the full set is available for the featured-items sort.
- */
 "use client";
 
 import Link from "next/link";

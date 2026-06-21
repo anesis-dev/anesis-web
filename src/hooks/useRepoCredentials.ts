@@ -1,10 +1,3 @@
-/**
- * Hook — fetches the authenticated user's saved repository credentials
- * (GitHub PATs stored server-side for accessing private repos).
- *
- * Endpoint: GET /repo-credentials (proxied via service layer)
- * Cache key: ["repo-credentials"]
- */
 import { useQuery } from "@tanstack/react-query";
 import { fetchRepoCredentials } from "@/services/repo-credential";
 import { IRepoCredential } from "@/types/repo-credential";

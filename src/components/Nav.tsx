@@ -1,9 +1,3 @@
-/**
- * Desktop navigation bar — Server Component.
- *
- * Renders the top-level nav links (Docs, Templates, Addons).
- * Shown inside the Header on `xl+` screens.
- */
 
 import Link from "next/link";
 

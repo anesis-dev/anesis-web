@@ -1,16 +1,3 @@
-/**
- * Notification bell button with dropdown — Client Component.
- *
- * Shows a red indicator dot when there are unread notifications. Opens a
- * dropdown panel listing all notifications.
- *
- * Currently supports the `org_invitation` notification type, which renders
- * Accept / Decline action buttons via the `OrgInvitationItem` sub-component.
- * Other notification types fall back to a plain text display.
- *
- * Accepting or declining an invitation invalidates both the notifications and
- * organizations queries so the sidebar and org pages reflect the change.
- */
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";

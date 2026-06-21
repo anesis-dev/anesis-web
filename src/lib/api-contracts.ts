@@ -1,24 +1,3 @@
-/**
- * API response parsers / contracts.
- *
- * Every function in this module accepts an `unknown` value (the raw JSON from
- * the server) and returns a strongly-typed TypeScript object. If the shape
- * doesn't match what is expected, an `Error` is thrown with a human-readable
- * path (e.g. `"template.config.version must be a string"`).
- *
- * This approach lets us catch API shape mismatches early — at the boundary
- * between the network and the application — rather than propagating `any`
- * types deep into the UI.
- *
- * The server has gone through a schema migration, so some parsers handle
- * two payload shapes:
- * - "legacy" templates — have a `config` field directly on the record.
- * - "current" templates — have an `info` field instead of `config`.
- * `parseTemplate` auto-detects the shape and dispatches accordingly.
- *
- * Similarly `parseTemplateVersionsResponse` handles both an array-of-groups
- * response and a single-group object response.
- */
 import { IAddon, IAddonConfig, IAddonUrlResponse, IStarResponse } from "@/types/addon";
 import { INotification, INotificationsResponse } from "@/types/notification";
 import { IAddonAccess, ITemplateAccess } from "@/types/access-control";

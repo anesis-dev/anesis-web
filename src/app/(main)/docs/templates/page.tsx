@@ -129,7 +129,6 @@ export default function DocsTemplatesPage() {
 				</div>
 			</section>
 
-			{/* Install */}
 			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
 				<Card>
 					<CardHeader className="gap-3">
@@ -194,7 +193,6 @@ export default function DocsTemplatesPage() {
 				</Card>
 			</div>
 
-			{/* anesis new */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -226,7 +224,6 @@ export default function DocsTemplatesPage() {
 				</CardContent>
 			</Card>
 
-			{/* List + Remove */}
 			<div className="grid gap-6 lg:grid-cols-2">
 				<Card>
 					<CardHeader className="gap-3">
@@ -266,7 +263,6 @@ export default function DocsTemplatesPage() {
 				</Card>
 			</div>
 
-			{/* Update */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -290,7 +286,6 @@ export default function DocsTemplatesPage() {
 				</CardContent>
 			</Card>
 
-			{/* Cache behavior */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -316,7 +311,6 @@ export default function DocsTemplatesPage() {
 				</CardContent>
 			</Card>
 
-			{/* Sub-page links */}
 			<div className="grid gap-4 sm:grid-cols-2">
 				<Card className="border-dashed">
 					<CardHeader>

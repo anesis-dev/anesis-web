@@ -1,13 +1,3 @@
-/**
- * Template reference / URL helpers.
- *
- * A "template ref" is the canonical identifier used in API paths and
- * displayed in the URL: `"<name>@<version>"` (e.g. `"react-ts@1.0.0"`).
- *
- * `getTemplateHref` builds the exact-version URL (`/templates/react-ts@1.0.0`).
- * `getTemplateLatestHref` builds the name-only URL (`/templates/react-ts`)
- *   which the server resolves to the latest published version.
- */
 import { ITemplate } from "@/types/template";
 
 export function getTemplateRef(template: Pick<ITemplate, "name" | "version">): string {

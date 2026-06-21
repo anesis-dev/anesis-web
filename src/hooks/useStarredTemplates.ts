@@ -1,9 +1,3 @@
-/**
- * Hook — fetches the authenticated user's starred templates (paginated).
- *
- * Endpoint: GET /template/starred?page=&page_size=
- * Cache key: ["templates", "starred", page, pageSize]
- */
 import { useQuery } from "@tanstack/react-query";
 import { fetchStarredTemplates } from "@/services/template";
 import {

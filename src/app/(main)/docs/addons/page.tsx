@@ -141,7 +141,6 @@ export default function DocsAddonsPage() {
 				</div>
 			</section>
 
-			{/* Install */}
 			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
 				<Card>
 					<CardHeader className="gap-3">
@@ -199,7 +198,6 @@ export default function DocsAddonsPage() {
 				</Card>
 			</div>
 
-			{/* Running commands */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -251,7 +249,6 @@ export default function DocsAddonsPage() {
 				</CardContent>
 			</Card>
 
-			{/* Typical flow */}
 			<Card>
 				<CardHeader>
 					<CardTitle>Typical workflow</CardTitle>
@@ -265,7 +262,6 @@ export default function DocsAddonsPage() {
 				</CardContent>
 			</Card>
 
-			{/* List + Remove */}
 			<div className="grid gap-6 lg:grid-cols-2">
 				<Card>
 					<CardHeader className="gap-3">
@@ -312,7 +308,6 @@ export default function DocsAddonsPage() {
 				</Card>
 			</div>
 
-			{/* Input prompts */}
 			<Card>
 				<CardHeader>
 					<CardTitle>Input prompts</CardTitle>
@@ -352,7 +347,6 @@ export default function DocsAddonsPage() {
 				</CardContent>
 			</Card>
 
-			{/* Lock file */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -378,7 +372,6 @@ export default function DocsAddonsPage() {
 				</CardContent>
 			</Card>
 
-			{/* Sub-page links */}
 			<div className="grid gap-4 sm:grid-cols-2">
 				<Card className="border-dashed">
 					<CardHeader>

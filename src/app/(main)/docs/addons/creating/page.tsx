@@ -223,7 +223,6 @@ export default function DocsAddonsCreatingPage() {
 				</div>
 			</section>
 
-			{/* Top-level manifest fields */}
 			<div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
 				<Card>
 					<CardHeader className="gap-3">
@@ -271,7 +270,6 @@ export default function DocsAddonsCreatingPage() {
 				</Card>
 			</div>
 
-			{/* Inputs */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -299,7 +297,6 @@ export default function DocsAddonsCreatingPage() {
 				</CardContent>
 			</Card>
 
-			{/* Detection */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -345,7 +342,6 @@ export default function DocsAddonsCreatingPage() {
 				</CardContent>
 			</Card>
 
-			{/* Variants */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -370,7 +366,6 @@ export default function DocsAddonsCreatingPage() {
 				</CardContent>
 			</Card>
 
-			{/* Commands */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -400,7 +395,6 @@ export default function DocsAddonsCreatingPage() {
 				</CardContent>
 			</Card>
 
-			{/* Steps */}
 			<section className="space-y-4">
 				<div className="space-y-2">
 					<p className="text-sm font-medium text-primary">Step types</p>
@@ -595,7 +589,6 @@ export default function DocsAddonsCreatingPage() {
 				</div>
 			</section>
 
-			{/* Rollback */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -621,7 +614,6 @@ export default function DocsAddonsCreatingPage() {
 				</CardContent>
 			</Card>
 
-			{/* Safety */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">

@@ -20,6 +20,14 @@ vi.mock("@/hooks/useTemplateReadme", () => ({
 	useTemplateReadme: vi.fn(),
 }));
 
+vi.mock("@/hooks/useOrganizations", () => ({
+	useOrganizations: vi.fn(() => ({
+		organizations: [],
+		isLoading: false,
+		isError: false,
+	})),
+}));
+
 vi.mock("@/components/templates/TemplateReadme", () => ({
 	TemplateReadme: ({
 		fileName,
@@ -102,7 +110,7 @@ describe("TemplateDetailsPage", () => {
 		expect(useTemplate).toHaveBeenCalledWith("missing-repo@0.1.0");
 	});
 
-	it("renders a package-style template page with quick start and readme content", async () => {
+	it("renders a repo-style template page with header, readme and tabs", async () => {
 		vi.mocked(useTemplate).mockReturnValue({
 			template: mockTemplate,
 			isLoading: false,
@@ -144,22 +152,25 @@ describe("TemplateDetailsPage", () => {
 		expect(
 			await screen.findByRole("heading", { name: "Demo Next Template" }),
 		).toBeInTheDocument();
-		expect(screen.getByText("Quick Start")).toBeInTheDocument();
+		expect(
+			screen.getByRole("link", { name: /open source/i }),
+		).toHaveAttribute("href", mockTemplate.config.repository.url);
+		expect(screen.getByText("README.md:# Demo")).toBeInTheDocument();
+		expect(screen.getByRole("tab", { name: /readme/i })).toBeInTheDocument();
+		expect(screen.getByRole("tab", { name: /about/i })).toBeInTheDocument();
+		expect(screen.getByRole("tab", { name: /statistics/i })).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("tab", { name: /about/i }));
 		expect(
 			screen.getByText("anesis new my-app demo-repo", { exact: false }),
 		).toBeInTheDocument();
 		expect(
 			screen.getByText("anesis template install demo-repo", { exact: false }),
 		).toBeInTheDocument();
-		expect(screen.getByText("Package Snapshot")).toBeInTheDocument();
-		expect(screen.getByText("Package Metadata")).toBeInTheDocument();
-		expect(screen.getByText("Versions")).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /v0\.1\.0/i })).toBeInTheDocument();
-		expect(screen.getByText("README.md:# Demo")).toBeInTheDocument();
-		expect(
-			screen.getAllByText("demo-repo@0.1.0", { exact: false }).length,
-		).toBeGreaterThan(0);
-		expect(screen.getByRole("button", { name: /copy demo-repo@0.1.0/i })).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("tab", { name: /statistics/i }));
+		expect(screen.getByText("Projects created")).toBeInTheDocument();
+		expect(screen.getByText("Downloads")).toBeInTheDocument();
 
 		await waitFor(() =>
 			expect(useTemplateReadme).toHaveBeenCalledWith(
@@ -168,7 +179,7 @@ describe("TemplateDetailsPage", () => {
 		);
 	});
 
-	it("lets an admin mark the current version as official", async () => {
+	it("lets an admin mark the current version as official from settings", async () => {
 		const template = createTemplate({
 			id: "uuid-template-version",
 			official: false,
@@ -223,6 +234,8 @@ describe("TemplateDetailsPage", () => {
 		});
 
 		const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+		fireEvent.click(await screen.findByRole("tab", { name: /settings/i }));
 
 		fireEvent.click(
 			await screen.findByRole("button", { name: /mark version 0\.1\.0 as official/i }),

@@ -1,13 +1,4 @@
-/**
- * Language color map — mirrors GitHub's language color palette.
- *
- * `getLanguageColor(language)` returns the hex color for the given language
- * name (case-insensitive), or a neutral grey fallback for unknown languages.
- * Used in the `TemplateFilters` component to show colored dots on language
- * filter pills.
- */
 const LANGUAGE_COLORS: Record<string, string> = {
-  // Common languages
   javascript: "#f1e05a",
   typescript: "#3178c6",
   python: "#3572a5",

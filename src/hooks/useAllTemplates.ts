@@ -1,12 +1,3 @@
-/**
- * Hook — fetches ALL templates across all pages in a single query.
- *
- * Cache key: ["templates", "all-pages"]
- *
- * Uses `fetchAllTemplates`, which internally iterates through every page
- * (100 items per page) until the full dataset is collected. This is intended
- * for admin views or cases where client-side filtering needs the entire list.
- */
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllTemplates } from "@/services/template";
 import { ITemplate } from "@/types/template";

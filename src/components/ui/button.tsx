@@ -1,11 +1,3 @@
-/**
- * Button component — shadcn/ui primitive.
- *
- * CVA-powered button with `variant` (`default`, `destructive`, `outline`,
- * `secondary`, `ghost`, `link`) and `size` (`default`, `xs`, `sm`, `lg`,
- * `icon`, `icon-xs`, `icon-sm`, `icon-lg`) props. Supports `asChild` via
- * Radix `Slot` to render as any element while keeping button styles.
- */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"

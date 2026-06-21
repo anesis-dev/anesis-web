@@ -1,13 +1,3 @@
-/**
- * Public user profile page — Client Component (`/user/:login`).
- *
- * Displays the GitHub profile of any Anesis user (fetched via `useGitHubUser`)
- * alongside their published templates and addons. When the viewer is the
- * profile owner, their own private templates and addons are included via
- * `useMyTemplates` / `useMyAddons`.
- *
- * Uses `UserProfilePageContent` for the full layout to keep this page thin.
- */
 "use client";
 
 import Link from "next/link";

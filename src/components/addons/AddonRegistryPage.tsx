@@ -1,15 +1,3 @@
-/**
- * Addon registry listing page — Client Component.
- *
- * Full-page component for `/addons/registry`. Uses `useAddons` to load addons
- * (server-paginated). When a search query is active, fetches up to 100 addons
- * at once and filters client-side; otherwise uses server pagination at
- * `PAGE_SIZE` (24) per page.
- *
- * Features: text search (across id, name, description, author), "Official
- * only" filter toggle, paginated grid, and a "Publish addon" button for
- * authenticated users.
- */
 "use client";
 
 import Link from "next/link";

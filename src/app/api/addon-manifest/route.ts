@@ -1,20 +1,3 @@
-/**
- * Next.js route handler: GET /api/addon-manifest
- *
- * Fetches and validates the `anesis.addon.json` manifest from a GitHub
- * repository or sub-directory. Runs server-side to avoid CORS issues.
- *
- * Query params:
- *   - `url` — a GitHub tree URL pointing to the addon directory.
- *
- * Response:
- *   - 200 with the parsed `AddonManifest` object on success.
- *   - 4xx on validation or not-found errors.
- *
- * The manifest JSON is decoded from GitHub's base64-encoded API response
- * and validated via `parseAddonManifest` from the addon-catalog service.
- * Caches GitHub API responses for 5 minutes.
- */
 import { NextRequest, NextResponse } from "next/server";
 import {
   getGitHubContentsApiUrl,

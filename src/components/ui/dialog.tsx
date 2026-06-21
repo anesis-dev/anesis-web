@@ -1,14 +1,3 @@
-/**
- * Dialog components — Client Component, shadcn/ui primitive.
- *
- * Radix UI Dialog wrappers. Exports `Dialog`, `DialogTrigger`, `DialogContent`,
- * `DialogHeader`, `DialogFooter`, `DialogTitle`, `DialogDescription`,
- * `DialogOverlay`, `DialogPortal`, and `DialogClose`.
- *
- * `DialogContent` renders an optional close button (controlled via
- * `showCloseButton`, default `true`). `DialogFooter` can optionally render a
- * close button via `showCloseButton` as well.
- */
 "use client"
 
 import * as React from "react"

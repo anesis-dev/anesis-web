@@ -1,24 +1,3 @@
-/**
- * Template card — Client Component.
- *
- * Renders a compact card for a template in grid listings.
- *
- * Props:
- * - `template` — the full `ITemplate` object from the API.
- * - `versionCount` — number of published versions; shown alongside the version
- *   badge when > 1.
- * - `linkToLatest` — when `true`, the card links to the latest-version page
- *   (`/templates/:name/latest`) instead of the exact version URL.
- * - `visibility` — override the template's own visibility field (e.g. from a
- *   parent component that already knows the effective visibility).
- *
- * The entire card is clickable via an absolutely-positioned `<Link>` overlay.
- * Interactive elements inside the card (star button, author link) use
- * `relative z-10` to sit above the overlay and receive their own clicks.
- *
- * Star state is managed locally with `useState` and synced from props via
- * `useEffect` so that external query invalidations are reflected.
- */
 "use client";
 
 import Link from "next/link";

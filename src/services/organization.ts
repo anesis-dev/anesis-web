@@ -1,14 +1,3 @@
-/**
- * Organization service — API calls for organization management.
- *
- * Covers CRUD for organizations, member management (list, update role, remove),
- * invitations (create, revoke, accept, decline), ownership transfer, and
- * fetching org-scoped template/addon listings.
- *
- * `acceptInvitation` / `declineInvitation` use a token-based URL so they can
- * be called without knowing the org ID (the token is embedded in the
- * notification payload).
- */
 import { api } from "@/api/client";
 import {
 	parseOrganizationResponse,

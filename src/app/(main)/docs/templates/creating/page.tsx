@@ -138,7 +138,6 @@ export default function DocsTemplatesCreatingPage() {
 				</div>
 			</section>
 
-			{/* Folder structure */}
 			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
 				<Card>
 					<CardHeader className="gap-3">
@@ -189,7 +188,6 @@ export default function DocsTemplatesCreatingPage() {
 				</Card>
 			</div>
 
-			{/* Manifest */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -218,7 +216,6 @@ export default function DocsTemplatesCreatingPage() {
 				</CardContent>
 			</Card>
 
-			{/* Tera rendering */}
 			<div className="grid gap-6 lg:grid-cols-2">
 				<Card>
 					<CardHeader className="gap-3">
@@ -263,7 +260,6 @@ export default function DocsTemplatesCreatingPage() {
 				</Card>
 			</div>
 
-			{/* File processing rules */}
 			<Card>
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -288,7 +284,6 @@ export default function DocsTemplatesCreatingPage() {
 				</CardContent>
 			</Card>
 
-			{/* Testing tip */}
 			<Card className="border-dashed">
 				<CardHeader className="gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">

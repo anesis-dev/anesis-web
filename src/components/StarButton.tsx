@@ -1,21 +1,3 @@
-/**
- * Star / unstar button with optimistic UI — Client Component.
- *
- * Props:
- * - `isStarred` / `starCount` — current server state.
- * - `onToggle` — async callback that calls the star/unstar API. Should return
- *   a Promise (or void); errors cause the optimistic update to roll back.
- * - `loading` — disables the button while an API call is in flight.
- * - `disabled` — used when the user is not authenticated (`"Log in to star"`).
- * - `variant` — `"button"` renders a GitHub-style split-button (label +
- *   count box); `"icon"` renders a compact star icon with an inline count.
- *
- * Optimistic update:
- * The component tracks `optimisticStarred` and `optimisticCount` in local
- * state. When `onToggle` resolves successfully the parent is expected to
- * propagate the new `isStarred`/`starCount` props from the server response,
- * at which point the optimistic state is reset.
- */
 "use client";
 
 import { useState } from "react";

@@ -1,15 +1,3 @@
-/**
- * Template service — all API calls related to templates.
- *
- * `buildPaginationPath` constructs the query string for paginated endpoints,
- * clamping `page` ≥ 1 and `pageSize` ∈ [1, 100].
- *
- * `fetchAllTemplates` iterates through every available page to collect the
- * complete template list — use sparingly (admin / client-side filtering).
- *
- * `deleteTemplate` requires the ref to include an explicit version
- * (`name@version`) to prevent accidental broad deletions.
- */
 import { api } from "@/api/client";
 import {
 	parsePublishTemplateResponse,

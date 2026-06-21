@@ -101,7 +101,9 @@ describe("AccountPage", () => {
 		);
 		expect(screen.getByText("My Templates")).toBeInTheDocument();
 		expect(screen.getByText("My Addons")).toBeInTheDocument();
-		expect(screen.queryByText("Repos")).not.toBeInTheDocument();
+		expect(screen.getByText("Repos")).toBeInTheDocument();
+		expect(screen.getByText("Followers")).toBeInTheDocument();
+		expect(screen.getByText("Following")).toBeInTheDocument();
 		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
 		expect(screen.getAllByTestId("addon-card")).toHaveLength(1);
 
@@ -109,7 +111,7 @@ describe("AccountPage", () => {
 		expect(logout).toHaveBeenCalledTimes(1);
 	});
 
-	it("shows preview cards with view-all links for owned templates and addons", () => {
+	it("lists every owned template and caps the addon preview at three with a manage link", () => {
 		vi.mocked(useAuth).mockReturnValue({
 			user: createUser(),
 			isLoading: false,
@@ -156,15 +158,14 @@ describe("AccountPage", () => {
 
 		render(<AccountPage />);
 
-		expect(screen.getAllByTestId("template-card")).toHaveLength(3);
-		expect(screen.queryByText("template-4")).not.toBeInTheDocument();
-		expect(screen.getByRole("link", { name: /view all templates/i })).toHaveAttribute(
-			"href",
-			"/account/templates",
-		);
+		// Templates section renders every owned template (no preview cap).
+		expect(screen.getAllByTestId("template-card")).toHaveLength(4);
+		expect(screen.getByText("template-4")).toBeInTheDocument();
+
+		// Addons section shows a capped preview of three with a manage link.
 		expect(screen.getAllByTestId("addon-card")).toHaveLength(3);
 		expect(screen.queryByText("Addon 4")).not.toBeInTheDocument();
-		expect(screen.getByRole("link", { name: /view all addons/i })).toHaveAttribute(
+		expect(screen.getByRole("link", { name: /manage addons/i })).toHaveAttribute(
 			"href",
 			"/account/addons",
 		);

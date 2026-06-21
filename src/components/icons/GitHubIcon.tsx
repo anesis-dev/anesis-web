@@ -1,10 +1,3 @@
-/**
- * GitHub brand icon — SVG component.
- *
- * Renders the GitHub mark (the Invertocat) as an inline SVG. Accepts an
- * optional `className` to control size and color via Tailwind classes;
- * defaults to `"w-4 h-4"`. Color follows `currentColor`.
- */
 export function GitHubIcon({ className }: { className?: string }) {
   return (
     <svg

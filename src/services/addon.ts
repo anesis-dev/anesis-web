@@ -1,12 +1,3 @@
-/**
- * Addon service — all API calls related to addons.
- *
- * `fetchAddon` does not have a direct "get by ref" endpoint, so it pages
- * through the public listing until it finds a match. When not found in the
- * public list it falls back to the user's own addons (covers private and
- * org-private addons). This is a known limitation — a dedicated endpoint
- * would be more efficient.
- */
 import { api } from "@/api/client";
 import { getAddonRef } from "@/lib/addon-ref";
 import {
@@ -69,7 +60,6 @@ export async function fetchAddon(addonRef: string): Promise<IAddon> {
     page += 1;
   }
 
-  // Fall back to user's own addons (covers private and org_private addons)
   try {
     page = 1;
     while (true) {
@@ -87,7 +77,6 @@ export async function fetchAddon(addonRef: string): Promise<IAddon> {
       page += 1;
     }
   } catch {
-    // Not authenticated or no own addons — ignore
   }
 
   throw new Error(`Addon "${addonRef}" was not found.`);

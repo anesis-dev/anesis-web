@@ -1,13 +1,3 @@
-/**
- * Publish URL validators for templates and addons.
- *
- * Validates that a user-pasted URL is a GitHub `/tree/` URL pointing to a
- * specific directory (not just the repo root). The expected format is:
- *   `https://github.com/<owner>/<repo>/tree/<branch>/<dir>`
- *
- * Returns `null` on success, or a human-readable error string on failure.
- * These strings are displayed inline in the publish dialogs.
- */
 const GITHUB_HOSTS = new Set(["github.com", "www.github.com"]);
 
 function validateGitHubTreeUrl(input: string, target: string): string | null {

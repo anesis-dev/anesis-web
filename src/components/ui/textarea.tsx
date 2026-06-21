@@ -1,10 +1,3 @@
-/**
- * Textarea component — shadcn/ui primitive.
- *
- * Styled `<textarea>` with `field-sizing-content` for auto-height growth.
- * Minimum height 64 px. Applies focus ring and `aria-invalid` destructive
- * border matching the `Input` component.
- */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

@@ -2,7 +2,6 @@
 import { Button } from "./ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { AvatarButton } from "./AvatarButton";
-import { NotificationBell } from "./NotificationBell";
 import { GitHubIcon } from "./icons/GitHubIcon";
 
 export default function AuthButton() {
@@ -17,7 +16,6 @@ export default function AuthButton() {
 	if (user) {
 		return (
 			<div className="flex w-full items-center justify-end gap-1 sm:w-auto">
-				<NotificationBell />
 				<AvatarButton user={user} logout={logout} />
 			</div>
 		);

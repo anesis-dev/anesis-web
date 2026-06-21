@@ -6,12 +6,6 @@ vi.mock("@/hooks/useAuth", () => ({
 	useAuth: vi.fn(),
 }));
 
-vi.mock("@/services/notification", () => ({
-	fetchNotifications: vi.fn(),
-	markNotificationRead: vi.fn(),
-	markAllNotificationsRead: vi.fn(),
-}));
-
 vi.mock("@/services/sessions", () => ({
 	fetchSessions: vi.fn(),
 }));
@@ -35,11 +29,6 @@ vi.mock("@/services/addon-manifest", () => ({
 }));
 
 import { useAuth } from "@/hooks/useAuth";
-import {
-	fetchNotifications,
-	markAllNotificationsRead,
-	markNotificationRead,
-} from "@/services/notification";
 import { fetchSessions } from "@/services/sessions";
 import { removeSessionRequest } from "@/services/auth";
 import {
@@ -48,7 +37,6 @@ import {
 } from "@/services/template";
 import { fetchStarredAddons } from "@/services/addon";
 import { fetchAddonManifest } from "@/services/addon-manifest";
-import { useNotifications } from "@/hooks/useNotifications";
 import { useSessions } from "@/hooks/useSessions";
 import { useStarredTemplates } from "@/hooks/useStarredTemplates";
 import { useStarredAddons } from "@/hooks/useStarredAddons";
@@ -76,61 +64,6 @@ function asGuest() {
 		logout: vi.fn(),
 	} as unknown as ReturnType<typeof useAuth>);
 }
-
-describe("notifications hook", () => {
-	it("exposes items and unread count for a logged-in user", async () => {
-		asLoggedIn();
-		vi.mocked(fetchNotifications).mockResolvedValueOnce({
-			items: [{ id: "n-1" }],
-			unread_count: 2,
-		} as never);
-
-		const { result } = renderHook(() => useNotifications(), {
-			wrapper: getWrapper(),
-		});
-
-		await waitFor(() => expect(result.current.isLoading).toBe(false));
-		expect(result.current.items).toEqual([{ id: "n-1" }]);
-		expect(result.current.unreadCount).toBe(2);
-	});
-
-	it("does not fetch notifications for a guest", async () => {
-		asGuest();
-
-		const { result } = renderHook(() => useNotifications(), {
-			wrapper: getWrapper(),
-		});
-
-		await waitFor(() => expect(result.current.isLoading).toBe(false));
-		expect(result.current.items).toEqual([]);
-		expect(result.current.unreadCount).toBe(0);
-		expect(fetchNotifications).not.toHaveBeenCalled();
-	});
-
-	it("exposes callable mark-read actions", async () => {
-		asLoggedIn();
-		vi.mocked(fetchNotifications).mockResolvedValue({
-			items: [],
-			unread_count: 0,
-		} as never);
-		vi.mocked(markNotificationRead).mockResolvedValue(undefined);
-		vi.mocked(markAllNotificationsRead).mockResolvedValue(undefined);
-
-		const { result } = renderHook(() => useNotifications(), {
-			wrapper: getWrapper(),
-		});
-
-		await waitFor(() => expect(result.current.isLoading).toBe(false));
-		expect(typeof result.current.markRead).toBe("function");
-		expect(typeof result.current.markAllRead).toBe("function");
-		expect(() =>
-			act(() => {
-				result.current.markRead("n-1");
-				result.current.markAllRead();
-			}),
-		).not.toThrow();
-	});
-});
 
 describe("sessions hook", () => {
 	it("loads sessions for a logged-in user", async () => {

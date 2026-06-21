@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
 	AlertCircleIcon,
-	Building2Icon,
 	GlobeIcon,
 	LoaderIcon,
 	LockIcon,
@@ -12,19 +11,14 @@ import {
 	ShieldCheckIcon,
 	ShieldOffIcon,
 	Trash2Icon,
-	UsersIcon,
 } from "lucide-react";
 import { getAddonRef } from "@/lib/addon-ref";
 import {
 	deleteAddon,
 	updateAddon,
 	updateAddonOfficialStatus,
-} from "@/services/addon";
-import {
-	removeAddonFromOrganization,
 	updateAddonVisibility,
-} from "@/services/access-control";
-import { useOrganizations } from "@/hooks/useOrganizations";
+} from "@/services/addon";
 import { IAddon } from "@/types/addon";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -46,7 +40,6 @@ type Notice =
 
 function visibilityIcon(visibility?: string) {
 	if (visibility === "private") return LockIcon;
-	if (visibility === "org_private") return UsersIcon;
 	return GlobeIcon;
 }
 
@@ -59,7 +52,6 @@ export function AddonSettings({
 }) {
 	const queryClient = useQueryClient();
 	const addonRef = getAddonRef(addon);
-	const { organizations } = useOrganizations();
 
 	const [notice, setNotice] = useState<Notice>(null);
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -70,11 +62,6 @@ export function AddonSettings({
 	const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
 	const [isChangingVisibility, setIsChangingVisibility] = useState(false);
 	const [pendingVisibility, setPendingVisibility] = useState(addon.visibility ?? "public");
-
-	const [isOrgOpen, setIsOrgOpen] = useState(false);
-	const [isMovingOrg, setIsMovingOrg] = useState(false);
-	const [pendingOrg, setPendingOrg] = useState<string>(addon.organization_id ?? "");
-	const [isDetaching, setIsDetaching] = useState(false);
 
 	const VisibilityIcon = visibilityIcon(addon.visibility);
 
@@ -144,49 +131,6 @@ export function AddonSettings({
 		}
 	}
 
-	async function moveToOrganization() {
-		if (!pendingOrg) {
-			setNotice({ type: "error", message: "Select an organization first." });
-			return;
-		}
-		setIsMovingOrg(true);
-		setNotice(null);
-		try {
-			await updateAddonVisibility(addon.id, "org_private", undefined, pendingOrg);
-			await refreshAddonQueries();
-			const org = organizations.find((entry) => entry.id === pendingOrg);
-			setNotice({
-				type: "success",
-				message: `Addon moved to ${org?.name ?? "the organization"}.`,
-			});
-			setIsOrgOpen(false);
-		} catch (error) {
-			setNotice({
-				type: "error",
-				message: error instanceof Error ? error.message : "Failed to move addon.",
-			});
-		} finally {
-			setIsMovingOrg(false);
-		}
-	}
-
-	async function detachFromOrganization() {
-		setIsDetaching(true);
-		setNotice(null);
-		try {
-			await removeAddonFromOrganization(addon.id);
-			await refreshAddonQueries();
-			setNotice({ type: "success", message: "Addon removed from its organization." });
-		} catch (error) {
-			setNotice({
-				type: "error",
-				message: error instanceof Error ? error.message : "Failed to detach addon.",
-			});
-		} finally {
-			setIsDetaching(false);
-		}
-	}
-
 	async function removeAddon() {
 		setIsDeleting(true);
 		setNotice(null);
@@ -208,8 +152,7 @@ export function AddonSettings({
 		}
 	}
 
-	const busy =
-		isRefreshing || isTogglingOfficial || isDeleting || isMovingOrg || isDetaching;
+	const busy = isRefreshing || isTogglingOfficial || isDeleting;
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -315,7 +258,6 @@ export function AddonSettings({
 								>
 									<option value="public">public — anyone can access</option>
 									<option value="private">private — only you</option>
-									<option value="org_private">org_private — granted organizations</option>
 								</select>
 							</div>
 							<DialogFooter>
@@ -340,98 +282,6 @@ export function AddonSettings({
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>
-				</SettingsRow>
-
-				<SettingsRow
-					title="Organization"
-					description={
-						addon.organization_id
-							? "This addon belongs to an organization."
-							: "Move this addon under an organization you belong to."
-					}
-				>
-					<div className="flex flex-wrap gap-2">
-						<Dialog open={isOrgOpen} onOpenChange={setIsOrgOpen}>
-							<DialogTrigger asChild>
-								<Button type="button" variant="outline" disabled={busy}>
-									<Building2Icon className="size-3.5" />
-									Move to organization
-								</Button>
-							</DialogTrigger>
-							<DialogContent className="sm:max-w-sm">
-								<DialogHeader>
-									<DialogTitle>Move to organization</DialogTitle>
-									<DialogDescription>
-										The addon becomes org-private and visible to that organization&apos;s
-										members.
-									</DialogDescription>
-								</DialogHeader>
-								<div className="py-2">
-									{organizations.length > 0 ? (
-										<select
-											value={pendingOrg}
-											onChange={(event) => setPendingOrg(event.target.value)}
-											aria-label="Organization"
-											className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-										>
-											<option value="">Select an organization…</option>
-											{organizations.map((org) => (
-												<option key={org.id} value={org.id}>
-													{org.name}
-												</option>
-											))}
-										</select>
-									) : (
-										<p className="text-sm text-muted-foreground">
-											You are not a member of any organization yet.
-										</p>
-									)}
-								</div>
-								<DialogFooter>
-									<Button
-										type="button"
-										variant="outline"
-										onClick={() => setIsOrgOpen(false)}
-										disabled={isMovingOrg}
-									>
-										Cancel
-									</Button>
-									<Button
-										type="button"
-										onClick={moveToOrganization}
-										disabled={isMovingOrg || !pendingOrg}
-									>
-										{isMovingOrg ? (
-											<>
-												<LoaderIcon className="size-3.5 animate-spin" />
-												Moving...
-											</>
-										) : (
-											"Move"
-										)}
-									</Button>
-								</DialogFooter>
-							</DialogContent>
-						</Dialog>
-
-						{addon.organization_id ? (
-							<Button
-								type="button"
-								variant="ghost"
-								onClick={detachFromOrganization}
-								disabled={busy}
-							>
-								{isDetaching ? (
-									<>
-										<LoaderIcon className="size-3.5 animate-spin" />
-										Removing...
-									</>
-								) : (
-									"Remove from organization"
-								)}
-							</Button>
-						) : null}
-					</div>
 				</SettingsRow>
 			</SettingsSection>
 

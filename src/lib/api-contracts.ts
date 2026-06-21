@@ -1,10 +1,6 @@
 import { IAddon, IAddonConfig, IAddonUrlResponse, IStarResponse } from "@/types/addon";
-import { INotification, INotificationsResponse } from "@/types/notification";
-import { IAddonAccess, ITemplateAccess } from "@/types/access-control";
 import { IGitHubUser } from "@/types/github";
-import { IInvitationStatus, IOrganization, IOrganizationInvitation, IOrganizationMember, IOrgRole } from "@/types/organization";
 import { IPaginatedResponse } from "@/types/pagination";
-import { IRepoCredential } from "@/types/repo-credential";
 import { ITemplate, ITemplateConfig, ITemplateUrlResponse } from "@/types/template";
 import { IUser } from "@/types/user";
 
@@ -174,7 +170,6 @@ function parseLegacyTemplate(value: unknown, path: string): ITemplate {
 	return {
 		id: expectString(template.id, `${path}.id`),
 		owner_id: expectString(template.owner_id, `${path}.owner_id`),
-		organization_id: expectOptionalString(template.organization_id, `${path}.organization_id`) ?? null,
 		url: expectString(template.url, `${path}.url`),
 		official: expectBoolean(template.official, `${path}.official`),
 		commit_sha: expectString(template.commit_sha, `${path}.commit_sha`),
@@ -273,7 +268,6 @@ function parseCurrentTemplate(value: unknown, path: string): ITemplate {
 	return {
 		id,
 		owner_id: expectString(template.owner_id, `${path}.owner_id`),
-		organization_id: expectOptionalString(template.organization_id, `${path}.organization_id`) ?? null,
 		url: info.repoUrl,
 		official: expectBoolean(template.official, `${path}.official`),
 		commit_sha: "",
@@ -362,7 +356,6 @@ function parseAddon(value: unknown, path: string): IAddon {
 	return {
 		id: expectString(addon.id, `${path}.id`),
 		owner_id: expectString(addon.owner_id, `${path}.owner_id`),
-		organization_id: expectOptionalString(addon.organization_id, `${path}.organization_id`),
 		url: expectString(addon.url, `${path}.url`),
 		addon_id: expectString(addon.addon_id, `${path}.addon_id`),
 		name: expectString(addon.name, `${path}.name`),
@@ -538,186 +531,6 @@ export function parseStarResponse(value: unknown): IStarResponse {
 	return {
 		is_starred: expectBoolean(payload.is_starred, "star.is_starred"),
 		star_count: expectNumber(payload.star_count, "star.star_count"),
-	};
-}
-
-function parseOrganization(value: unknown, path: string): IOrganization {
-	const org = expectRecord(value, path);
-
-	return {
-		id: expectString(org.id, `${path}.id`),
-		name: expectString(org.name, `${path}.name`),
-		slug: expectString(org.slug, `${path}.slug`),
-		description: expectOptionalString(org.description, `${path}.description`),
-		avatar_url: expectOptionalString(org.avatar_url, `${path}.avatar_url`),
-		owner_id: expectString(org.owner_id, `${path}.owner_id`),
-		created_at: expectString(org.created_at, `${path}.created_at`),
-		updated_at: expectString(org.updated_at, `${path}.updated_at`),
-	};
-}
-
-function parseOrgMember(value: unknown, path: string): IOrganizationMember {
-	const member = expectRecord(value, path);
-	const role = expectString(member.role, `${path}.role`);
-
-	if (role !== "member" && role !== "admin" && role !== "owner") {
-		throw new Error(`Invalid API response: ${path}.role must be "member", "admin", or "owner".`);
-	}
-
-	return {
-		id: expectString(member.id, `${path}.id`),
-		organization_id: expectString(member.organization_id, `${path}.organization_id`),
-		user_id: expectString(member.user_id, `${path}.user_id`),
-		role: role as IOrgRole,
-		invited_by: expectOptionalString(member.invited_by, `${path}.invited_by`),
-		joined_at: expectString(member.joined_at, `${path}.joined_at`),
-		user_login: expectOptionalString(member.user_login, `${path}.user_login`),
-		user_avatar_url: expectOptionalString(member.user_avatar_url, `${path}.user_avatar_url`),
-	};
-}
-
-function parseOrgInvitation(value: unknown, path: string): IOrganizationInvitation {
-	const inv = expectRecord(value, path);
-	const role = expectString(inv.role, `${path}.role`);
-	const status = expectString(inv.status, `${path}.status`);
-
-	if (role !== "member" && role !== "admin" && role !== "owner") {
-		throw new Error(`Invalid API response: ${path}.role must be "member", "admin", or "owner".`);
-	}
-
-	if (status !== "pending" && status !== "accepted" && status !== "declined" && status !== "expired") {
-		throw new Error(`Invalid API response: ${path}.status must be "pending", "accepted", "declined", or "expired".`);
-	}
-
-	return {
-		id: expectString(inv.id, `${path}.id`),
-		organization_id: expectString(inv.organization_id, `${path}.organization_id`),
-		email: expectOptionalString(inv.email, `${path}.email`),
-		user_id: expectOptionalString(inv.user_id, `${path}.user_id`),
-		token: expectString(inv.token, `${path}.token`),
-		role: role as IOrgRole,
-		status: status as IInvitationStatus,
-		expires_at: expectString(inv.expires_at, `${path}.expires_at`),
-		invited_by: expectOptionalString(inv.invited_by, `${path}.invited_by`),
-		created_at: expectString(inv.created_at, `${path}.created_at`),
-	};
-}
-
-function parseRepoCredential(value: unknown, path: string): IRepoCredential {
-	const cred = expectRecord(value, path);
-
-	return {
-		id: expectString(cred.id, `${path}.id`),
-		name: expectString(cred.name, `${path}.name`),
-		provider: expectString(cred.provider, `${path}.provider`),
-		credential_type: expectString(cred.credential_type, `${path}.credential_type`),
-		organization_id: expectOptionalString(cred.organization_id, `${path}.organization_id`),
-		created_by: expectString(cred.created_by, `${path}.created_by`),
-		created_at: expectString(cred.created_at, `${path}.created_at`),
-	};
-}
-
-function parseTemplateAccess(value: unknown, path: string): ITemplateAccess {
-	const access = expectRecord(value, path);
-
-	return {
-		id: expectString(access.id, `${path}.id`),
-		template_id: expectString(access.template_id, `${path}.template_id`),
-		grantee_type: expectString(access.grantee_type, `${path}.grantee_type`),
-		grantee_id: expectString(access.grantee_id, `${path}.grantee_id`),
-		granted_by: expectString(access.granted_by, `${path}.granted_by`),
-		created_at: expectString(access.created_at, `${path}.created_at`),
-	};
-}
-
-function parseAddonAccess(value: unknown, path: string): IAddonAccess {
-	const access = expectRecord(value, path);
-
-	return {
-		id: expectString(access.id, `${path}.id`),
-		addon_id: expectString(access.addon_id, `${path}.addon_id`),
-		grantee_type: expectString(access.grantee_type, `${path}.grantee_type`),
-		grantee_id: expectString(access.grantee_id, `${path}.grantee_id`),
-		granted_by: expectString(access.granted_by, `${path}.granted_by`),
-		created_at: expectString(access.created_at, `${path}.created_at`),
-	};
-}
-
-export function parseOrganizationsResponse(value: unknown): IOrganization[] {
-	if (!Array.isArray(value)) {
-		throw new Error("Invalid API response: organizations payload must be an array.");
-	}
-
-	return value.map((org, index) => parseOrganization(org, `organizations[${index}]`));
-}
-
-export function parseOrganizationResponse(value: unknown): IOrganization {
-	return parseOrganization(value, "organization");
-}
-
-export function parseOrgMembersResponse(value: unknown): IOrganizationMember[] {
-	if (!Array.isArray(value)) {
-		throw new Error("Invalid API response: org members payload must be an array.");
-	}
-
-	return value.map((member, index) => parseOrgMember(member, `members[${index}]`));
-}
-
-export function parseOrgInvitationsResponse(value: unknown): IOrganizationInvitation[] {
-	if (!Array.isArray(value)) {
-		throw new Error("Invalid API response: org invitations payload must be an array.");
-	}
-
-	return value.map((inv, index) => parseOrgInvitation(inv, `invitations[${index}]`));
-}
-
-export function parseInvitationResponse(value: unknown): IOrganizationInvitation {
-	return parseOrgInvitation(value, "invitation");
-}
-
-export function parseRepoCredentialsResponse(value: unknown): IRepoCredential[] {
-	if (!Array.isArray(value)) {
-		throw new Error("Invalid API response: repo credentials payload must be an array.");
-	}
-
-	return value.map((cred, index) => parseRepoCredential(cred, `credentials[${index}]`));
-}
-
-export function parseTemplateAccessListResponse(value: unknown): ITemplateAccess[] {
-	if (!Array.isArray(value)) {
-		throw new Error("Invalid API response: template access payload must be an array.");
-	}
-
-	return value.map((access, index) => parseTemplateAccess(access, `templateAccess[${index}]`));
-}
-
-export function parseAddonAccessListResponse(value: unknown): IAddonAccess[] {
-	if (!Array.isArray(value)) {
-		throw new Error("Invalid API response: addon access payload must be an array.");
-	}
-
-	return value.map((access, index) => parseAddonAccess(access, `addonAccess[${index}]`));
-}
-
-function parseNotification(value: unknown, path: string): INotification {
-	const n = expectRecord(value, path);
-	return {
-		id: expectString(n.id, `${path}.id`),
-		type: expectString(n.type, `${path}.type`),
-		payload: expectRecord(n.payload, `${path}.payload`) as INotification["payload"],
-		read_at: n.read_at === null ? null : expectString(n.read_at, `${path}.read_at`),
-		created_at: expectString(n.created_at, `${path}.created_at`),
-	};
-}
-
-export function parseNotificationsResponse(value: unknown): INotificationsResponse {
-	const resp = expectRecord(value, "notifications");
-	const items = Array.isArray(resp.items)
-		? resp.items.map((item, i) => parseNotification(item, `notifications.items[${i}]`))
-		: [];
-	return {
-		items,
-		unread_count: expectNumber(resp.unread_count, "notifications.unread_count"),
 	};
 }
 

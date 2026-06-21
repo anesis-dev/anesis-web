@@ -72,7 +72,7 @@ export function PublishTemplateDialog({
 
 		setState({ status: "loading" });
 		try {
-			const result = await publishTemplate(url.trim(), undefined, visibility);
+			const result = await publishTemplate(url.trim(), visibility);
 			setState({ status: "success", name: result.name });
 			await Promise.all([
 				queryClient.invalidateQueries({ queryKey: ["templates"] }),

@@ -226,7 +226,6 @@ describe("template services", () => {
 		});
 		expect(api.post).toHaveBeenCalledWith("/template/publish", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
-			organization_id: null,
 			visibility: "public",
 		});
 	});
@@ -239,7 +238,6 @@ describe("template services", () => {
 		).resolves.toBeUndefined();
 		expect(api.patch).toHaveBeenCalledWith("/template", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
-			organization_id: null,
 		});
 	});
 
@@ -253,7 +251,6 @@ describe("template services", () => {
 		).resolves.toBeUndefined();
 		expect(api.patch).toHaveBeenCalledWith("/template/official", {
 			url: "https://github.com/demo-owner/demo-repo/tree/main/template",
-			organization_id: null,
 		});
 	});
 

@@ -14,7 +14,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
-import { LockIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
+import { LockIcon, ShieldCheckIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StarButton } from "@/components/StarButton";
 import { starTemplate } from "@/services/template";
@@ -104,12 +104,6 @@ export function TemplateCard({
               <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
                 <LockIcon className="size-2.5" />
                 Private
-              </span>
-            )}
-            {(visibility ?? template.visibility) === "org_private" && (
-              <span className="flex items-center gap-1 rounded-full bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400">
-                <UsersIcon className="size-2.5" />
-                Members only
               </span>
             )}
           </div>

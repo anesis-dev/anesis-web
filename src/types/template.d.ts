@@ -43,7 +43,6 @@ export interface ITemplateConfig {
 export interface ITemplate {
   id: string;
   owner_id: string;
-  organization_id?: string | null;
   url: string;
   official: boolean;
   commit_sha?: string;

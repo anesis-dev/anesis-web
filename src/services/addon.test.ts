@@ -154,7 +154,6 @@ describe("addon services", () => {
     });
     expect(api.post).toHaveBeenCalledWith("/addon/publish", {
       url: "https://github.com/anesis-addons/drizzle/tree/main",
-      organization_id: null,
       visibility: "public",
     });
   });
@@ -174,7 +173,6 @@ describe("addon services", () => {
     ).resolves.toBeUndefined();
     expect(api.patch).toHaveBeenCalledWith("/addon", {
       url: "https://github.com/anesis-addons/nest-drizzle/tree/main",
-      organization_id: null,
     });
   });
 

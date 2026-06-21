@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
 	AlertCircleIcon,
-	Building2Icon,
 	GlobeIcon,
 	LoaderIcon,
 	LockIcon,
@@ -12,7 +11,6 @@ import {
 	ShieldCheckIcon,
 	ShieldOffIcon,
 	Trash2Icon,
-	UsersIcon,
 } from "lucide-react";
 import { getTemplateRef } from "@/lib/template-ref";
 import {
@@ -20,12 +18,8 @@ import {
 	updateTemplate,
 	updateTemplateAsOfficial,
 	updateTemplateOfficialStatus,
-} from "@/services/template";
-import {
-	removeTemplateFromOrganization,
 	updateTemplateVisibility,
-} from "@/services/access-control";
-import { useOrganizations } from "@/hooks/useOrganizations";
+} from "@/services/template";
 import { ITemplate } from "@/types/template";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -47,7 +41,6 @@ type Notice =
 
 function visibilityIcon(visibility?: string) {
 	if (visibility === "private") return LockIcon;
-	if (visibility === "org_private") return UsersIcon;
 	return GlobeIcon;
 }
 
@@ -60,7 +53,6 @@ export function TemplateSettings({
 }) {
 	const queryClient = useQueryClient();
 	const templateRef = getTemplateRef(template);
-	const { organizations } = useOrganizations();
 
 	const [notice, setNotice] = useState<Notice>(null);
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -72,11 +64,6 @@ export function TemplateSettings({
 	const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
 	const [isChangingVisibility, setIsChangingVisibility] = useState(false);
 	const [pendingVisibility, setPendingVisibility] = useState(template.visibility ?? "public");
-
-	const [isOrgOpen, setIsOrgOpen] = useState(false);
-	const [isMovingOrg, setIsMovingOrg] = useState(false);
-	const [pendingOrg, setPendingOrg] = useState<string>(template.organization_id ?? "");
-	const [isDetaching, setIsDetaching] = useState(false);
 
 	const VisibilityIcon = visibilityIcon(template.visibility);
 
@@ -170,49 +157,6 @@ export function TemplateSettings({
 		}
 	}
 
-	async function moveToOrganization() {
-		if (!pendingOrg) {
-			setNotice({ type: "error", message: "Select an organization first." });
-			return;
-		}
-		setIsMovingOrg(true);
-		setNotice(null);
-		try {
-			await updateTemplateVisibility(template.id, "org_private", undefined, pendingOrg);
-			await refreshTemplateQueries();
-			const org = organizations.find((entry) => entry.id === pendingOrg);
-			setNotice({
-				type: "success",
-				message: `Template moved to ${org?.name ?? "the organization"}.`,
-			});
-			setIsOrgOpen(false);
-		} catch (error) {
-			setNotice({
-				type: "error",
-				message: error instanceof Error ? error.message : "Failed to move template.",
-			});
-		} finally {
-			setIsMovingOrg(false);
-		}
-	}
-
-	async function detachFromOrganization() {
-		setIsDetaching(true);
-		setNotice(null);
-		try {
-			await removeTemplateFromOrganization(template.id);
-			await refreshTemplateQueries();
-			setNotice({ type: "success", message: "Template removed from its organization." });
-		} catch (error) {
-			setNotice({
-				type: "error",
-				message: error instanceof Error ? error.message : "Failed to detach template.",
-			});
-		} finally {
-			setIsDetaching(false);
-		}
-	}
-
 	async function removeTemplate() {
 		setIsDeleting(true);
 		setNotice(null);
@@ -237,12 +181,7 @@ export function TemplateSettings({
 	}
 
 	const busy =
-		isRefreshing ||
-		isRefreshingOfficial ||
-		isTogglingOfficial ||
-		isDeleting ||
-		isMovingOrg ||
-		isDetaching;
+		isRefreshing || isRefreshingOfficial || isTogglingOfficial || isDeleting;
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -378,7 +317,6 @@ export function TemplateSettings({
 								>
 									<option value="public">public — anyone can access</option>
 									<option value="private">private — only you</option>
-									<option value="org_private">org_private — granted organizations</option>
 								</select>
 							</div>
 							<DialogFooter>
@@ -403,98 +341,6 @@ export function TemplateSettings({
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>
-				</SettingsRow>
-
-				<SettingsRow
-					title="Organization"
-					description={
-						template.organization_id
-							? "This template belongs to an organization."
-							: "Move this template under an organization you belong to."
-					}
-				>
-					<div className="flex flex-wrap gap-2">
-						<Dialog open={isOrgOpen} onOpenChange={setIsOrgOpen}>
-							<DialogTrigger asChild>
-								<Button type="button" variant="outline" disabled={busy}>
-									<Building2Icon className="size-3.5" />
-									Move to organization
-								</Button>
-							</DialogTrigger>
-							<DialogContent className="sm:max-w-sm">
-								<DialogHeader>
-									<DialogTitle>Move to organization</DialogTitle>
-									<DialogDescription>
-										The template becomes org-private and visible to that organization&apos;s
-										members.
-									</DialogDescription>
-								</DialogHeader>
-								<div className="py-2">
-									{organizations.length > 0 ? (
-										<select
-											value={pendingOrg}
-											onChange={(event) => setPendingOrg(event.target.value)}
-											aria-label="Organization"
-											className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-										>
-											<option value="">Select an organization…</option>
-											{organizations.map((org) => (
-												<option key={org.id} value={org.id}>
-													{org.name}
-												</option>
-											))}
-										</select>
-									) : (
-										<p className="text-sm text-muted-foreground">
-											You are not a member of any organization yet.
-										</p>
-									)}
-								</div>
-								<DialogFooter>
-									<Button
-										type="button"
-										variant="outline"
-										onClick={() => setIsOrgOpen(false)}
-										disabled={isMovingOrg}
-									>
-										Cancel
-									</Button>
-									<Button
-										type="button"
-										onClick={moveToOrganization}
-										disabled={isMovingOrg || !pendingOrg}
-									>
-										{isMovingOrg ? (
-											<>
-												<LoaderIcon className="size-3.5 animate-spin" />
-												Moving...
-											</>
-										) : (
-											"Move"
-										)}
-									</Button>
-								</DialogFooter>
-							</DialogContent>
-						</Dialog>
-
-						{template.organization_id ? (
-							<Button
-								type="button"
-								variant="ghost"
-								onClick={detachFromOrganization}
-								disabled={busy}
-							>
-								{isDetaching ? (
-									<>
-										<LoaderIcon className="size-3.5 animate-spin" />
-										Removing...
-									</>
-								) : (
-									"Remove from organization"
-								)}
-							</Button>
-						) : null}
-					</div>
 				</SettingsRow>
 			</SettingsSection>
 

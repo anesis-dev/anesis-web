@@ -13,7 +13,6 @@ import {
 	RefreshCcwIcon,
 	ShieldCheckIcon,
 	Trash2Icon,
-	UsersIcon,
 } from "lucide-react";
 import { formatDate } from "@/lib/date";
 import {
@@ -24,8 +23,8 @@ import {
 	deleteTemplate,
 	updateTemplate,
 	updateTemplateAsOfficial,
+	updateTemplateVisibility,
 } from "@/services/template";
-import { updateTemplateVisibility } from "@/services/access-control";
 import { ITemplate } from "@/types/template";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -215,16 +214,12 @@ export function OwnedTemplateCard({
 									"border-border/70 bg-background/80",
 									template.visibility === "private" &&
 										"border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-									template.visibility === "org_private" &&
-										"border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
 									(!template.visibility || template.visibility === "public") &&
 										"text-muted-foreground",
 								)}
 							>
 								{template.visibility === "private" ? (
 									<LockIcon className="mr-1 size-3" />
-								) : template.visibility === "org_private" ? (
-									<UsersIcon className="mr-1 size-3" />
 								) : (
 									<GlobeIcon className="mr-1 size-3" />
 								)}
@@ -328,8 +323,6 @@ export function OwnedTemplateCard({
 							>
 								{template.visibility === "private" ? (
 									<LockIcon className="size-3.5" />
-								) : template.visibility === "org_private" ? (
-									<UsersIcon className="size-3.5" />
 								) : (
 									<GlobeIcon className="size-3.5" />
 								)}
@@ -352,7 +345,6 @@ export function OwnedTemplateCard({
 								>
 									<option value="public">public — anyone can access</option>
 									<option value="private">private — only you</option>
-									<option value="org_private">org_private — granted organizations</option>
 								</select>
 							</div>
 							<DialogFooter>

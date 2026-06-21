@@ -43,7 +43,6 @@ describe("PublishTemplateDialog", () => {
 		await waitFor(() =>
 			expect(publishTemplate).toHaveBeenCalledWith(
 				"https://github.com/demo-owner/demo-repo/tree/main/template",
-				undefined,
 				"public",
 			),
 		);

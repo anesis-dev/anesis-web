@@ -20,14 +20,6 @@ vi.mock("@/hooks/useTemplateReadme", () => ({
 	useTemplateReadme: vi.fn(),
 }));
 
-vi.mock("@/hooks/useOrganizations", () => ({
-	useOrganizations: vi.fn(() => ({
-		organizations: [],
-		isLoading: false,
-		isError: false,
-	})),
-}));
-
 vi.mock("@/components/templates/TemplateReadme", () => ({
 	TemplateReadme: ({
 		fileName,

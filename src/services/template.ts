@@ -86,24 +86,31 @@ export async function fetchTemplateUrl(
 
 export async function publishTemplate(
 	url: string,
-	organizationId?: string,
-	visibility: "public" | "private" | "org_private" = "public",
+	visibility: "public" | "private" = "public",
 ): Promise<{ message: string; name: string }> {
 	return parsePublishTemplateResponse(
 		await api.post<unknown>("/template/publish", {
 			url,
-			organization_id: organizationId ?? null,
 			visibility,
 		}),
 	);
 }
 
-export async function updateTemplate(url: string, organizationId?: string): Promise<void> {
-	await api.patch<void>("/template", { url, organization_id: organizationId ?? null });
+export async function updateTemplate(url: string): Promise<void> {
+	await api.patch<void>("/template", { url });
 }
 
-export async function updateTemplateAsOfficial(url: string, organizationId?: string): Promise<void> {
-	await api.patch<void>("/template/official", { url, organization_id: organizationId ?? null });
+export async function updateTemplateAsOfficial(url: string): Promise<void> {
+	await api.patch<void>("/template/official", { url });
+}
+
+export async function updateTemplateVisibility(
+	id: string,
+	visibility: string,
+): Promise<void> {
+	await api.patch<void>(`/template/${encodeURIComponent(id)}/visibility`, {
+		visibility,
+	});
 }
 
 export async function recordTemplateUse(templateName: string): Promise<void> {

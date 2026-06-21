@@ -74,17 +74,20 @@ function AddonSkeleton() {
 const features = [
 	{
 		title: "Template starters",
-		description: "Pull polished project starters from a shared registry and keep setup consistent across teams.",
+		description:
+			"Pull polished project starters from a shared registry and keep setup consistent across teams.",
 		icon: CommandIcon,
 	},
 	{
 		title: "Workflow addons",
-		description: "Attach reusable commands for QA, migrations, release routines, and internal delivery flows.",
+		description:
+			"Attach reusable commands for QA, migrations, release routines, and internal delivery flows.",
 		icon: BoxesIcon,
 	},
 	{
 		title: "Rust CLI core",
-		description: "Keep local scaffolding fast while the web app handles discovery, documentation, and publishing.",
+		description:
+			"Keep local scaffolding fast while the web app handles discovery, documentation, and publishing.",
 		icon: ServerCogIcon,
 	},
 ];
@@ -127,7 +130,7 @@ export default function Home() {
 				}
 				return getDateTimestamp(b.created_at) - getDateTimestamp(a.created_at);
 			})
-			.slice(0, 3);
+			.slice(0, 4);
 	}, [addons]);
 
 	return (
@@ -141,7 +144,9 @@ export default function Home() {
 								Anesis CLI Registry
 							</h1>
 							<p className="mx-auto max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-								Launch projects from shared templates, install team workflow addons, and keep repeatable setup fast with a Rust-powered local CLI.
+								Launch projects from shared templates, install team workflow
+								addons, and keep repeatable setup fast with a Rust-powered local
+								CLI.
 							</p>
 						</div>
 
@@ -258,7 +263,8 @@ export default function Home() {
 							Install the CLI, wire templates, and publish clean manifests
 						</h2>
 						<p className="mt-3 text-sm leading-6 text-muted-foreground">
-							The docs cover installation, CLI usage, and the registry contracts for `anesis.template.json` and `anesis.addon.json`.
+							The docs cover installation, CLI usage, and the registry contracts
+							for `anesis.template.json` and `anesis.addon.json`.
 						</p>
 						<div className="mt-5 flex flex-wrap gap-3">
 							<Button
@@ -298,7 +304,8 @@ export default function Home() {
 							Ship starters and workflow packages from the same registry model
 						</h2>
 						<p className="mt-3 text-sm leading-6 text-muted-foreground">
-							Templates can target any stack, and addons can encapsulate repeated commands for setup, maintenance, or delivery.
+							Templates can target any stack, and addons can encapsulate
+							repeated commands for setup, maintenance, or delivery.
 						</p>
 						<div className="mt-5 flex flex-wrap gap-3">
 							<Button
@@ -334,7 +341,9 @@ export default function Home() {
 							Latest automations from the registry
 						</h2>
 						<p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-							These packages extend Anesis with reusable commands, so the homepage shows live registry activity instead of only starter templates.
+							These packages extend Anesis with reusable commands, so the
+							homepage shows live registry activity instead of only starter
+							templates.
 						</p>
 					</div>
 					<Button

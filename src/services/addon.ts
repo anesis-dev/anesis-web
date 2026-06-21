@@ -100,20 +100,27 @@ export async function fetchAddonUrl(
 
 export async function publishAddon(
   url: string,
-  organizationId?: string,
-  visibility: "public" | "private" | "org_private" = "public",
+  visibility: "public" | "private" = "public",
 ): Promise<{ message: string; addon_id: string }> {
   return parsePublishAddonResponse(
     await api.post<unknown>("/addon/publish", {
       url,
-      organization_id: organizationId ?? null,
       visibility,
     }),
   );
 }
 
-export async function updateAddon(url: string, organizationId?: string): Promise<void> {
-  await api.patch<void>("/addon", { url, organization_id: organizationId ?? null });
+export async function updateAddon(url: string): Promise<void> {
+  await api.patch<void>("/addon", { url });
+}
+
+export async function updateAddonVisibility(
+  id: string,
+  visibility: string,
+): Promise<void> {
+  await api.patch<void>(`/addon/${encodeURIComponent(id)}/visibility`, {
+    visibility,
+  });
 }
 
 export async function recordAddonUse(addonId: string): Promise<void> {

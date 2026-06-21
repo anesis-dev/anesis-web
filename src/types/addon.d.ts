@@ -18,7 +18,6 @@ export interface IAddonConfig {
 export interface IAddon {
 	id: string;
 	owner_id: string;
-	organization_id?: string;
 	url: string;
 	addon_id: string;
 	name: string;

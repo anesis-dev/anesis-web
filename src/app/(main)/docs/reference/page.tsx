@@ -1,16 +1,11 @@
 import Link from "next/link";
 import { DatabaseIcon, GitBranchIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
+import { DocsHero } from "@/components/docs/DocsHero";
 import { CodeBlock } from "@/components/docs/CodeBlock";
+import { DocsSection, DocsList } from "@/components/docs/prose";
 import { env } from "@/config/env";
 import { fetchTemplateSchema } from "@/services/schema";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const nameRules = `Project name:
@@ -75,101 +70,86 @@ export default async function DocsReferencePage() {
 	}
 
 	return (
-		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-10 lg:px-8">
-			<section className="relative overflow-hidden rounded-[2rem] border bg-card px-6 py-8 shadow-sm sm:px-8">
-				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(181,111,43,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(112,73,35,0.12),transparent_30%)]" />
-				<div className="relative space-y-5">
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
-						<DatabaseIcon className="size-4" />
-						Reference
-					</div>
-					<div className="max-w-4xl space-y-3">
-						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-							Local state, validation rules, and schema links
-						</h1>
-						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
-							Use this page as a compact operational reference for where Anesis
-							stores files, how it validates user input, and where the backend
-							exposes the current template schema.
-						</p>
-					</div>
-					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							`~/.anesis` home
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Schema endpoint preview
-						</span>
-					</div>
-				</div>
-			</section>
+		<div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 lg:px-8">
+			<DocsHero
+				eyebrow="Reference"
+				eyebrowIcon={DatabaseIcon}
+				title="Local state, validation rules, and schema links"
+				description="Use this page as a compact operational reference for where Anesis stores files, how it validates user input, and where the backend exposes the current template schema."
+				chips={["~/.anesis home", "Schema endpoint preview"]}
+			/>
 
-			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-				<Card>
-					<CardHeader>
-						<CardTitle>Local Anesis state</CardTitle>
-						<CardDescription>
-							These directories and files are created or updated by the current
-							CLI implementation.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
+			<div className="flex flex-col gap-10">
+				<DocsSection
+					id="local-state"
+					title="Local Anesis state"
+					lead="These directories and files are created or updated by the current CLI implementation."
+				>
+					<dl className="space-y-3">
 						{localState.map((item) => (
-							<div key={item.path} className="rounded-2xl border bg-muted/20 p-4">
-								<p className="font-mono text-sm font-medium">{item.path}</p>
-								<p className="mt-2 text-sm text-muted-foreground">
-									{item.description}
-								</p>
+							<div key={item.path} className="space-y-1">
+								<dt>
+									<code className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-foreground">
+										{item.path}
+									</code>
+								</dt>
+								<dd className="text-muted-foreground">{item.description}</dd>
 							</div>
 						))}
-					</CardContent>
-				</Card>
+					</dl>
+				</DocsSection>
 
-				<div className="grid gap-6">
-					<Card>
-						<CardHeader>
-							<CardTitle>Cache and lock file fields</CardTitle>
-							<CardDescription>
-								The CLI stores more than raw extracted files; it also writes index
-								metadata for cache and execution state.
-							</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<ul className="space-y-3 text-sm text-muted-foreground">
-								{cacheFields.map((item) => (
-									<li key={item} className="flex gap-2">
-										<span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
-										<span>{item}</span>
-									</li>
-								))}
-							</ul>
-						</CardContent>
-					</Card>
-				</div>
-			</div>
+				<DocsSection
+					id="cache-fields"
+					title="Cache and lock file fields"
+					lead="The CLI stores more than raw extracted files; it also writes index metadata for cache and execution state."
+				>
+					<DocsList items={cacheFields} />
+				</DocsSection>
 
-			<div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-				<Card>
-					<CardHeader>
-						<CardTitle>Validation rules at a glance</CardTitle>
-						<CardDescription>
-							These are the local checks performed before project creation,
-							template installation, and publish/update requests.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={nameRules} />
-					</CardContent>
-				</Card>
+				<DocsSection
+					id="validation"
+					title="Validation rules at a glance"
+					lead="These are the local checks performed before project creation, template installation, and publish/update requests."
+				>
+					<CodeBlock code={nameRules} />
+				</DocsSection>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Related surfaces</CardTitle>
-						<CardDescription>
-							These pages pair naturally with the docs while working with Anesis.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="flex flex-wrap gap-3">
+				<DocsSection
+					id="schema"
+					title="Template schema endpoint"
+					lead="The backend exposes the current JSON Schema used by the web app and registry validation layer."
+				>
+					<div className="flex flex-wrap gap-3">
+						<Button variant="outline" asChild>
+							<Link
+								href={`${env.apiUrl}/schema/anesis.template.schema.json`}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								View raw schema
+							</Link>
+						</Button>
+					</div>
+					{schemaPreview ? (
+						<CodeBlock code={schemaPreview} />
+					) : (
+						<p>
+							Schema preview is unavailable right now. The raw endpoint is still
+							linked above.
+						</p>
+					)}
+				</DocsSection>
+
+				<DocsSection
+					id="related"
+					title="Related surfaces"
+					lead="These pages pair naturally with the docs while working with Anesis."
+				>
+					<div className="flex flex-wrap gap-3">
+						<Button variant="outline" asChild>
+							<Link href="/docs/reference/commands">CLI commands</Link>
+						</Button>
 						<Button variant="outline" asChild>
 							<Link href="/templates">Browse templates</Link>
 						</Button>
@@ -186,41 +166,9 @@ export default async function DocsReferencePage() {
 								CLI repository
 							</Link>
 						</Button>
-					</CardContent>
-				</Card>
-			</div>
-
-			<Card>
-				<CardHeader>
-					<CardTitle>Template schema endpoint</CardTitle>
-					<CardDescription>
-						The backend still exposes the current JSON Schema used by the web app
-						and registry validation layer.
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					<div className="flex flex-wrap gap-3">
-						<Button variant="outline" asChild>
-							<Link
-								href={`${env.apiUrl}/schema/anesis.template.schema.json`}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								View raw schema
-							</Link>
-						</Button>
 					</div>
-
-					{schemaPreview ? (
-						<CodeBlock code={schemaPreview} />
-					) : (
-						<p className="text-sm text-muted-foreground">
-							Schema preview is unavailable right now. The raw endpoint is still
-							linked above.
-						</p>
-					)}
-				</CardContent>
-			</Card>
+				</DocsSection>
+			</div>
 
 			<DocsPagination currentHref="/docs/reference" />
 		</div>

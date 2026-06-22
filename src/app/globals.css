@@ -129,6 +129,14 @@
 		overflow-wrap: anywhere;
 		word-break: break-word;
 	}
+	button:not(:disabled),
+	[role="button"]:not([aria-disabled="true"]),
+	[role="tab"]:not([aria-disabled="true"]),
+	label[for],
+	summary,
+	select:not(:disabled) {
+		cursor: pointer;
+	}
 }
 
 @keyframes fadeIn {

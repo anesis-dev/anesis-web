@@ -197,7 +197,12 @@ export default function AddonDetailsPage({
 					<div className="min-w-0 space-y-3">
 						<div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xl font-semibold">
 							<BoxesIcon className="size-5 text-muted-foreground" />
-							<span className="text-muted-foreground">{addon.config.author}</span>
+							<Link
+								href={`/user/${addon.config.author}`}
+								className="text-primary transition-colors hover:underline"
+							>
+								{addon.config.author}
+							</Link>
 							<span className="text-muted-foreground">/</span>
 							<span className="break-all text-foreground">{addon.addon_id}</span>
 							<span className="ml-1">

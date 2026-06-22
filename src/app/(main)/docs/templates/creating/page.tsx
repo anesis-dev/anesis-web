@@ -1,23 +1,15 @@
 import Link from "next/link";
-import {
-	ArrowRightIcon,
-	FileCodeIcon,
-	FolderOpenIcon,
-	InfoIcon,
-	LayoutTemplateIcon,
-	ShieldCheckIcon,
-	SparklesIcon,
-} from "lucide-react";
+import { LayoutTemplateIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
+import { DocsHero } from "@/components/docs/DocsHero";
 import { CodeBlock } from "@/components/docs/CodeBlock";
-import { Button } from "@/components/ui/button";
+import { Callout } from "@/components/docs/Callout";
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+	DocsSection,
+	DocsSubheading,
+	DocsList,
+	Markup,
+} from "@/components/docs/prose";
 
 const folderStructure = `my-template/
 ├── anesis.template.json   ← required manifest
@@ -99,227 +91,140 @@ const pathRules = [
 
 export default function DocsTemplatesCreatingPage() {
 	return (
-		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-10 lg:px-8">
-			<section className="relative overflow-hidden rounded-[2rem] border bg-card px-6 py-8 shadow-sm sm:px-8">
-				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(181,111,43,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(112,73,35,0.12),transparent_30%)]" />
-				<div className="relative space-y-5">
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
-						<LayoutTemplateIcon className="size-4" />
-						Templates / Creating Templates
-					</div>
-					<div className="max-w-4xl space-y-3">
-						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-							Build your own template
-						</h1>
-						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
-							A template is a folder of project files plus one required manifest:{" "}
-							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								anesis.template.json
-							</code>
-							. Files ending in{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								.tera
-							</code>{" "}
-							are rendered with the user's project name substituted in at generation
-							time. Everything else is copied exactly as-is.
-						</p>
-					</div>
-					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							anesis.template.json manifest
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Tera template rendering
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							project_name variables
-						</span>
-					</div>
-				</div>
-			</section>
+		<div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 lg:px-8">
+			<DocsHero
+				eyebrow="Templates / Creating Templates"
+				eyebrowIcon={LayoutTemplateIcon}
+				title="Build your own template"
+				description={
+					<>
+						A template is a folder of project files plus one required manifest:{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							anesis.template.json
+						</code>
+						. Files ending in{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							.tera
+						</code>{" "}
+						are rendered with the user&apos;s project name substituted in at
+						generation time. Everything else is copied exactly as-is.
+					</>
+				}
+				chips={[
+					"anesis.template.json manifest",
+					"Tera template rendering",
+					"project_name variables",
+				]}
+			/>
 
-			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-				<Card>
-					<CardHeader className="gap-3">
-						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							<FolderOpenIcon className="size-5" />
-						</div>
-						<div>
-							<CardTitle>Folder structure</CardTitle>
-							<CardDescription>
-								Your template is a regular directory. The only required file is the
-								manifest at the root. Everything else is up to you.
-							</CardDescription>
-						</div>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={folderStructure} />
-					</CardContent>
-				</Card>
+			<div className="flex flex-col gap-10">
+				<DocsSection
+					id="folder"
+					title="Folder structure"
+					lead="Your template is a regular directory. The only required file is the manifest at the root — everything else is up to you."
+				>
+					<CodeBlock code={folderStructure} />
+				</DocsSection>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>The two kinds of files</CardTitle>
-						<CardDescription>
-							Anesis decides at generation time whether to render or copy each file.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4 text-sm text-muted-foreground">
-						<div className="rounded-xl border bg-muted/20 p-4 space-y-1">
-							<p className="font-medium text-foreground font-mono text-xs">*.tera files</p>
-							<p>
-								Rendered through the Tera template engine. The{" "}
-								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									.tera
-								</code>{" "}
-								suffix is removed from the output filename. Use these for any file
-								that should contain the project name.
-							</p>
-						</div>
-						<div className="rounded-xl border bg-muted/20 p-4 space-y-1">
-							<p className="font-medium text-foreground font-mono text-xs">All other files</p>
-							<p>
-								Copied exactly as-is. The content is not modified. Use these for
-								binary files, lockfiles, or any file that should never change between
-								projects.
-							</p>
-						</div>
-					</CardContent>
-				</Card>
-			</div>
+				<DocsSection
+					id="file-types"
+					title="The two kinds of files"
+					lead="Anesis decides at generation time whether to render or copy each file."
+				>
+					<DocsSubheading id="tera-files">*.tera files</DocsSubheading>
+					<p>
+						Rendered through the Tera template engine. The <code>.tera</code>{" "}
+						suffix is removed from the output filename. Use these for any file
+						that should contain the project name.
+					</p>
 
-			<Card>
-				<CardHeader className="gap-3">
-					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-						<FileCodeIcon className="size-5" />
-					</div>
-					<div>
-						<CardTitle>The anesis.template.json manifest</CardTitle>
-						<CardDescription>
-							This file must be at the root of your template directory. The CLI reads
-							it to populate the cache index and display metadata in the registry.
-						</CardDescription>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-6">
+					<DocsSubheading id="other-files">All other files</DocsSubheading>
+					<p>
+						Copied exactly as-is — the content is not modified. Use these for
+						binary files, lockfiles, or any file that should never change between
+						projects.
+					</p>
+				</DocsSection>
+
+				<DocsSection
+					id="manifest"
+					title="The anesis.template.json manifest"
+					lead="This file must be at the root of your template directory. The CLI reads it to populate the cache index and display metadata in the registry."
+				>
 					<CodeBlock code={manifestExample} />
-					<div className="space-y-3">
+					<dl className="space-y-3">
 						{manifestFields.map((item) => (
-							<div key={item.field} className="flex gap-3 rounded-xl border bg-muted/10 p-3">
-								<code className="mt-0.5 shrink-0 rounded bg-muted px-2 py-0.5 font-mono text-xs text-foreground">
-									{item.field}
-								</code>
-								<p className="text-sm text-muted-foreground">{item.description}</p>
+							<div
+								key={item.field}
+								className="flex flex-col gap-1 sm:flex-row sm:gap-4"
+							>
+								<dt className="sm:w-48 sm:shrink-0">
+									<code className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-foreground">
+										{item.field}
+									</code>
+								</dt>
+								<dd className="text-muted-foreground">
+									<Markup>{item.description}</Markup>
+								</dd>
 							</div>
 						))}
-					</div>
-				</CardContent>
-			</Card>
+					</dl>
+				</DocsSection>
 
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
-					<CardHeader className="gap-3">
-						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							<SparklesIcon className="size-5" />
-						</div>
-						<div>
-							<CardTitle>Available template variables</CardTitle>
-							<CardDescription>
-								Three forms of the project name are injected into the Tera context
-								automatically. There are no other built-in variables.
-							</CardDescription>
-						</div>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<CodeBlock code={teraVariables} />
-						<p className="text-sm text-muted-foreground">
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								project_name_kebab
-							</code>{" "}
-							and{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								project_name_snake
-							</code>{" "}
-							are derived automatically — you don't need to do any string
-							manipulation in your templates.
+				<DocsSection
+					id="variables"
+					title="Available template variables"
+					lead="Three forms of the project name are injected into the Tera context automatically. There are no other built-in variables."
+				>
+					<CodeBlock code={teraVariables} />
+					<p>
+						<code>project_name_kebab</code> and <code>project_name_snake</code>{" "}
+						are derived automatically — you don&apos;t need to do any string
+						manipulation in your templates.
+					</p>
+
+					<DocsSubheading id="variable-usage">
+						Variable usage in .tera files
+					</DocsSubheading>
+					<p>
+						Use the Tera double-brace syntax anywhere in a <code>.tera</code>{" "}
+						file. The output filename has the <code>.tera</code> suffix removed.
+					</p>
+					<CodeBlock code={teraFileExamples} />
+				</DocsSection>
+
+				<DocsSection
+					id="safety"
+					title="File processing rules and safety"
+					lead="These rules are enforced by the CLI during extraction and rendering."
+				>
+					<DocsList items={pathRules} />
+				</DocsSection>
+
+				<DocsSection
+					id="testing"
+					title="Testing your template locally"
+					lead="You don't need to publish to test."
+				>
+					<Callout variant="tip" title="Local test loop">
+						<p>
+							Install from a local path with <code>anesis template install</code>{" "}
+							pointing at your directory, then run{" "}
+							<code>anesis new test-project my-template</code> to verify the
+							output. Check that <code>.tera</code> files render correctly and
+							that all plain files are copied intact.
 						</p>
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader>
-						<CardTitle>Variable usage in .tera files</CardTitle>
-						<CardDescription>
-							Use the Tera double-brace syntax anywhere in a `.tera` file. The
-							output filename has the `.tera` suffix removed.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={teraFileExamples} />
-					</CardContent>
-				</Card>
-			</div>
-
-			<Card>
-				<CardHeader className="gap-3">
-					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-						<ShieldCheckIcon className="size-5" />
-					</div>
-					<div>
-						<CardTitle>File processing rules and safety</CardTitle>
-						<CardDescription>
-							These rules are enforced by the CLI during extraction and rendering.
-						</CardDescription>
-					</div>
-				</CardHeader>
-				<CardContent>
-					<ul className="space-y-3 text-sm text-muted-foreground">
-						{pathRules.map((item) => (
-							<li key={item} className="flex gap-2">
-								<span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
-								<span>{item}</span>
-							</li>
-						))}
-					</ul>
-				</CardContent>
-			</Card>
-
-			<Card className="border-dashed">
-				<CardHeader className="gap-3">
-					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-						<InfoIcon className="size-5" />
-					</div>
-					<div>
-						<CardTitle className="text-base">Testing your template locally</CardTitle>
-						<CardDescription>
-							You don't need to publish to test. Install from a local path by running{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								anesis template install
-							</code>{" "}
-							with your local directory, then run{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								anesis new test-project my-template
-							</code>{" "}
-							to verify the output. Check that{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								.tera
-							</code>{" "}
-							files are rendered correctly and all plain files are copied intact.
-						</CardDescription>
-					</div>
-				</CardHeader>
-			</Card>
-
-			<div className="flex flex-wrap gap-3">
-				<Button asChild>
-					<Link href="/docs/templates/publishing">
-						Next: Publishing your template
-						<ArrowRightIcon className="size-4" />
-					</Link>
-				</Button>
-				<Button variant="outline" asChild>
-					<Link href="/docs/templates">← Back to Using Templates</Link>
-				</Button>
+					</Callout>
+					<p>
+						When it looks right, continue to{" "}
+						<Link
+							href="/docs/templates/publishing"
+							className="font-medium text-primary hover:underline"
+						>
+							Publishing your template →
+						</Link>
+					</p>
+				</DocsSection>
 			</div>
 
 			<DocsPagination currentHref="/docs/templates/creating" />

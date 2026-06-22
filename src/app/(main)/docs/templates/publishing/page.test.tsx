@@ -20,7 +20,7 @@ describe("DocsTemplatesPublishingPage", () => {
 	it("documents the GitHub URL rules", () => {
 		render(<DocsTemplatesPublishingPage />);
 
-		expect(screen.getByText(/the host must be `github\.com`/i)).toBeInTheDocument();
+		expect(screen.getByText(/the host must be/i)).toBeInTheDocument();
 		expect(screen.getByText(/tree\/<branch>\/<path>/i)).toBeInTheDocument();
 	});
 

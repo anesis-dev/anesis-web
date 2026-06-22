@@ -19,15 +19,6 @@ import {
 	UsersIcon,
 } from "lucide-react";
 
-function Stat({ label, value }: { label: string; value: number }) {
-	return (
-		<div className="flex flex-col items-center gap-0.5">
-			<span className="text-lg font-bold">{value.toLocaleString()}</span>
-			<span className="text-xs text-muted-foreground">{label}</span>
-		</div>
-	);
-}
-
 function ProfileSkeleton() {
 	return (
 		<div className="flex flex-col items-center gap-5 sm:flex-row sm:items-start animate-pulse">
@@ -156,14 +147,6 @@ export default function AccountPage() {
 							<p className="max-w-md text-center text-sm text-muted-foreground sm:text-left">
 								{githubUser.bio}
 							</p>
-						)}
-
-						{githubUser && (
-							<div className="grid w-full max-w-sm grid-cols-3 gap-4 sm:w-auto sm:max-w-none sm:flex sm:items-center sm:gap-6">
-								<Stat label="Followers" value={githubUser.followers} />
-								<Stat label="Following" value={githubUser.following} />
-								<Stat label="Repos" value={githubUser.public_repos} />
-							</div>
 						)}
 
 						<div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-start">

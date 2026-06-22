@@ -1,25 +1,14 @@
 import Link from "next/link";
 import {
 	ArrowRightIcon,
-	DownloadIcon,
 	FolderOpenIcon,
 	LayoutTemplateIcon,
-	ListIcon,
-	PackageCheckIcon,
-	RefreshCwIcon,
-	Trash2Icon,
-	WandSparklesIcon,
 } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
+import { DocsHero } from "@/components/docs/DocsHero";
 import { CodeBlock } from "@/components/docs/CodeBlock";
+import { DocsSection, DocsList } from "@/components/docs/prose";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 
 const installExample = `# Install a template by name from the registry
 anesis template install react-vite-ts
@@ -35,22 +24,18 @@ anesis new . react-vite-ts`;
 
 const newSteps = [
 	{
-		step: "1",
 		title: "Validate the project name",
 		body: 'The name must not already exist on disk. A single dot (".") is allowed to scaffold into the current directory. Names can use letters, numbers, hyphens, underscores, and dots, but cannot start with a dot or end with a dot or space.',
 	},
 	{
-		step: "2",
 		title: "Ensure the template is available",
 		body: "If the template isn't already in the local cache, Anesis fetches it from the registry automatically. This step requires a valid login.",
 	},
 	{
-		step: "3",
 		title: "Render and copy files",
 		body: "Files ending in .tera are rendered with your project name substituted in. All other files are copied exactly as-is.",
 	},
 	{
-		step: "4",
 		title: "Print next steps",
 		body: 'Once the project is written, Anesis prints "cd <project-name>" so you know where to go.',
 	},
@@ -76,43 +61,32 @@ const cacheFacts = [
 
 export default function DocsTemplatesPage() {
 	return (
-		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-10 lg:px-8">
-			<section className="relative overflow-hidden rounded-[2rem] border bg-card px-6 py-8 shadow-sm sm:px-8">
-				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(181,111,43,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(112,73,35,0.12),transparent_30%)]" />
-				<div className="relative space-y-5">
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
-						<LayoutTemplateIcon className="size-4" />
-						Templates
-					</div>
-					<div className="max-w-4xl space-y-3">
-						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-							Scaffold new projects from templates
-						</h1>
-						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
-							A template is a project starter — a folder of files with an{" "}
-							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								anesis.template.json
-							</code>
-							manifest. Install one, run{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								anesis new
-							</code>
-							, and Anesis writes a fully-rendered project to disk with your project
-							name substituted throughout.
-						</p>
-					</div>
-					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Local cache under ~/.anesis
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							.tera file rendering
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Commit-aware cache reuse
-						</span>
-					</div>
-					<div className="flex flex-wrap gap-3">
+		<div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 lg:px-8">
+			<DocsHero
+				eyebrow="Templates"
+				eyebrowIcon={LayoutTemplateIcon}
+				title="Scaffold new projects from templates"
+				description={
+					<>
+						A template is a project starter — a folder of files with an{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							anesis.template.json
+						</code>{" "}
+						manifest. Install one, run{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							anesis new
+						</code>
+						, and Anesis writes a fully-rendered project to disk with your
+						project name substituted throughout.
+					</>
+				}
+				chips={[
+					"Local cache under ~/.anesis",
+					".tera file rendering",
+					"Commit-aware cache reuse",
+				]}
+				actions={
+					<>
 						<Button asChild>
 							<Link href="/templates">
 								Browse templates
@@ -125,228 +99,132 @@ export default function DocsTemplatesPage() {
 								Create a template
 							</Link>
 						</Button>
-					</div>
-				</div>
-			</section>
+					</>
+				}
+			/>
 
-			<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-				<Card>
-					<CardHeader className="gap-3">
-						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							<DownloadIcon className="size-5" />
-						</div>
-						<div>
-							<CardTitle>Installing a template</CardTitle>
-							<CardDescription>
-								<code>anesis template install</code> downloads the template and saves
-								it to your local cache. You only need to install once — subsequent
-								uses of that template are served from cache unless there's a newer
-								version.
-							</CardDescription>
-						</div>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<CodeBlock code={installExample} />
-						<p className="text-sm text-muted-foreground">
-							Installing requires a valid login session from{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								anesis login
-							</code>{" "}
-							because the CLI looks up the template in the backend registry.
-						</p>
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader>
-						<CardTitle>Finding templates</CardTitle>
-						<CardDescription>
-							Browse the template registry to discover what's available before
-							installing.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4 text-sm text-muted-foreground">
-						<p>
-							Every template in the registry has a name, description, and version.
-							The template name is what you pass to{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								anesis template install
-							</code>{" "}
-							and{" "}
-							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								anesis new
-							</code>
-							.
-						</p>
-						<p>
-							Template names can only contain letters, numbers, hyphens, and
-							underscores. Spaces and special characters are rejected by the CLI
-							before it even contacts the backend.
-						</p>
-						<Button variant="outline" asChild>
-							<Link href="/templates">
-								Open template registry
-								<ArrowRightIcon className="size-4" />
-							</Link>
-						</Button>
-					</CardContent>
-				</Card>
-			</div>
-
-			<Card>
-				<CardHeader className="gap-3">
-					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-						<WandSparklesIcon className="size-5" />
-					</div>
-					<div>
-						<CardTitle>Creating a new project with `anesis new`</CardTitle>
-						<CardDescription>
-							This is the primary command for using templates. It combines template
-							auto-install (if needed) with project generation in a single step.
-						</CardDescription>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-6">
-					<CodeBlock code={newExample} />
-					<div className="grid gap-4 sm:grid-cols-2">
-						{newSteps.map((item) => (
-							<div key={item.step} className="flex gap-3 rounded-2xl border bg-muted/20 p-4">
-								<span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
-									{item.step}
-								</span>
-								<div className="space-y-1">
-									<p className="text-sm font-medium">{item.title}</p>
-									<p className="text-sm text-muted-foreground">{item.body}</p>
-								</div>
-							</div>
-						))}
-					</div>
-				</CardContent>
-			</Card>
-
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
-					<CardHeader className="gap-3">
-						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							<ListIcon className="size-5" />
-						</div>
-						<div>
-							<CardTitle>Listing installed templates</CardTitle>
-							<CardDescription>
-								See which templates are already cached on this machine. This command
-								reads only local files — no network call, no login required.
-							</CardDescription>
-						</div>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={listExample} />
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader className="gap-3">
-						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							<Trash2Icon className="size-5" />
-						</div>
-						<div>
-							<CardTitle>Removing a template</CardTitle>
-							<CardDescription>
-								Remove a template from the local cache. The template can be
-								re-installed later; the registry entry is not affected. No login
-								required.
-							</CardDescription>
-						</div>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={removeExample} />
-					</CardContent>
-				</Card>
-			</div>
-
-			<Card>
-				<CardHeader className="gap-3">
-					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-						<RefreshCwIcon className="size-5" />
-					</div>
-					<div>
-						<CardTitle>Updating a template</CardTitle>
-						<CardDescription>
-							Re-fetch a template from its source URL and update its registry entry.
-							Use this when the template author has pushed new changes.
-						</CardDescription>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					<CodeBlock code={updateExample} />
-					<p className="text-sm text-muted-foreground">
-						The update command requires a GitHub URL pointing to the template
-						directory — the same URL used when the template was originally published.
-						A valid login is required.
+			<div className="flex flex-col gap-10">
+				<DocsSection
+					id="install"
+					title="Installing a template"
+					lead="anesis template install downloads the template and saves it to your local cache. You only need to install once — subsequent uses are served from cache unless there's a newer version."
+				>
+					<CodeBlock code={installExample} />
+					<p>
+						Installing requires a valid login session from{" "}
+						<code>anesis login</code>, because the CLI looks up the template in
+						the backend registry.
 					</p>
-				</CardContent>
-			</Card>
+				</DocsSection>
 
-			<Card>
-				<CardHeader className="gap-3">
-					<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-						<PackageCheckIcon className="size-5" />
-					</div>
-					<div>
-						<CardTitle>How the cache works</CardTitle>
-						<CardDescription>
-							Anesis caches templates locally and avoids unnecessary re-downloads using
-							commit SHAs.
-						</CardDescription>
-					</div>
-				</CardHeader>
-				<CardContent>
-					<ul className="space-y-3 text-sm text-muted-foreground">
-						{cacheFacts.map((item) => (
-							<li key={item} className="flex gap-2">
-								<span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary" />
-								<span>{item}</span>
+				<DocsSection
+					id="finding"
+					title="Finding templates"
+					lead="Browse the template registry to discover what's available before installing."
+				>
+					<p>
+						Every template in the registry has a name, description, and version.
+						The template name is what you pass to{" "}
+						<code>anesis template install</code> and <code>anesis new</code>.
+					</p>
+					<p>
+						Template names can only contain letters, numbers, hyphens, and
+						underscores. Spaces and special characters are rejected by the CLI
+						before it even contacts the backend.
+					</p>
+					<p>
+						<Link
+							href="/templates"
+							className="font-medium text-primary hover:underline"
+						>
+							Open the template registry →
+						</Link>
+					</p>
+				</DocsSection>
+
+				<DocsSection
+					id="new"
+					title="Creating a new project with anesis new"
+					lead="This is the primary command for using templates. It combines template auto-install (if needed) with project generation in a single step."
+				>
+					<CodeBlock code={newExample} />
+					<p>When you run it, Anesis works through four steps:</p>
+					<ol className="space-y-3 pl-5 list-decimal marker:text-muted-foreground/60">
+						{newSteps.map((item) => (
+							<li key={item.title} className="pl-1">
+								<span className="font-medium text-foreground">{item.title}.</span>{" "}
+								{item.body}
 							</li>
 						))}
-					</ul>
-				</CardContent>
-			</Card>
+					</ol>
+				</DocsSection>
 
-			<div className="grid gap-4 sm:grid-cols-2">
-				<Card className="border-dashed">
-					<CardHeader>
-						<CardTitle className="text-base">Creating your own template</CardTitle>
-						<CardDescription>
-							Learn how to author an `anesis.template.json` manifest, structure your
-							template folder, and use Tera variables for project name rendering.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<Button variant="outline" asChild>
-							<Link href="/docs/templates/creating">
+				<DocsSection
+					id="list"
+					title="Listing installed templates"
+					lead="See which templates are already cached on this machine. This command reads only local files — no network call, no login required."
+				>
+					<CodeBlock code={listExample} />
+				</DocsSection>
+
+				<DocsSection
+					id="remove"
+					title="Removing a template"
+					lead="Remove a template from the local cache. The template can be re-installed later; the registry entry is not affected. No login required."
+				>
+					<CodeBlock code={removeExample} />
+				</DocsSection>
+
+				<DocsSection
+					id="update"
+					title="Updating a template"
+					lead="Re-fetch a template from its source URL and update its registry entry. Use this when the template author has pushed new changes."
+				>
+					<CodeBlock code={updateExample} />
+					<p>
+						The update command requires a GitHub URL pointing to the template
+						directory — the same URL used when the template was originally
+						published. A valid login is required.
+					</p>
+				</DocsSection>
+
+				<DocsSection
+					id="cache"
+					title="How the cache works"
+					lead="Anesis caches templates locally and avoids unnecessary re-downloads using commit SHAs."
+				>
+					<DocsList items={cacheFacts} />
+				</DocsSection>
+
+				<DocsSection
+					id="next-steps"
+					title="Next steps"
+					lead="Ready to build and share your own?"
+				>
+					<ul className="space-y-2 pl-5 list-disc marker:text-muted-foreground/60">
+						<li className="pl-1">
+							<Link
+								href="/docs/templates/creating"
+								className="font-medium text-primary hover:underline"
+							>
 								Creating Templates
-								<ArrowRightIcon className="size-4" />
-							</Link>
-						</Button>
-					</CardContent>
-				</Card>
-
-				<Card className="border-dashed">
-					<CardHeader>
-						<CardTitle className="text-base">Publishing to the registry</CardTitle>
-						<CardDescription>
-							Learn how to publish and update a template in the Anesis registry using a
-							GitHub URL.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<Button variant="outline" asChild>
-							<Link href="/docs/templates/publishing">
+							</Link>{" "}
+							— author an <code>anesis.template.json</code> manifest, structure
+							your template folder, and use Tera variables for project-name
+							rendering.
+						</li>
+						<li className="pl-1">
+							<Link
+								href="/docs/templates/publishing"
+								className="font-medium text-primary hover:underline"
+							>
 								Publishing Templates
-								<ArrowRightIcon className="size-4" />
-							</Link>
-						</Button>
-					</CardContent>
-				</Card>
+							</Link>{" "}
+							— publish and update a template in the Anesis registry using a
+							GitHub URL.
+						</li>
+					</ul>
+				</DocsSection>
 			</div>
 
 			<DocsPagination currentHref="/docs/templates" />

@@ -17,7 +17,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
-	CardContent,
 	CardFooter,
 	CardHeader,
 	CardTitle,
@@ -129,7 +128,7 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 
 	return (
 		<Card className="h-full gap-0 overflow-hidden py-0 shadow-sm transition-colors hover:border-foreground/30">
-			<CardHeader className="flex min-h-[13.5rem] flex-col justify-between gap-4 border-b bg-[linear-gradient(135deg,rgba(245,158,11,0.08),transparent_38%),linear-gradient(315deg,rgba(16,185,129,0.06),transparent_42%)] px-5 py-5">
+			<CardHeader className="flex flex-col justify-between gap-3 px-4 py-4">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 					<div className="flex min-w-0 flex-1 flex-col gap-3">
 						<div className="flex flex-wrap items-center gap-2">
@@ -149,7 +148,7 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 						</div>
 
 						<div className="space-y-1.5">
-							<CardTitle className="min-h-[3.5rem] text-lg leading-7">
+							<CardTitle className="text-base leading-6">
 								<Link
 									href={detailsHref}
 									className="line-clamp-2 block transition-colors hover:text-primary"
@@ -198,29 +197,7 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 				</div>
 			</CardHeader>
 
-			<CardContent className="flex flex-1 flex-col px-5 py-5">
-				<div className="grid gap-3 sm:grid-cols-2">
-					<div className="rounded-lg border bg-muted/15 px-3 py-3">
-						<p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-							Addon ID
-						</p>
-						<p className="mt-2 truncate font-mono text-sm text-foreground">
-							{addon.addon_id}
-						</p>
-					</div>
-
-					<div className="rounded-lg border bg-muted/15 px-3 py-3">
-						<p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-							Last sync
-						</p>
-						<p className="mt-2 text-sm font-medium text-foreground">
-							{formatDate(addon.updated_at)}
-						</p>
-					</div>
-				</div>
-			</CardContent>
-
-			<CardFooter className="flex flex-col items-stretch gap-2 border-t px-5 py-5">
+			<CardFooter className="mt-auto flex flex-col items-stretch gap-2 border-t px-4 py-4">
 				<Button
 					type="button"
 					size="sm"
@@ -228,7 +205,7 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 					onClick={refreshAddon}
 					disabled={isRefreshing || isDeleting}
 					aria-label={`Update addon ${addon.name}`}
-					className="h-11 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
+					className="h-9 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
 				>
 					{isRefreshing ? (
 						<>
@@ -250,7 +227,7 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 							size="sm"
 							variant="destructive"
 							aria-label={`Delete addon ${addon.name}`}
-							className="h-11 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
+							className="h-9 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
 							disabled={isRefreshing || isDeleting}
 						>
 							<Trash2Icon className="size-3.5" />

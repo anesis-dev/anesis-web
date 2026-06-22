@@ -101,9 +101,6 @@ describe("AccountPage", () => {
 		);
 		expect(screen.getByText("My Templates")).toBeInTheDocument();
 		expect(screen.getByText("My Addons")).toBeInTheDocument();
-		expect(screen.getByText("Repos")).toBeInTheDocument();
-		expect(screen.getByText("Followers")).toBeInTheDocument();
-		expect(screen.getByText("Following")).toBeInTheDocument();
 		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
 		expect(screen.getAllByTestId("addon-card")).toHaveLength(1);
 

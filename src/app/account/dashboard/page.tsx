@@ -15,6 +15,7 @@ import {
 import {
 	BookOpenIcon,
 	BoxesIcon,
+	InfoIcon,
 	PackageIcon,
 	ShieldIcon,
 	StarIcon,
@@ -32,16 +33,16 @@ function DashboardCard({
 	icon: React.ElementType;
 }) {
 	return (
-		<Card>
-			<CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
-				<div>
-					<CardTitle className="text-sm">{title}</CardTitle>
-					<CardDescription className="mt-1">{description}</CardDescription>
-				</div>
-				<Icon className="size-4 text-muted-foreground" />
+		<Card className="gap-0 py-4">
+			<CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 px-4">
+				<CardTitle className="text-sm font-medium text-muted-foreground">
+					{title}
+				</CardTitle>
+				<Icon className="size-4 shrink-0 text-muted-foreground" />
 			</CardHeader>
-			<CardContent>
+			<CardContent className="px-4 pt-2">
 				<p className="text-3xl font-semibold tracking-tight">{value}</p>
+				<CardDescription className="mt-1 text-xs">{description}</CardDescription>
 			</CardContent>
 		</Card>
 	);
@@ -85,7 +86,7 @@ export default function DashboardPage() {
 	return (
 		<div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 sm:px-5 lg:px-8">
 			<div className="space-y-1">
-				<h1 className="text-3xl font-semibold tracking-tight">
+				<h1 className="text-2xl font-semibold tracking-tight">
 					Account dashboard
 				</h1>
 				<p className="text-sm text-muted-foreground">
@@ -121,7 +122,7 @@ export default function DashboardPage() {
 				/>
 			</div>
 
-			<div className="grid gap-4 lg:grid-cols-[1.3fr_0.9fr]">
+			<div className="grid gap-4 lg:grid-cols-2">
 				<Card>
 					<CardHeader>
 						<CardTitle>Next actions</CardTitle>
@@ -160,14 +161,25 @@ export default function DashboardPage() {
 				</Card>
 
 				<Card>
-					<CardHeader>
-						<CardTitle>Publishing reminder</CardTitle>
-						<CardDescription>
-							The current CLI uses authenticated template-download endpoints, so
-							sign-in matters for install/new flows as well as publishing and
-							registry management.
-						</CardDescription>
+					<CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+						<div className="space-y-1.5">
+							<CardTitle>Publishing reminder</CardTitle>
+							<CardDescription>
+								The current CLI uses authenticated template-download endpoints, so
+								sign-in matters for install/new flows as well as publishing and
+								registry management.
+							</CardDescription>
+						</div>
+						<InfoIcon className="size-4 shrink-0 text-muted-foreground" />
 					</CardHeader>
+					<CardContent>
+						<Link href="/docs">
+							<Button variant="outline" size="sm" className="gap-2">
+								<BookOpenIcon className="size-4" />
+								Read the docs
+							</Button>
+						</Link>
+					</CardContent>
 				</Card>
 			</div>
 		</div>

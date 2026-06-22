@@ -26,7 +26,7 @@ import {
 
 const PAGE_SIZE = 6;
 
-function MetricTile({
+function MetricStat({
 	label,
 	value,
 	icon: Icon,
@@ -36,16 +36,12 @@ function MetricTile({
 	icon: React.ElementType;
 }) {
 	return (
-		<div className="rounded-lg border bg-background/85 px-4 py-3 shadow-sm">
-			<div className="flex items-center justify-between gap-3">
-				<p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-					{label}
-				</p>
-				<Icon className="size-4 text-muted-foreground" />
-			</div>
-			<p className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
-				{value}
-			</p>
+		<div className="flex items-center gap-2 rounded-md border bg-background/60 px-3 py-1.5">
+			<Icon className="size-3.5 text-muted-foreground" />
+			<span className="text-sm font-semibold text-foreground">{value}</span>
+			<span className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+				{label}
+			</span>
 		</div>
 	);
 }
@@ -126,45 +122,25 @@ export default function AccountAddonsPage() {
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-5 lg:px-8">
-			<section className="overflow-hidden rounded-xl border bg-card shadow-sm">
-				<div className="bg-[linear-gradient(135deg,rgba(245,158,11,0.12),transparent_38%),linear-gradient(315deg,rgba(16,185,129,0.08),transparent_44%)] px-5 py-6 sm:px-6 sm:py-7">
-					<div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-						<div className="max-w-3xl space-y-3">
-							<div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-								<span className="rounded-md border bg-background/90 px-2.5 py-1">
-									Addon workspace
-								</span>
-							</div>
-							<div className="space-y-2">
-								<h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-									Your addons
-								</h1>
-								<p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-									Manage addon entries published under @{user.login}, keep
-									registry metadata in sync with GitHub, and retire old packages
-									from one place.
-								</p>
-							</div>
-						</div>
+			<section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<h1 className="text-2xl font-semibold tracking-tight">Your addons</h1>
 
-						<div className="grid gap-3 sm:grid-cols-3 xl:w-[28rem]">
-							<MetricTile
-								label="Entries"
-								value={isLoading ? "..." : totalCount}
-								icon={BoxesIcon}
-							/>
-							<MetricTile
-								label="Official"
-								value={isLoading ? "..." : officialAddons}
-								icon={ShieldCheckIcon}
-							/>
-							<MetricTile
-								label="Community"
-								value={isLoading ? "..." : communityAddons}
-								icon={SparklesIcon}
-							/>
-						</div>
-					</div>
+				<div className="flex flex-wrap items-center gap-2">
+					<MetricStat
+						label="Entries"
+						value={isLoading ? "..." : totalCount}
+						icon={BoxesIcon}
+					/>
+					<MetricStat
+						label="Official"
+						value={isLoading ? "..." : officialAddons}
+						icon={ShieldCheckIcon}
+					/>
+					<MetricStat
+						label="Community"
+						value={isLoading ? "..." : communityAddons}
+						icon={SparklesIcon}
+					/>
 				</div>
 			</section>
 

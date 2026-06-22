@@ -1,52 +1,101 @@
+import {
+	BoxesIcon,
+	DatabaseIcon,
+	DownloadIcon,
+	HomeIcon,
+	LayoutTemplateIcon,
+	PencilRulerIcon,
+	ShieldCheckIcon,
+	TerminalIcon,
+	UploadIcon,
+	type LucideIcon,
+} from "lucide-react";
+
 export interface DocsNavItem {
 	title: string;
 	href: string;
-	indent?: boolean;
+	icon: LucideIcon;
 }
 
-export const docsNav: DocsNavItem[] = [
+export interface DocsNavSection {
+	label: string;
+	items: DocsNavItem[];
+}
+
+/**
+ * Grouped documentation navigation rendered in the sidebar. Each section gets a
+ * header label, and each item carries an icon — mirroring a sectioned docs IA.
+ */
+export const docsNavSections: DocsNavSection[] = [
 	{
-		title: "Overview",
-		href: "/docs",
+		label: "Getting Started",
+		items: [
+			{ title: "Overview", href: "/docs", icon: HomeIcon },
+			{ title: "Installation", href: "/docs/installation", icon: DownloadIcon },
+			{
+				title: "Authentication",
+				href: "/docs/authentication",
+				icon: ShieldCheckIcon,
+			},
+		],
 	},
 	{
-		title: "Installation",
-		href: "/docs/installation",
+		label: "Templates",
+		items: [
+			{
+				title: "Using Templates",
+				href: "/docs/templates",
+				icon: LayoutTemplateIcon,
+			},
+			{
+				title: "Creating Templates",
+				href: "/docs/templates/creating",
+				icon: PencilRulerIcon,
+			},
+			{
+				title: "Publishing Templates",
+				href: "/docs/templates/publishing",
+				icon: UploadIcon,
+			},
+		],
 	},
 	{
-		title: "Authentication",
-		href: "/docs/authentication",
+		label: "Addons",
+		items: [
+			{ title: "Using Addons", href: "/docs/addons", icon: BoxesIcon },
+			{
+				title: "Creating Addons",
+				href: "/docs/addons/creating",
+				icon: PencilRulerIcon,
+			},
+			{
+				title: "Publishing Addons",
+				href: "/docs/addons/publishing",
+				icon: UploadIcon,
+			},
+		],
 	},
 	{
-		title: "Templates",
-		href: "/docs/templates",
-	},
-	{
-		title: "Creating Templates",
-		href: "/docs/templates/creating",
-		indent: true,
-	},
-	{
-		title: "Publishing Templates",
-		href: "/docs/templates/publishing",
-		indent: true,
-	},
-	{
-		title: "Addons",
-		href: "/docs/addons",
-	},
-	{
-		title: "Creating Addons",
-		href: "/docs/addons/creating",
-		indent: true,
-	},
-	{
-		title: "Publishing Addons",
-		href: "/docs/addons/publishing",
-		indent: true,
-	},
-	{
-		title: "Reference",
-		href: "/docs/reference",
+		label: "Reference",
+		items: [
+			{
+				title: "Local State & Schema",
+				href: "/docs/reference",
+				icon: DatabaseIcon,
+			},
+			{
+				title: "CLI Commands",
+				href: "/docs/reference/commands",
+				icon: TerminalIcon,
+			},
+		],
 	},
 ];
+
+/**
+ * Flattened, ordered list derived from {@link docsNavSections}. Used by the
+ * previous/next pagination and the command palette search.
+ */
+export const docsNav: DocsNavItem[] = docsNavSections.flatMap(
+	(section) => section.items,
+);

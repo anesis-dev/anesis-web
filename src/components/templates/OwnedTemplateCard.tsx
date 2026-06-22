@@ -31,7 +31,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
-	CardContent,
 	CardFooter,
 	CardHeader,
 	CardTitle,
@@ -195,7 +194,7 @@ export function OwnedTemplateCard({
 
 	return (
 		<Card className="h-full gap-0 overflow-hidden py-0 shadow-sm transition-colors hover:border-foreground/30">
-			<CardHeader className="flex min-h-[13.5rem] flex-col justify-between gap-4 border-b px-5 py-5">
+			<CardHeader className="flex flex-col justify-between gap-3 px-4 py-4">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 					<div className="flex min-w-0 flex-1 flex-col gap-3">
 						<div className="flex flex-wrap items-center gap-2">
@@ -236,7 +235,7 @@ export function OwnedTemplateCard({
 						</div>
 
 						<div className="space-y-1.5">
-							<CardTitle className="min-h-[3.5rem] text-lg leading-7">
+							<CardTitle className="text-base leading-6">
 								<Link
 									href={templateHref}
 									className="block line-clamp-2 transition-colors hover:text-primary"
@@ -288,29 +287,7 @@ export function OwnedTemplateCard({
 				</div>
 			</CardHeader>
 
-			<CardContent className="flex flex-1 flex-col px-5 py-5">
-				<div className="grid gap-3 sm:grid-cols-2">
-					<div className="rounded-lg border bg-muted/15 px-3 py-3">
-						<p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-							Package
-						</p>
-						<p className="mt-2 truncate font-mono text-sm text-foreground">
-							{template.name}
-						</p>
-					</div>
-
-					<div className="rounded-lg border bg-muted/15 px-3 py-3">
-						<p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-							Published
-						</p>
-						<p className="mt-2 text-sm font-medium text-foreground">
-							{publishedAt}
-						</p>
-					</div>
-				</div>
-			</CardContent>
-
-			<CardFooter className="flex flex-col items-stretch gap-2 border-t px-5 py-5">
+			<CardFooter className="mt-auto flex flex-col items-stretch gap-2 border-t px-4 py-4">
 				<div className="flex flex-col gap-2">
 					<Dialog open={isVisibilityOpen} onOpenChange={setIsVisibilityOpen}>
 						<DialogTrigger asChild>
@@ -318,7 +295,7 @@ export function OwnedTemplateCard({
 								type="button"
 								size="sm"
 								variant="outline"
-								className="h-11 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
+								className="h-9 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
 								disabled={isRefreshing || isRefreshingOfficial || isDeleting}
 							>
 								{template.visibility === "private" ? (
@@ -341,7 +318,7 @@ export function OwnedTemplateCard({
 								<select
 									value={pendingVisibility}
 									onChange={(e) => setPendingVisibility(e.target.value)}
-									className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+									className="h-9 w-full cursor-pointer rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 								>
 									<option value="public">public — anyone can access</option>
 									<option value="private">private — only you</option>
@@ -387,7 +364,7 @@ export function OwnedTemplateCard({
 							onClick={refreshTemplate}
 							disabled={isRefreshing || isRefreshingOfficial || isDeleting}
 							aria-label={`Update template ${template.config.metadata.displayName}`}
-							className="h-11 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
+							className="h-9 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
 						>
 							{isRefreshing ? (
 								<>
@@ -410,7 +387,7 @@ export function OwnedTemplateCard({
 								onClick={refreshTemplateAsOfficial}
 								disabled={isRefreshing || isRefreshingOfficial || isDeleting}
 								aria-label={`Update as official for ${template.config.metadata.displayName}`}
-								className="h-11 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
+								className="h-9 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
 							>
 								{isRefreshingOfficial ? (
 									<>
@@ -434,7 +411,7 @@ export function OwnedTemplateCard({
 								size="sm"
 								variant="destructive"
 								aria-label={`Delete template ${template.config.metadata.displayName}`}
-								className="h-11 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
+								className="h-9 w-full justify-center gap-1.5 whitespace-nowrap px-4 text-center"
 								disabled={isRefreshing || isRefreshingOfficial || isDeleting}
 							>
 								<Trash2Icon className="size-3.5" />

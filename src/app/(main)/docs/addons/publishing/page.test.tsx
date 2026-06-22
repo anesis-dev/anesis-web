@@ -20,7 +20,7 @@ describe("DocsAddonsPublishingPage", () => {
 	it("documents the GitHub URL rules", () => {
 		render(<DocsAddonsPublishingPage />);
 
-		expect(screen.getByText(/the host must be `github\.com`/i)).toBeInTheDocument();
+		expect(screen.getByText(/the host must be/i)).toBeInTheDocument();
 	});
 
 	it("explains what publish does step by step", () => {

@@ -254,7 +254,7 @@ export function AddonSettings({
 									value={pendingVisibility}
 									onChange={(event) => setPendingVisibility(event.target.value)}
 									aria-label="Visibility"
-									className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+									className="h-9 w-full cursor-pointer rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 								>
 									<option value="public">public — anyone can access</option>
 									<option value="private">private — only you</option>

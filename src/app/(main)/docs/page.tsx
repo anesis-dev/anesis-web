@@ -7,18 +7,14 @@ import {
 	PackagePlusIcon,
 	PencilRulerIcon,
 	ShieldCheckIcon,
+	TerminalIcon,
 	UploadIcon,
 } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
+import { DocsHero } from "@/components/docs/DocsHero";
 import { CodeBlock } from "@/components/docs/CodeBlock";
+import { DocsSection, Markup } from "@/components/docs/prose";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 
 const quickStart = `anesis login
 anesis new my-app react-vite-ts
@@ -81,44 +77,31 @@ const pillars = [
 		icon: UploadIcon,
 		href: "/docs/addons/publishing",
 	},
+	{
+		title: "CLI Commands",
+		description:
+			"Complete command reference: aliases, usage signatures, flags, and runnable examples for every command.",
+		icon: TerminalIcon,
+		href: "/docs/reference/commands",
+	},
 ];
 
 export default function DocsOverviewPage() {
 	return (
-		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-10 lg:px-8">
-			<section className="relative overflow-hidden rounded-[2rem] border bg-card px-6 py-8 shadow-sm sm:px-8">
-				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(181,111,43,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(112,73,35,0.12),transparent_30%)]" />
-				<div className="relative space-y-5">
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
-						<BookOpenIcon className="size-4" />
-						Anesis Documentation
-					</div>
-					<div className="max-w-4xl space-y-3">
-						<h1 className="text-3xl font-bold tracking-tight sm:text-5xl">
-							Everything you need to scaffold, extend, and publish with Anesis
-						</h1>
-						<p className="max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-							Anesis is a CLI tool for creating new projects from templates and
-							extending existing ones with addons. This documentation covers
-							installation, day-to-day usage, and how to build and publish your own
-							templates and addons.
-						</p>
-					</div>
-					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Project scaffolding
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Declarative addons
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Template + addon cache in ~/.anesis
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Addon runs tracked in anesis.lock
-						</span>
-					</div>
-					<div className="flex flex-wrap gap-3">
+		<div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 lg:px-8">
+			<DocsHero
+				eyebrow="Anesis Documentation"
+				eyebrowIcon={BookOpenIcon}
+				title="Everything you need to scaffold, extend, and publish with Anesis"
+				description="Anesis is a CLI tool for creating new projects from templates and extending existing ones with addons. This documentation covers installation, day-to-day usage, and how to build and publish your own templates and addons."
+				chips={[
+					"Project scaffolding",
+					"Declarative addons",
+					"Template + addon cache in ~/.anesis",
+					"Addon runs tracked in anesis.lock",
+				]}
+				actions={
+					<>
 						<Button asChild>
 							<Link href="/docs/installation">
 								Get started
@@ -134,108 +117,72 @@ export default function DocsOverviewPage() {
 						<Button variant="outline" asChild>
 							<Link href="/templates">Browse templates</Link>
 						</Button>
-					</div>
-				</div>
-			</section>
+					</>
+				}
+			/>
 
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
-					<CardHeader>
-						<CardTitle>First-run flow</CardTitle>
-						<CardDescription>
-							Log in, scaffold a project from a template, then apply an addon.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={quickStart} />
-					</CardContent>
-				</Card>
+			<div className="flex flex-col gap-10">
+				<DocsSection
+					id="first-run"
+					title="First-run flow"
+					lead="Log in, scaffold a project from a template, then apply an addon."
+				>
+					<CodeBlock code={quickStart} />
+				</DocsSection>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>How Anesis works</CardTitle>
-						<CardDescription>
-							Two primitives — templates and addons — cover the full project lifecycle.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4 text-sm text-muted-foreground">
-						<div className="flex gap-3">
-							<span className="mt-0.5 size-5 shrink-0 rounded-full bg-primary/10 text-center text-xs leading-5 text-primary font-medium">1</span>
-							<p>
-								<span className="font-medium text-foreground">Templates</span> are
-								project starters. Run{" "}
-								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									anesis new my-app react-vite-ts
-								</code>{" "}
-								and Anesis downloads the template, renders any{" "}
-								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									.tera
-								</code>{" "}
-								files with your project name, and writes the output to disk.
-							</p>
-						</div>
-						<div className="flex gap-3">
-							<span className="mt-0.5 size-5 shrink-0 rounded-full bg-primary/10 text-center text-xs leading-5 text-primary font-medium">2</span>
-							<p>
-								<span className="font-medium text-foreground">Addons</span> extend an
-								existing project. Run{" "}
-								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									anesis use nest-drizzle install
-								</code>{" "}
-								and Anesis reads the addon manifest, detects your project variant,
-								prompts for inputs, and applies declarative file operations.
-							</p>
-						</div>
-						<div className="flex gap-3">
-							<span className="mt-0.5 size-5 shrink-0 rounded-full bg-primary/10 text-center text-xs leading-5 text-primary font-medium">3</span>
-							<p>
-								Both are cached locally under{" "}
-								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									~/.anesis
-								</code>
-								. Anesis only re-downloads when the backend reports a new commit SHA,
-								and addon runs are recorded in{" "}
-								<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									anesis.lock
-								</code>
-								.
-							</p>
-						</div>
-					</CardContent>
-				</Card>
+				<DocsSection
+					id="how-it-works"
+					title="How Anesis works"
+					lead="Two primitives — templates and addons — cover the full project lifecycle."
+				>
+					<p>
+						<span className="font-medium text-foreground">Templates</span> are
+						project starters. Run{" "}
+						<code>anesis new my-app react-vite-ts</code> and Anesis downloads the
+						template, renders any <code>.tera</code> files with your project
+						name, and writes the output to disk.
+					</p>
+					<p>
+						<span className="font-medium text-foreground">Addons</span> extend an
+						existing project. Run <code>anesis use nest-drizzle install</code> and
+						Anesis reads the addon manifest, detects your project variant, prompts
+						for inputs, and applies declarative file operations.
+					</p>
+					<p>
+						Both are cached locally under <code>~/.anesis</code>. Anesis only
+						re-downloads when the backend reports a new commit SHA, and addon runs
+						are recorded in <code>anesis.lock</code>.
+					</p>
+				</DocsSection>
+
+				<DocsSection
+					id="map"
+					title="Documentation map"
+					lead="Every page is focused on one job. Jump straight to what you need."
+				>
+					<ul className="divide-y rounded-xl border">
+						{pillars.map((item) => (
+							<li key={item.href}>
+								<Link
+									href={item.href}
+									className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-accent/50"
+								>
+									<item.icon className="mt-0.5 size-4 shrink-0 text-primary" />
+									<span className="min-w-0">
+										<span className="font-medium text-foreground">
+											{item.title}
+										</span>
+										<span className="block text-sm text-muted-foreground">
+											<Markup>{item.description}</Markup>
+										</span>
+									</span>
+									<ArrowRightIcon className="mt-1 ml-auto size-4 shrink-0 text-muted-foreground" />
+								</Link>
+							</li>
+						))}
+					</ul>
+				</DocsSection>
 			</div>
-
-			<section className="space-y-4">
-				<div className="space-y-2">
-					<p className="text-sm font-medium text-primary">Documentation map</p>
-					<h2 className="text-2xl font-bold tracking-tight">
-						Every page is focused on one job
-					</h2>
-				</div>
-				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-					{pillars.map((item) => (
-						<Card key={item.href} className="gap-4">
-							<CardHeader className="gap-3">
-								<div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-									<item.icon className="size-5" />
-								</div>
-								<div className="space-y-1">
-									<CardTitle className="text-base">{item.title}</CardTitle>
-									<CardDescription>{item.description}</CardDescription>
-								</div>
-							</CardHeader>
-							<CardContent>
-								<Button variant="outline" asChild>
-									<Link href={item.href}>
-										Open page
-										<ArrowRightIcon className="size-4" />
-									</Link>
-								</Button>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</section>
 
 			<DocsPagination currentHref="/docs" />
 		</div>

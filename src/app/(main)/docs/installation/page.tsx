@@ -1,13 +1,8 @@
-import { DownloadIcon, PackageIcon, TerminalSquareIcon } from "lucide-react";
+import { DownloadIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
+import { DocsHero } from "@/components/docs/DocsHero";
 import { CodeBlock } from "@/components/docs/CodeBlock";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { DocsSection, DocsSubheading } from "@/components/docs/prose";
 
 const installUnix = `curl -sSL https://raw.githubusercontent.com/anesis-dev/anesis-cli/main/install.sh | bash`;
 
@@ -47,190 +42,117 @@ https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-windows
 
 export default function DocsInstallationPage() {
 	return (
-		<div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-5 py-10 lg:px-8">
-			<section className="relative overflow-hidden rounded-[2rem] border bg-card px-6 py-8 shadow-sm sm:px-8">
-				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(181,111,43,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(112,73,35,0.12),transparent_30%)]" />
-				<div className="relative space-y-5">
-					<div className="flex items-center gap-2 text-sm text-muted-foreground">
-						<DownloadIcon className="size-4" />
-						Installation
-					</div>
-					<div className="max-w-3xl space-y-3">
-						<h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-							Install Anesis from scripts, npm, cargo, or release artifacts
-						</h1>
-						<p className="text-sm leading-6 text-muted-foreground sm:text-base">
-							The repository currently exposes four practical installation paths:
-							the Unix shell installer, the PowerShell installer, the npm wrapper
-							package <code>@anesis-cli/anesis</code>, and a direct cargo install for
-							Rust users.
-						</p>
-					</div>
-					<div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Scripts install to `~/.local/bin`
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							Cargo installs to `~/.cargo/bin`
-						</span>
-						<span className="rounded-full border bg-background/80 px-3 py-1">
-							NPM wrapper downloads the platform binary in `postinstall`
-						</span>
-					</div>
-				</div>
-			</section>
+		<div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 lg:px-8">
+			<DocsHero
+				eyebrow="Installation"
+				eyebrowIcon={DownloadIcon}
+				title="Install Anesis from scripts, npm, cargo, or release artifacts"
+				description={
+					<>
+						The repository currently exposes four practical installation paths:
+						the Unix shell installer, the PowerShell installer, the npm wrapper
+						package <code>@anesis-cli/anesis</code>, and a direct cargo install
+						for Rust users.
+					</>
+				}
+				chips={[
+					"Scripts install to ~/.local/bin",
+					"Cargo installs to ~/.cargo/bin",
+					"NPM wrapper downloads the platform binary in postinstall",
+				]}
+			/>
 
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
-					<CardHeader>
-						<CardTitle>Linux and macOS</CardTitle>
-						<CardDescription>
-							The official shell installer fetches the latest release binary.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={installUnix} />
-					</CardContent>
-				</Card>
+			<div className="flex flex-col gap-10">
+				<DocsSection
+					id="shell-installers"
+					title="Shell installers"
+					lead="The official installers fetch the latest release binary and drop it on your PATH. This is the recommended path for most users."
+				>
+					<DocsSubheading id="linux-macos">Linux and macOS</DocsSubheading>
+					<CodeBlock code={installUnix} />
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Windows PowerShell</CardTitle>
-						<CardDescription>
-							Use the PowerShell installer when working on Windows.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={installWindows} />
-					</CardContent>
-				</Card>
-			</div>
+					<DocsSubheading id="windows">Windows PowerShell</DocsSubheading>
+					<CodeBlock code={installWindows} />
+				</DocsSection>
 
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
-					<CardHeader className="gap-3">
-						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							<PackageIcon className="size-5" />
-						</div>
-						<div>
-							<CardTitle>Install with npm</CardTitle>
-							<CardDescription>
-								The npm wrapper package defined in the repository is
-								<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-									@anesis-cli/anesis
-								</code>
-								.
-							</CardDescription>
-						</div>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<CodeBlock code={installNpm} />
-						<p className="text-sm text-muted-foreground">
-							The package downloads the matching Anesis binary during
-							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								postinstall
-							</code>
-							and then exposes the <code>anesis</code> executable.
-						</p>
-					</CardContent>
-				</Card>
+				<DocsSection
+					id="npm"
+					title="Install with npm"
+					lead={
+						<>
+							The npm wrapper package defined in the repository is{" "}
+							<code>@anesis-cli/anesis</code>.
+						</>
+					}
+				>
+					<CodeBlock code={installNpm} />
+					<p>
+						The package downloads the matching Anesis binary during{" "}
+						<code>postinstall</code> and then exposes the <code>anesis</code>{" "}
+						executable.
+					</p>
+				</DocsSection>
 
-				<Card>
-					<CardHeader className="gap-3">
-						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							<TerminalSquareIcon className="size-5" />
-						</div>
-						<div>
-							<CardTitle>Install with cargo</CardTitle>
-							<CardDescription>
-								Use cargo when you already have the Rust toolchain and want the CLI
-								directly from crates.io.
-							</CardDescription>
-						</div>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<CodeBlock code={installCargo} />
-						<p className="text-sm text-muted-foreground">
-							Cargo places the binary into
-							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.cargo/bin
-							</code>
-							, so make sure your shell loads that directory.
-						</p>
-					</CardContent>
-				</Card>
-			</div>
+				<DocsSection
+					id="cargo"
+					title="Install with cargo"
+					lead="Use cargo when you already have the Rust toolchain and want the CLI directly from crates.io."
+				>
+					<CodeBlock code={installCargo} />
+					<p>
+						Cargo places the binary into <code>~/.cargo/bin</code>, so make sure
+						your shell loads that directory.
+					</p>
+				</DocsSection>
 
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
-					<CardHeader>
-						<CardTitle>Upgrade Anesis</CardTitle>
-						<CardDescription>
-							Update the installed CLI binary from the latest GitHub Release.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<CodeBlock code={upgradeCommand} />
-						<p className="text-sm text-muted-foreground">
-							After most commands, Anesis checks for a newer CLI release in the
-							background and prints a short notice when an update is available.
-						</p>
-					</CardContent>
-				</Card>
+				<DocsSection
+					id="path-and-verify"
+					title="PATH setup and verification"
+					lead={
+						<>
+							The Unix installers write the binary to <code>~/.local/bin</code>.
+							If <code>anesis</code> is not found after install, add that
+							directory to your PATH.
+						</>
+					}
+				>
+					<DocsSubheading id="path-bash">Bash</DocsSubheading>
+					<CodeBlock code={pathBash} />
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Shell completions</CardTitle>
-						<CardDescription>
-							Install tab completion for bash, zsh, fish, or PowerShell.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={completionsCommand} />
-					</CardContent>
-				</Card>
-			</div>
+					<DocsSubheading id="path-zsh">Zsh</DocsSubheading>
+					<CodeBlock code={pathZsh} />
 
-			<div className="grid gap-6 lg:grid-cols-2">
-				<Card>
-					<CardHeader>
-						<CardTitle>PATH setup and verification</CardTitle>
-						<CardDescription>
-							The Unix installers write the binary to
-							<code className="mx-1 rounded bg-muted px-1 py-0.5 font-mono text-xs">
-								~/.local/bin
-							</code>
-							.
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="space-y-2">
-							<p className="text-sm font-medium">Bash</p>
-							<CodeBlock code={pathBash} />
-						</div>
-						<div className="space-y-2">
-							<p className="text-sm font-medium">Zsh</p>
-							<CodeBlock code={pathZsh} />
-						</div>
-						<div className="space-y-2">
-							<p className="text-sm font-medium">Verify</p>
-							<CodeBlock code={verifyInstall} />
-						</div>
-					</CardContent>
-				</Card>
+					<DocsSubheading id="verify">Verify the install</DocsSubheading>
+					<CodeBlock code={verifyInstall} />
+				</DocsSection>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Manual release artifacts</CardTitle>
-						<CardDescription>
-							If you prefer to place the binary yourself, download the archive for
-							your platform from GitHub Releases.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<CodeBlock code={manualInstall} />
-					</CardContent>
-				</Card>
+				<DocsSection
+					id="upgrade"
+					title="Upgrade Anesis"
+					lead="Update the installed CLI binary from the latest GitHub Release."
+				>
+					<CodeBlock code={upgradeCommand} />
+					<p>
+						After most commands, Anesis checks for a newer CLI release in the
+						background and prints a short notice when an update is available.
+					</p>
+				</DocsSection>
+
+				<DocsSection
+					id="completions"
+					title="Shell completions"
+					lead="Install tab completion for bash, zsh, fish, or PowerShell."
+				>
+					<CodeBlock code={completionsCommand} />
+				</DocsSection>
+
+				<DocsSection
+					id="manual"
+					title="Manual release artifacts"
+					lead="If you prefer to place the binary yourself, download the archive for your platform from GitHub Releases."
+				>
+					<CodeBlock code={manualInstall} />
+				</DocsSection>
 			</div>
 
 			<DocsPagination currentHref="/docs/installation" />

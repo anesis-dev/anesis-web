@@ -78,6 +78,24 @@ export default function Footer() {
 					</div>
 				</div>
 			</div>
+
+			<div className="border-t border-white/10">
+				<div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-5 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between lg:px-8">
+					<p>© {new Date().getFullYear()} Anesis</p>
+					<p>
+						Source-available under the{" "}
+						<Link
+							href="https://github.com/anesis-dev/anesis/blob/main/LICENSE.md"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-foreground/80 underline-offset-4 transition-colors hover:text-primary hover:underline"
+						>
+							PolyForm Noncommercial License 1.0.0
+						</Link>{" "}
+						— no commercial use.
+					</p>
+				</div>
+			</div>
 		</footer>
 	);
 }

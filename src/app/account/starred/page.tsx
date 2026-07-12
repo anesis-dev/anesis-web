@@ -1,9 +1,9 @@
 /**
  * Starred items page — Client Component (`/account/starred`).
  *
- * Shows all templates and addons that the authenticated user has starred.
- * Paginated separately for templates and addons. Redirects to sign-in if
- * the user is not authenticated.
+ * Shows all templates, addons, and stacks that the authenticated user has
+ * starred. Paginated separately per section. Redirects to sign-in if the user
+ * is not authenticated.
  */
 "use client";
 
@@ -12,11 +12,13 @@ import { useState } from "react";
 import { PaginationControls } from "@/components/PaginationControls";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { AddonCard } from "@/components/addons/AddonCard";
+import { StackCard } from "@/components/stacks/StackCard";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useStarredTemplates } from "@/hooks/useStarredTemplates";
 import { useStarredAddons } from "@/hooks/useStarredAddons";
-import { BoxesIcon, PackageIcon, StarIcon } from "lucide-react";
+import { useStarredStacks } from "@/hooks/useStarredStacks";
+import { BoxesIcon, LayersIcon, PackageIcon, StarIcon } from "lucide-react";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 
 const PAGE_SIZE = 6;
@@ -54,6 +56,7 @@ export default function AccountStarredPage() {
 	const { user, login } = useAuth();
 	const [templatesPage, setTemplatesPage] = useState(1);
 	const [addonsPage, setAddonsPage] = useState(1);
+	const [stacksPage, setStacksPage] = useState(1);
 
 	const {
 		templates,
@@ -66,6 +69,12 @@ export default function AccountStarredPage() {
 		isLoading: addonsLoading,
 		pagination: addonPagination,
 	} = useStarredAddons({ enabled: !!user, page: addonsPage, pageSize: PAGE_SIZE });
+
+	const {
+		stacks,
+		isLoading: stacksLoading,
+		pagination: stackPagination,
+	} = useStarredStacks({ enabled: !!user, page: stacksPage, pageSize: PAGE_SIZE });
 
 	if (!user) {
 		return (
@@ -175,6 +184,45 @@ export default function AccountStarredPage() {
 							page={addonsPage}
 							totalPages={addonPagination.totalPages}
 							onPageChange={setAddonsPage}
+						/>
+					</>
+				)}
+			</div>
+
+			<div className="h-px w-full bg-border" />
+
+			<div className="flex flex-col gap-5">
+				<div className="flex items-center gap-2">
+					<LayersIcon className="size-4 text-muted-foreground" />
+					<h2 className="font-semibold">
+						Starred stacks
+						{!stacksLoading && (
+							<span className="ml-2 font-mono text-sm font-normal text-muted-foreground">
+								{stackPagination.total}
+							</span>
+						)}
+					</h2>
+				</div>
+
+				{stacksLoading ? (
+					<SectionSkeleton />
+				) : stacks.length === 0 ? (
+					<EmptyState
+						icon={LayersIcon}
+						title="No starred stacks yet"
+						description="Stacks you star will show up here."
+					/>
+				) : (
+					<>
+						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+							{stacks.map((stack) => (
+								<StackCard key={stack.id} stack={stack} />
+							))}
+						</div>
+						<PaginationControls
+							page={stacksPage}
+							totalPages={stackPagination.totalPages}
+							onPageChange={setStacksPage}
 						/>
 					</>
 				)}

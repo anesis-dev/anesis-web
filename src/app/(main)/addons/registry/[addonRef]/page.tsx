@@ -38,6 +38,7 @@ import { AddonSettings } from "@/components/addons/AddonSettings";
 import { RepoTabs, RepoTab } from "@/components/RepoTabs";
 import { StatCard } from "@/components/StatCard";
 import { StarButton } from "@/components/StarButton";
+import { BadgeSnippet } from "@/components/BadgeSnippet";
 import { CommandCard } from "@/components/CommandCard";
 
 function Pill({ children }: { children: React.ReactNode }) {
@@ -290,6 +291,10 @@ export default function AddonDetailsPage({
 								<CommandCard label="Install" command={installCommand} copyLabel={installCommand} />
 								<CommandCard label="Remove" command={removeCommand} copyLabel={removeCommand} />
 							</div>
+						</InfoCard>
+
+						<InfoCard title="README badge">
+							<BadgeSnippet resourceType="addon" id={addon.addon_id} />
 						</InfoCard>
 					</div>
 

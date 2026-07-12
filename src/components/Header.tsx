@@ -3,6 +3,7 @@ import { MobileHeaderMenu } from "./MobileHeaderMenu";
 import Nav from "./Nav";
 import { Search } from "./Search";
 import AuthButton from "./AuthButton";
+import { HeaderNotifications } from "./HeaderNotifications";
 
 export default function Header() {
 	return (
@@ -18,6 +19,7 @@ export default function Header() {
 
 					<div className="hidden min-w-0 flex-1 items-center justify-end gap-3 xl:flex">
 						<Search className="w-[11rem] xl:w-[12rem] 2xl:w-[14rem]" />
+						<HeaderNotifications />
 						<div className="shrink-0">
 							<AuthButton />
 						</div>
@@ -25,6 +27,7 @@ export default function Header() {
 
 					<div className="flex items-center gap-2 xl:hidden">
 						<Search variant="icon" />
+						<HeaderNotifications />
 						<MobileHeaderMenu />
 					</div>
 				</div>

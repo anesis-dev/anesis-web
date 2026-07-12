@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchMyTemplates } from "@/services/template";
 import {
 	getEmptyPagination,
@@ -19,6 +19,7 @@ export function useMyTemplates(options: PaginatedQueryOptions | boolean = {}) {
 		queryKey: ["my-templates", page, pageSize],
 		queryFn: () => fetchMyTemplates({ page, pageSize }),
 		enabled,
+		placeholderData: keepPreviousData,
 	});
 
 	return {

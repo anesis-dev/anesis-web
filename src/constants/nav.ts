@@ -13,4 +13,12 @@ export const nav: INav[] = [
     title: "Addons",
     url: "addons",
   },
+  {
+    title: "Stacks",
+    url: "stacks",
+  },
+  {
+    title: "Builder",
+    url: "builder",
+  },
 ];

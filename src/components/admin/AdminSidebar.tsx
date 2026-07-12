@@ -9,6 +9,7 @@ import {
 	LayoutDashboardIcon,
 	BarChart2Icon,
 	BoxesIcon,
+	LayersIcon,
 	PackageIcon,
 	UsersIcon,
 	ArrowLeftIcon,
@@ -19,6 +20,7 @@ const navItems = [
 	{ title: "Dashboard", href: "/admin", icon: LayoutDashboardIcon, exact: true },
 	{ title: "Templates", href: "/admin/templates", icon: PackageIcon, exact: false },
 	{ title: "Addons", href: "/admin/addons", icon: BoxesIcon, exact: false },
+	{ title: "Stacks", href: "/admin/stacks", icon: LayersIcon, exact: false },
 	{ title: "Analytics", href: "/admin/analytics", icon: BarChart2Icon, exact: false },
 	{ title: "Users", href: "/admin/users", icon: UsersIcon, exact: false },
 ];

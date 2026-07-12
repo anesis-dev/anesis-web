@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchMyAddons } from "@/services/addon";
 import {
 	getEmptyPagination,
@@ -19,6 +19,7 @@ export function useMyAddons(options: PaginatedQueryOptions | boolean = {}) {
 		queryKey: ["addons", "my", page, pageSize],
 		queryFn: () => fetchMyAddons({ page, pageSize }),
 		enabled,
+		placeholderData: keepPreviousData,
 	});
 
 	return {

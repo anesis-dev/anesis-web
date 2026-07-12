@@ -57,11 +57,12 @@ describe("AddonRegistryPage", () => {
 		expect(screen.getByText("Failed to load addons")).toBeInTheDocument();
 	});
 
-	it("renders addons with filtering and pagination", async () => {
+	it("renders addons and forwards search to the server", async () => {
 		vi.mocked(useAddons).mockReturnValue({
 			addons,
 			isLoading: false,
 			isError: false,
+			pagination: { total: 10, page: 1, pageSize: 24, totalPages: 1 },
 		});
 		vi.mocked(useAuth).mockReturnValue({
 			user: createUser(),
@@ -79,17 +80,18 @@ describe("AddonRegistryPage", () => {
 		expect(screen.getAllByTestId("addon-card")).toHaveLength(10);
 		expect(screen.getByText("Special Addon")).toBeInTheDocument();
 
+		// Search is now applied server-side: typing must forward the term to the hook.
 		fireEvent.change(
 			screen.getByPlaceholderText(/search by addon id, name, description or author/i),
 			{ target: { value: "special" } },
 		);
 
 		await waitFor(() =>
-			expect(
-				screen.getByText((_, element) => element?.textContent === "Showing 1 of 10 addons"),
-			).toBeInTheDocument(),
+			expect(useAddons).toHaveBeenLastCalledWith(
+				{ page: 1, pageSize: 24 },
+				"recent",
+				{ search: "special", official: false },
+			),
 		);
-		expect(screen.getAllByTestId("addon-card")).toHaveLength(1);
-		expect(screen.getByText("Special Addon")).toBeInTheDocument();
 	});
 });

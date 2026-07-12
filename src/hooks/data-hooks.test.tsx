@@ -84,7 +84,7 @@ describe("data hooks", () => {
       pageSize: 12,
       totalPages: 2,
     });
-    expect(fetchTemplates).toHaveBeenCalledWith({ page: 2, pageSize: 12 });
+    expect(fetchTemplates).toHaveBeenCalledWith({ page: 2, pageSize: 12 }, undefined);
   });
 
   it("loads addons", async () => {
@@ -109,7 +109,11 @@ describe("data hooks", () => {
       pageSize: 9,
       totalPages: 3,
     });
-    expect(fetchAddons).toHaveBeenCalledWith({ page: 3, pageSize: 9 });
+    expect(fetchAddons).toHaveBeenCalledWith(
+      { page: 3, pageSize: 9 },
+      "recent",
+      undefined,
+    );
   });
 
   it("loads every public template page", async () => {

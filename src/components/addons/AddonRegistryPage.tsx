@@ -8,8 +8,10 @@ import { PublishAddonDialog } from "@/components/addons/PublishAddonDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAddons } from "@/hooks/useAddons";
+import { SortMode } from "@/services/addon";
 import { useAuth } from "@/hooks/useAuth";
 import { getDateTimestamp } from "@/lib/date";
+import { SortSelect } from "@/components/SortSelect";
 import {
 	AlertCircleIcon,
 	BookOpenIcon,
@@ -46,59 +48,30 @@ export function AddonRegistryPage() {
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
 	const [officialOnly, setOfficialOnly] = useState(false);
-	const searchActive = search.trim().length > 0;
-	const { addons, isLoading, isError, pagination } = useAddons({
-		page: searchActive ? 1 : page,
-		pageSize: searchActive ? 100 : PAGE_SIZE,
-	});
+	const [sort, setSort] = useState<SortMode>("recent");
+	const { addons, isLoading, isError, pagination } = useAddons(
+		{ page, pageSize: PAGE_SIZE },
+		sort,
+		{ search, official: officialOnly },
+	);
 
-	const filtered = useMemo(() => {
-		const query = search.trim().toLowerCase();
-		const sorted = [...addons].sort((left, right) => {
+	// Server handles search/official/pagination; for the default "recent" view we
+	// still surface official addons first within the current page.
+	const visibleAddons = useMemo(() => {
+		if (sort !== "recent") return addons;
+		return [...addons].sort((left, right) => {
 			if (left.official !== right.official) {
 				return Number(right.official) - Number(left.official);
 			}
-
 			return (
 				getDateTimestamp(right.created_at) - getDateTimestamp(left.created_at)
 			);
 		});
-
-		let result = sorted;
-
-		if (officialOnly) {
-			result = result.filter((addon) => addon.official);
-		}
-
-		if (!query) {
-			return result;
-		}
-
-		return result.filter((addon) =>
-			[
-				addon.addon_id,
-				addon.name,
-				addon.config.description,
-				addon.config.author,
-			]
-				.join(" ")
-				.toLowerCase()
-				.includes(query),
-		);
-	}, [addons, search, officialOnly]);
+	}, [addons, sort]);
 
 	const totalCount = pagination?.total ?? addons.length;
-	const localPagination = searchActive || !pagination;
-	const totalPages = Math.max(
-		1,
-		localPagination
-			? Math.ceil(filtered.length / PAGE_SIZE)
-			: (pagination?.totalPages ?? 1),
-	);
+	const totalPages = Math.max(1, pagination?.totalPages ?? 1);
 	const currentPage = Math.min(page, totalPages);
-	const visibleAddons = localPagination
-		? filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-		: filtered;
 
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8 sm:px-5 lg:px-8">
@@ -141,36 +114,31 @@ export function AddonRegistryPage() {
 						className="pl-10"
 					/>
 				</div>
-				<Button
-					type="button"
-					variant={officialOnly ? "default" : "outline"}
-					onClick={() => setOfficialOnly(!officialOnly)}
-					className="w-full gap-1.5 sm:w-auto"
-				>
-					<ShieldCheckIcon className="size-4" />
-					Official only
-				</Button>
+				<div className="flex gap-2">
+					<SortSelect
+						value={sort}
+						onChange={(next) => {
+							setSort(next);
+							setPage(1);
+						}}
+					/>
+					<Button
+						type="button"
+						variant={officialOnly ? "default" : "outline"}
+						onClick={() => setOfficialOnly(!officialOnly)}
+						className="w-full gap-1.5 sm:w-auto"
+					>
+						<ShieldCheckIcon className="size-4" />
+						Official only
+					</Button>
+				</div>
 			</div>
 
 			{!isLoading && !isError && (
 				<p className="text-xs text-muted-foreground">
-					{filtered.length === totalCount ? (
-						<>
-							Showing{" "}
-							<span className="font-medium text-foreground">{totalCount}</span>{" "}
-							{totalCount === 1 ? "addon" : "addons"}
-						</>
-					) : (
-						<>
-							Showing{" "}
-							<span className="font-medium text-foreground">
-								{filtered.length}
-							</span>{" "}
-							of{" "}
-							<span className="font-medium text-foreground">{totalCount}</span>{" "}
-							addons
-						</>
-					)}
+					Showing{" "}
+					<span className="font-medium text-foreground">{totalCount}</span>{" "}
+					{totalCount === 1 ? "addon" : "addons"}
 				</p>
 			)}
 
@@ -194,13 +162,13 @@ export function AddonRegistryPage() {
 				</div>
 			)}
 
-			{!isLoading && !isError && filtered.length === 0 && (
+			{!isLoading && !isError && addons.length === 0 && (
 				<div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-16 text-center">
 					<BoxesIcon className="size-8 text-muted-foreground" />
 					<div>
 						<p className="text-sm font-medium">No addons found</p>
 						<p className="mt-1 text-xs text-muted-foreground">
-							{addons.length === 0
+							{totalCount === 0
 								? "No addons have been published yet."
 								: "Try adjusting your search query."}
 						</p>
@@ -208,7 +176,7 @@ export function AddonRegistryPage() {
 				</div>
 			)}
 
-			{!isLoading && !isError && filtered.length > 0 && (
+			{!isLoading && !isError && addons.length > 0 && (
 				<>
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 						{visibleAddons.map((addon) => (

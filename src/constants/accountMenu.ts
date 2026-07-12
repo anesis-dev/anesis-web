@@ -18,6 +18,10 @@ export const accountMenu: INav[] = [
 		url: "/account/addons",
 	},
 	{
+		title: "Stacks",
+		url: "/account/stacks",
+	},
+	{
 		title: "Starred",
 		url: "/account/starred",
 	},

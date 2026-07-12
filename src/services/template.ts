@@ -7,17 +7,27 @@ import {
 	parseTemplatesPageResponse,
 	parseTemplateVersionsResponse,
 } from "@/lib/api-contracts";
-import { IPaginatedResponse, IPaginationParams } from "@/types/pagination";
+import {
+	ICatalogFilters,
+	IPaginatedResponse,
+	IPaginationParams,
+} from "@/types/pagination";
 import { ITemplate, ITemplateUrlResponse } from "@/types/template";
 import { IStarResponse } from "@/types/addon";
+import { appendCatalogFilters } from "@/services/catalog-filters";
 
-function buildPaginationPath(path: string, pagination: IPaginationParams): string {
+function buildPaginationPath(
+	path: string,
+	pagination: IPaginationParams,
+	filters?: ICatalogFilters,
+): string {
 	const page = Math.max(1, Math.trunc(pagination.page ?? 1));
 	const pageSize = Math.min(100, Math.max(1, Math.trunc(pagination.pageSize ?? 20)));
 	const params = new URLSearchParams({
 		page: String(page),
 		page_size: String(pageSize),
 	});
+	appendCatalogFilters(params, filters);
 
 	return `${path}?${params.toString()}`;
 }
@@ -30,23 +40,24 @@ function hasExplicitTemplateVersion(templateRef: string): boolean {
 
 export async function fetchTemplates(
 	pagination: IPaginationParams = {},
+	filters?: ICatalogFilters,
 ): Promise<IPaginatedResponse<ITemplate>> {
 	return parseTemplatesPageResponse(
-		await api.get<unknown>(buildPaginationPath("/template/all", pagination)),
+		await api.get<unknown>(buildPaginationPath("/template/all", pagination, filters)),
 	);
 }
 
 export async function fetchAllTemplates(): Promise<ITemplate[]> {
 	const pageSize = 100;
 	const firstPage = await fetchTemplates({ page: 1, pageSize });
-	const templates = [...firstPage.data];
 
-	for (let page = 2; page <= firstPage.totalPages; page += 1) {
-		const nextPage = await fetchTemplates({ page, pageSize });
-		templates.push(...nextPage.data);
-	}
+	const rest = await Promise.all(
+		Array.from({ length: Math.max(0, firstPage.totalPages - 1) }, (_, i) =>
+			fetchTemplates({ page: i + 2, pageSize }),
+		),
+	);
 
-	return templates;
+	return [...firstPage.data, ...rest.flatMap((p) => p.data)];
 }
 
 export async function fetchMyTemplates(

@@ -6,39 +6,57 @@ import {
   parsePublishAddonResponse,
   parseStarResponse,
 } from "@/lib/api-contracts";
-import { IPaginatedResponse, IPaginationParams } from "@/types/pagination";
+import {
+  ICatalogFilters,
+  IPaginatedResponse,
+  IPaginationParams,
+} from "@/types/pagination";
 import { IAddon, IAddonUrlResponse, IStarResponse } from "@/types/addon";
+import { appendCatalogFilters } from "@/services/catalog-filters";
 
-function buildPaginationPath(path: string, pagination: IPaginationParams): string {
+export type SortMode = "recent" | "popular" | "trending";
+
+function buildPaginationPath(
+  path: string,
+  pagination: IPaginationParams,
+  sort?: SortMode,
+  filters?: ICatalogFilters,
+): string {
   const page = Math.max(1, Math.trunc(pagination.page ?? 1));
   const pageSize = Math.min(100, Math.max(1, Math.trunc(pagination.pageSize ?? 20)));
   const params = new URLSearchParams({
     page: String(page),
     page_size: String(pageSize),
   });
+  if (sort && sort !== "recent") {
+    params.set("sort", sort);
+  }
+  appendCatalogFilters(params, filters);
 
   return `${path}?${params.toString()}`;
 }
 
 export async function fetchAddons(
   pagination: IPaginationParams = {},
+  sort?: SortMode,
+  filters?: ICatalogFilters,
 ): Promise<IPaginatedResponse<IAddon>> {
   return parseAddonsPageResponse(
-    await api.get<unknown>(buildPaginationPath("/addon/all", pagination)),
+    await api.get<unknown>(buildPaginationPath("/addon/all", pagination, sort, filters)),
   );
 }
 
 export async function fetchAllAddons(): Promise<IAddon[]> {
   const pageSize = 100;
   const firstPage = await fetchAddons({ page: 1, pageSize });
-  const addons = [...firstPage.data];
 
-  for (let page = 2; page <= firstPage.totalPages; page += 1) {
-    const nextPage = await fetchAddons({ page, pageSize });
-    addons.push(...nextPage.data);
-  }
+  const rest = await Promise.all(
+    Array.from({ length: Math.max(0, firstPage.totalPages - 1) }, (_, i) =>
+      fetchAddons({ page: i + 2, pageSize }),
+    ),
+  );
 
-  return addons;
+  return [...firstPage.data, ...rest.flatMap((p) => p.data)];
 }
 
 export async function fetchAddon(addonRef: string): Promise<IAddon> {

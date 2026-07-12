@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchStarredAddons } from "@/services/addon";
 import {
 	getEmptyPagination,
@@ -19,6 +19,7 @@ export function useStarredAddons(options: PaginatedQueryOptions | boolean = {}) 
 		queryKey: ["addons", "starred", page, pageSize],
 		queryFn: () => fetchStarredAddons({ page, pageSize }),
 		enabled,
+		placeholderData: keepPreviousData,
 	});
 
 	return {

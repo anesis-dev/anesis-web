@@ -1,14 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchTemplates } from "@/services/template";
+import { catalogFiltersKey } from "@/services/catalog-filters";
 import {
 	getEmptyPagination,
 	normalizePaginatedQueryOptions,
 	PaginatedQueryOptions,
 } from "@/hooks/pagination";
 import { ITemplate } from "@/types/template";
-import { IPaginatedResponse } from "@/types/pagination";
+import { ICatalogFilters, IPaginatedResponse } from "@/types/pagination";
 
-export function useTemplates(options: PaginatedQueryOptions = {}) {
+export function useTemplates(
+	options: PaginatedQueryOptions = {},
+	filters?: ICatalogFilters,
+) {
 	const { page, pageSize, enabled } = normalizePaginatedQueryOptions(options);
 	const fallback = getEmptyPagination<ITemplate>(page, pageSize);
 	const {
@@ -16,9 +20,10 @@ export function useTemplates(options: PaginatedQueryOptions = {}) {
 		isLoading,
 		isError,
 	} = useQuery<IPaginatedResponse<ITemplate>>({
-		queryKey: ["templates", page, pageSize],
-		queryFn: () => fetchTemplates({ page, pageSize }),
+		queryKey: ["templates", page, pageSize, catalogFiltersKey(filters)],
+		queryFn: () => fetchTemplates({ page, pageSize }, filters),
 		enabled,
+		placeholderData: keepPreviousData,
 	});
 
 	return {

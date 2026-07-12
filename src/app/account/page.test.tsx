@@ -23,6 +23,10 @@ vi.mock("@/hooks/useMyAddons", () => ({
 	useMyAddons: vi.fn(),
 }));
 
+vi.mock("@/hooks/useMyStacks", () => ({
+	useMyStacks: vi.fn(),
+}));
+
 vi.mock("@/components/addons/AddonCard", () => ({
 	AddonCard: ({ addon }: { addon: { name: string } }) => (
 		<div data-testid="addon-card">{addon.name}</div>
@@ -35,12 +39,27 @@ vi.mock("@/components/templates/TemplateCard", () => ({
 	),
 }));
 
+vi.mock("@/components/stacks/StackCard", () => ({
+	StackCard: ({ stack }: { stack: { name: string } }) => (
+		<div data-testid="stack-card">{stack.name}</div>
+	),
+}));
+
 import { useAuth } from "@/hooks/useAuth";
 import { useGitHubUser } from "@/hooks/useGitHubUser";
 import { useMyAddons } from "@/hooks/useMyAddons";
+import { useMyStacks } from "@/hooks/useMyStacks";
 import { useMyTemplates } from "@/hooks/useMyTemplates";
 
 describe("AccountPage", () => {
+	beforeEach(() => {
+		vi.mocked(useMyStacks).mockReturnValue({
+			stacks: [],
+			isLoading: false,
+			isError: false,
+		});
+	});
+
 	it("renders a sign-in prompt for guests", () => {
 		vi.mocked(useAuth).mockReturnValue({
 			user: null,

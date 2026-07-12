@@ -1,4 +1,5 @@
 import {
+	BotIcon,
 	BoxesIcon,
 	DatabaseIcon,
 	DownloadIcon,
@@ -87,6 +88,11 @@ export const docsNavSections: DocsNavSection[] = [
 				title: "CLI Commands",
 				href: "/docs/reference/commands",
 				icon: TerminalIcon,
+			},
+			{
+				title: "AI Agents & MCP",
+				href: "/docs/ai-agents",
+				icon: BotIcon,
 			},
 		],
 	},

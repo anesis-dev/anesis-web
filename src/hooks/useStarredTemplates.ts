@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchStarredTemplates } from "@/services/template";
 import {
 	getEmptyPagination,
@@ -19,6 +19,7 @@ export function useStarredTemplates(options: PaginatedQueryOptions | boolean = {
 		queryKey: ["templates", "starred", page, pageSize],
 		queryFn: () => fetchStarredTemplates({ page, pageSize }),
 		enabled,
+		placeholderData: keepPreviousData,
 	});
 
 	return {

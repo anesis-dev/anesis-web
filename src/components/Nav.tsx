@@ -5,6 +5,7 @@ const navItems = [
 	{ title: "Docs", url: "docs" },
 	{ title: "Templates", url: "templates" },
 	{ title: "Addons", url: "addons" },
+	{ title: "Stacks", url: "stacks" },
 ];
 
 export default function Nav() {

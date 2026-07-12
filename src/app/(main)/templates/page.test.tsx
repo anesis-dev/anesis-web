@@ -1,9 +1,13 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import TemplatesPage from "@/app/(main)/templates/page";
+import { TemplatesRegistryPage } from "@/components/templates/TemplatesRegistryPage";
 import { createTemplate, createUser } from "@/test/fixtures";
 
 vi.mock("@/hooks/useTemplates", () => ({
 	useTemplates: vi.fn(),
+}));
+
+vi.mock("@/hooks/useAllTemplates", () => ({
+	useAllTemplates: vi.fn(() => ({ templates: [], isLoading: false, isError: false })),
 }));
 
 vi.mock("@/hooks/useAuth", () => ({
@@ -32,31 +36,22 @@ vi.mock("@/components/templates/PublishTemplateDialog", () => ({
 import { useAuth } from "@/hooks/useAuth";
 import { useTemplates } from "@/hooks/useTemplates";
 
-const TEMPLATE_COUNT = 25;
-const SPECIAL_INDEX = TEMPLATE_COUNT - 1;
-
-const templates = Array.from({ length: TEMPLATE_COUNT }, (_, index) =>
+const PAGE_TEMPLATES = Array.from({ length: 24 }, (_, index) =>
 	createTemplate({
 		id: `template-${index + 1}`,
 		name: `demo-${index + 1}`,
 		version: `0.${index}.0`,
 		config: {
 			metadata: {
-				displayName:
-					index === SPECIAL_INDEX
-						? "Special Template 25"
-						: `Template ${index + 1}`,
-				description:
-					index === SPECIAL_INDEX
-						? "Contains a unique search term."
-						: `Description ${index + 1}`,
-				tags: [index === SPECIAL_INDEX ? "special" : `tag-${index + 1}`],
+				displayName: `Template ${index + 1}`,
+				description: `Description ${index + 1}`,
+				tags: [`tag-${index + 1}`],
 			},
 		},
 	}),
 );
 
-describe("TemplatesPage", () => {
+describe("TemplatesRegistryPage", () => {
 	it("shows an error state when templates fail to load", () => {
 		vi.mocked(useTemplates).mockReturnValue({
 			templates: [],
@@ -70,16 +65,17 @@ describe("TemplatesPage", () => {
 			logout: vi.fn(),
 		});
 
-		render(<TemplatesPage />);
+		render(<TemplatesRegistryPage />);
 
 		expect(screen.getByText("Failed to load templates")).toBeInTheDocument();
 	});
 
-	it("renders published templates with filtering and pagination", async () => {
+	it("renders the server-provided page and forwards paging/search to the hook", async () => {
 		vi.mocked(useTemplates).mockReturnValue({
-			templates,
+			templates: PAGE_TEMPLATES,
 			isLoading: false,
 			isError: false,
+			pagination: { total: 25, page: 1, pageSize: 24, totalPages: 2 },
 		});
 		vi.mocked(useAuth).mockReturnValue({
 			user: createUser(),
@@ -87,36 +83,38 @@ describe("TemplatesPage", () => {
 			login: vi.fn(),
 			logout: vi.fn(),
 		});
-		render(<TemplatesPage />);
+
+		render(<TemplatesRegistryPage />);
 
 		expect(screen.getByText("Publish Template")).toBeInTheDocument();
 		expect(
-			screen.getByText((_, element) =>
-				element?.textContent === "Showing 25 templates",
+			screen.getByText(
+				(_, element) => element?.textContent === "Showing 25 templates",
 			),
 		).toBeInTheDocument();
 		expect(screen.getAllByTestId("template-card")).toHaveLength(24);
+		expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
 
+		// Server pagination: clicking Next re-queries the hook for the next page.
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
-		expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
-		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
-		expect(screen.getByText("Special Template 25")).toBeInTheDocument();
+		await waitFor(() =>
+			expect(useTemplates).toHaveBeenLastCalledWith(
+				{ page: 2, pageSize: 24 },
+				expect.objectContaining({ search: "" }),
+			),
+		);
 
+		// Search is applied server-side and resets to the first page.
 		fireEvent.change(
 			screen.getByPlaceholderText(/search by name or description/i),
 			{ target: { value: "special" } },
 		);
-
 		await waitFor(() =>
-			expect(
-				screen.getByText(
-					(_, element) => element?.textContent === "Showing 1 of 25 templates",
-				),
-			).toBeInTheDocument(),
+			expect(useTemplates).toHaveBeenLastCalledWith(
+				{ page: 1, pageSize: 24 },
+				expect.objectContaining({ search: "special" }),
+			),
 		);
-		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
-		expect(screen.getByText("Special Template 25")).toBeInTheDocument();
-		expect(screen.queryByText("Page 2 of 2")).not.toBeInTheDocument();
 	});
 
 	it("shows grouped template payloads with the backend-provided version count", () => {
@@ -132,6 +130,7 @@ describe("TemplatesPage", () => {
 			],
 			isLoading: false,
 			isError: false,
+			pagination: { total: 1, page: 1, pageSize: 24, totalPages: 1 },
 		});
 		vi.mocked(useAuth).mockReturnValue({
 			user: null,
@@ -140,16 +139,14 @@ describe("TemplatesPage", () => {
 			logout: vi.fn(),
 		});
 
-		render(<TemplatesPage />);
+		render(<TemplatesRegistryPage />);
 
 		expect(screen.getAllByTestId("template-card")).toHaveLength(1);
 		expect(screen.getByText("React Vite", { exact: false })).toHaveTextContent(
 			"(2)",
 		);
 		expect(
-			screen.getByText((_, element) =>
-				element?.textContent === "Showing 1 template",
-			),
+			screen.getByText((_, element) => element?.textContent === "Showing 1 template"),
 		).toBeInTheDocument();
 	});
 });

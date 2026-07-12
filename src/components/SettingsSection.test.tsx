@@ -42,13 +42,13 @@ describe("SettingsSection", () => {
 describe("SettingsRow", () => {
 	it("renders the row title, description and action", () => {
 		render(
-			<SettingsRow title="Email" description="Used for notifications">
+			<SettingsRow title="Email" description="Used for sign-in">
 				<button type="button">Edit</button>
 			</SettingsRow>,
 		);
 
 		expect(screen.getByText("Email")).toBeInTheDocument();
-		expect(screen.getByText("Used for notifications")).toBeInTheDocument();
+		expect(screen.getByText("Used for sign-in")).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
 	});
 });

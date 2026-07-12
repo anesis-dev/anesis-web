@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { cn } from "@/lib/utils";
-import { LockIcon, ShieldCheckIcon } from "lucide-react";
+import { DownloadIcon, LockIcon, ShieldCheckIcon } from "lucide-react";
 import { StarButton } from "@/components/StarButton";
 import { starAddon } from "@/services/addon";
 import { useAuth } from "@/hooks/useAuth";
@@ -118,6 +118,15 @@ export function AddonCard({ addon, visibility }: AddonCardProps) {
 				</Link>
 
 				<div className="flex items-center gap-2 shrink-0">
+					{(addon.download_count ?? 0) > 0 && (
+						<span
+							className="flex items-center gap-1 text-[11px] text-muted-foreground"
+							title={`${addon.download_count} installs`}
+						>
+							<DownloadIcon className="size-3" />
+							{addon.download_count}
+						</span>
+					)}
 					<StarButton
 						isStarred={isStarred}
 						starCount={starCount}

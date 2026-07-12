@@ -16,6 +16,7 @@ import {
 	BookOpenIcon,
 	BoxesIcon,
 	InfoIcon,
+	KeyRoundIcon,
 	PackageIcon,
 	ShieldIcon,
 	StarIcon,
@@ -147,6 +148,12 @@ export default function DashboardPage() {
 							<Button variant="outline" className="w-full gap-2 sm:w-auto">
 								<BoxesIcon className="size-4" />
 								Manage addons
+							</Button>
+						</Link>
+						<Link href="/account/tokens" className="w-full sm:w-auto">
+							<Button variant="outline" className="w-full gap-2 sm:w-auto">
+								<KeyRoundIcon className="size-4" />
+								API tokens
 							</Button>
 						</Link>
 						{user.role === "admin" && (

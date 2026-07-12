@@ -10,8 +10,17 @@ class ApiError extends Error {
 	}
 }
 
+// Server-side (SSR/build) can't reliably resolve the relative `/api/backend`
+// rewrite used by the browser — hit the backend directly instead.
+function requestBaseUrl(): string {
+	if (typeof window === "undefined" && process.env.API_PROXY_URL) {
+		return process.env.API_PROXY_URL.replace(/\/+$/, "");
+	}
+	return env.apiUrl;
+}
+
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-	const res = await fetch(`${env.apiUrl}${path}`, {
+	const res = await fetch(`${requestBaseUrl()}${path}`, {
 		credentials: "include",
 		...options,
 		headers: {

@@ -90,7 +90,7 @@ export default function DocsAiAgentsPage() {
 						any MCP-capable client (e.g. Claude Code) at it with this
 						configuration:
 					</p>
-					<CodeBlock code={mcpConfig} />
+					<CodeBlock code={mcpConfig} lang="json" />
 
 					<DocsSubheading id="mcp-tools">Exposed tools</DocsSubheading>
 					<DocsList items={mcpTools} />

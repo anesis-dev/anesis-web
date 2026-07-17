@@ -9,13 +9,15 @@ import { fetchTemplateSchema } from "@/services/schema";
 import { Button } from "@/components/ui/button";
 
 const nameRules = `Project name:
-- "." is allowed
+- "." is allowed (scaffolds into the current directory)
 - other names may use letters, numbers, -, _, .
+- max 255 characters
 - must not start with "."
 - must not end with "." or space
 - must not already exist on disk
+- must not be a reserved Windows device name (CON, PRN, COM1, LPT1, ...)
 
-Template name:
+Template / addon-id name:
 - may use letters, numbers, -, _
 - spaces, dots, slashes, and other punctuation are rejected
 
@@ -27,6 +29,11 @@ const localState = [
 	{
 		path: "~/.anesis",
 		description: "Root home directory created by the CLI at startup.",
+	},
+	{
+		path: "~/.anesis/version_check.json",
+		description:
+			"Cached result of the background CLI-version check, so it isn't hit on every run.",
 	},
 	{
 		path: "~/.anesis/cache/templates",
@@ -45,8 +52,18 @@ const localState = [
 		description: "Addon cache index with id, name, version, path, and commit SHA.",
 	},
 	{
+		path: "~/.anesis/cache/stacks",
+		description: "Cached stack manifests (anesis.stack.json), one file per stack id.",
+	},
+	{
 		path: "~/.anesis/auth.json",
-		description: "Local auth session returned by the browser login flow.",
+		description:
+			"Local auth session returned by the browser login flow (owner-only 0600 permissions on Unix).",
+	},
+	{
+		path: "anesis.json",
+		description:
+			"Written in the project root by `anesis new`: the template name, its commit SHA at generation time, and the list of applied addon ids.",
 	},
 	{
 		path: "anesis.lock",
@@ -55,9 +72,10 @@ const localState = [
 ];
 
 const cacheFields = [
-	"`anesis-templates.json` tracks template `name`, `version`, `source`, `path`, `official`, and `commit_sha`.",
+	"`anesis-templates.json` tracks template `name`, `version`, `source`, `path`, and `commit_sha`.",
 	"`anesis-addons.json` tracks addon `id`, `name`, `version`, `path`, `commit_sha`, and `repo_url`.",
-	"`anesis.lock` stores `id`, `version`, `variant`, and `commands_executed` for each addon used in a project.",
+	"`anesis.json` tracks `template_name`, `template_sha`, and `addons` (ids applied via `anesis new --stack`).",
+	"`anesis.lock` stores, per addon: `id`, `version`, `variant`, `commands_executed`, a `journal` of rollback actions, and the resolved `inputs` used for that addon.",
 ];
 
 export default async function DocsReferencePage() {
@@ -112,7 +130,7 @@ export default async function DocsReferencePage() {
 					title="Validation rules at a glance"
 					lead="These are the local checks performed before project creation, template installation, and publish/update requests."
 				>
-					<CodeBlock code={nameRules} />
+					<CodeBlock code={nameRules} lang="plaintext" />
 				</DocsSection>
 
 				<DocsSection
@@ -132,7 +150,7 @@ export default async function DocsReferencePage() {
 						</Button>
 					</div>
 					{schemaPreview ? (
-						<CodeBlock code={schemaPreview} />
+						<CodeBlock code={schemaPreview} lang="json" />
 					) : (
 						<p>
 							Schema preview is unavailable right now. The raw endpoint is still
@@ -157,8 +175,11 @@ export default async function DocsReferencePage() {
 							<Link href="/addons">Browse addons</Link>
 						</Button>
 						<Button variant="outline" asChild>
+							<Link href="/stacks">Browse stacks</Link>
+						</Button>
+						<Button variant="outline" asChild>
 							<Link
-								href="https://github.com/anesis-dev/anesis-cli"
+								href="https://github.com/anesis-dev/anesis"
 								target="_blank"
 								rel="noopener noreferrer"
 							>

@@ -4,6 +4,7 @@ import {
 	DatabaseIcon,
 	DownloadIcon,
 	HomeIcon,
+	LayersIcon,
 	LayoutTemplateIcon,
 	PencilRulerIcon,
 	ShieldCheckIcon,
@@ -75,6 +76,10 @@ export const docsNavSections: DocsNavSection[] = [
 				icon: UploadIcon,
 			},
 		],
+	},
+	{
+		label: "Stacks",
+		items: [{ title: "Using Stacks", href: "/docs/stacks", icon: LayersIcon }],
 	},
 	{
 		label: "Reference",

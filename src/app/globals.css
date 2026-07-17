@@ -347,3 +347,62 @@
 .anesis-signal-dot {
 	animation: anesisSignalBlink 2.6s ease-in-out infinite;
 }
+
+.hljs {
+	background: transparent;
+	color: var(--foreground);
+}
+
+.hljs-comment,
+.hljs-quote {
+	color: var(--muted-foreground);
+	font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link {
+	color: var(--primary);
+}
+
+.hljs-string,
+.hljs-attr,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: var(--chart-4);
+}
+
+.hljs-number,
+.hljs-name {
+	color: var(--chart-3);
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-title.class_,
+.hljs-built_in,
+.hljs-type {
+	color: var(--chart-2);
+}
+
+.hljs-variable,
+.hljs-template-variable,
+.hljs-property,
+.hljs-attribute {
+	color: var(--foreground);
+}
+
+.hljs-deletion {
+	color: var(--destructive);
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: 600;
+}

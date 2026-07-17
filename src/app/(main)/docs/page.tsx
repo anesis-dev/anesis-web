@@ -2,7 +2,10 @@ import Link from "next/link";
 import {
 	ArrowRightIcon,
 	BookOpenIcon,
+	BotIcon,
+	DatabaseIcon,
 	KeyRoundIcon,
+	LayersIcon,
 	LayoutTemplateIcon,
 	PackagePlusIcon,
 	PencilRulerIcon,
@@ -20,7 +23,10 @@ const quickStart = `anesis login
 anesis new my-app react-vite-ts
 cd my-app
 anesis addon install nest-drizzle
-anesis use nest-drizzle install`;
+anesis use nest-drizzle install
+
+# Or scaffold a template + a pinned set of addons in one shot
+anesis new my-app --stack nest-drizzle-stack`;
 
 const pillars = [
 	{
@@ -78,11 +84,32 @@ const pillars = [
 		href: "/docs/addons/publishing",
 	},
 	{
+		title: "Using Stacks",
+		description:
+			"Scaffold a template plus an ordered, pre-configured set of addons in a single `anesis new --stack` call.",
+		icon: LayersIcon,
+		href: "/docs/stacks",
+	},
+	{
 		title: "CLI Commands",
 		description:
 			"Complete command reference: aliases, usage signatures, flags, and runnable examples for every command.",
 		icon: TerminalIcon,
 		href: "/docs/reference/commands",
+	},
+	{
+		title: "Local State & Schema",
+		description:
+			"Where Anesis stores files under `~/.anesis`, cache/lock file fields, and validation rules.",
+		icon: DatabaseIcon,
+		href: "/docs/reference",
+	},
+	{
+		title: "AI Agents & MCP",
+		description:
+			"Non-interactive flags, token auth, and the `anesis mcp` server for AI agents and CI.",
+		icon: BotIcon,
+		href: "/docs/ai-agents",
 	},
 ];
 
@@ -97,7 +124,8 @@ export default function DocsOverviewPage() {
 				chips={[
 					"Project scaffolding",
 					"Declarative addons",
-					"Template + addon cache in ~/.anesis",
+					"Stacks: template + addons in one command",
+					"Template + addon + stack cache in ~/.anesis",
 					"Addon runs tracked in anesis.lock",
 				]}
 				actions={
@@ -133,23 +161,32 @@ export default function DocsOverviewPage() {
 				<DocsSection
 					id="how-it-works"
 					title="How Anesis works"
-					lead="Two primitives — templates and addons — cover the full project lifecycle."
+					lead="Three primitives — templates, addons, and stacks — cover the full project lifecycle."
 				>
 					<p>
 						<span className="font-medium text-foreground">Templates</span> are
 						project starters. Run{" "}
 						<code>anesis new my-app react-vite-ts</code> and Anesis downloads the
-						template, renders any <code>.tera</code> files with your project
-						name, and writes the output to disk.
+						template, prompts for any inputs the template declares, renders every{" "}
+						<code>.tera</code> file through those inputs plus the project name, and
+						writes the output to disk.
 					</p>
 					<p>
 						<span className="font-medium text-foreground">Addons</span> extend an
 						existing project. Run <code>anesis use nest-drizzle install</code> and
 						Anesis reads the addon manifest, detects your project variant, prompts
-						for inputs, and applies declarative file operations.
+						for inputs, and applies declarative file operations — tracked so they
+						can be undone with <code>anesis undo</code>.
 					</p>
 					<p>
-						Both are cached locally under <code>~/.anesis</code>. Anesis only
+						<span className="font-medium text-foreground">Stacks</span> tie the two
+						together. Run <code>anesis new my-app --stack &lt;id&gt;</code> and
+						Anesis scaffolds the stack&apos;s template, then applies its ordered
+						list of addons with their inputs pre-filled — one command instead of a
+						template followed by several <code>anesis use</code> calls.
+					</p>
+					<p>
+						All three are cached locally under <code>~/.anesis</code>. Anesis only
 						re-downloads when the backend reports a new commit SHA, and addon runs
 						are recorded in <code>anesis.lock</code>.
 					</p>

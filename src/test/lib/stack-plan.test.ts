@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { orderByRequires } from "./stack-plan";
+import { orderByRequires } from "@/lib/stack-plan";
 
 describe("orderByRequires", () => {
 	const deps: Record<string, string[]> = {

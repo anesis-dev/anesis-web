@@ -2,6 +2,7 @@
 
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { AlertCircleIcon, BookOpenTextIcon, LoaderIcon } from "lucide-react";
@@ -15,6 +16,8 @@ const readmeSanitizeSchema = {
 		a: [...(defaultSchema.attributes?.a ?? []), "target", "rel"],
 		img: [...(defaultSchema.attributes?.img ?? []), "width", "height"],
 		p: [...(defaultSchema.attributes?.p ?? []), "align"],
+		code: [...(defaultSchema.attributes?.code ?? []), "className"],
+		span: [...(defaultSchema.attributes?.span ?? []), "className"],
 	},
 };
 
@@ -143,7 +146,7 @@ export function TemplateReadme({
 			<div className="template-readme min-w-0 max-w-full">
 				<ReactMarkdown
 					remarkPlugins={[remarkGfm]}
-					rehypePlugins={[rehypeRaw, [rehypeSanitize, readmeSanitizeSchema]]}
+					rehypePlugins={[rehypeRaw, rehypeHighlight, [rehypeSanitize, readmeSanitizeSchema]]}
 					components={{
 						a: ({ className: markdownClassName, href = "", ...props }) => {
 							const resolvedHref =
@@ -202,7 +205,7 @@ export function TemplateReadme({
 							<pre
 								{...props}
 								className={cn(
-									"max-w-full overflow-x-auto whitespace-pre-wrap break-words rounded-2xl border bg-muted/35 p-4 text-sm leading-6 sm:whitespace-pre [&_code]:block [&_code]:min-w-0 [&_code]:bg-transparent [&_code]:p-0",
+									"max-w-full overflow-x-auto whitespace-pre-wrap break-words rounded-2xl border bg-muted/35 p-4 text-sm leading-6 sm:whitespace-pre [&_code]:block [&_code]:min-w-0 [&_code]:bg-transparent [&_code]:p-0 [&_.hljs]:bg-transparent",
 									markdownClassName,
 								)}
 							/>

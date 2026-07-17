@@ -30,7 +30,26 @@ const manifestExample = `{
   "metadata": {
     "displayName": "React Vite TypeScript",
     "description": "Starter for React + Vite + TypeScript."
-  }
+  },
+  "inputs": [
+    {
+      "name": "package_manager",
+      "type": "select",
+      "description": "Which package manager to target",
+      "default": "npm",
+      "required": true,
+      "options": ["npm", "pnpm", "bun"]
+    },
+    {
+      "name": "use_tailwind",
+      "type": "boolean",
+      "description": "Include Tailwind CSS setup?",
+      "default": false
+    }
+  ],
+  "exclude": [
+    { "when": "!use_tailwind", "paths": ["tailwind.config.ts", "src/styles/tailwind.css"] }
+  ]
 }`;
 
 const manifestFields = [
@@ -61,16 +80,35 @@ const manifestFields = [
 		field: "metadata.description",
 		description: "A short sentence describing what this template creates.",
 	},
+	{
+		field: "inputs",
+		description:
+			"Optional array of input definitions — same shape as addon inputs (text, boolean, select). Anesis prompts for each one before generating any files, and every value is available to .tera files.",
+	},
+	{
+		field: "exclude",
+		description:
+			'Optional array of { "when": "<input-expr>", "paths": [...] } blocks. Paths listed are skipped at generation time when the expression is truthy. Prefix an input name with "!" to negate it, e.g. "!use_tailwind".',
+	},
 ];
 
-const teraVariables = `# Available in every .tera file:
+const teraVariables = `# Always available in every .tera file:
 {{ project_name }}         # exactly what the user typed: "my-app"
 {{ project_name_kebab }}   # lowercase with dashes: "my-app"
-{{ project_name_snake }}   # lowercase with underscores: "my_app"`;
+{{ project_name_snake }}   # lowercase with underscores: "my_app"
+
+# Plus every declared input, and four derived case forms per input.
+# Given an input "package_manager" with value "npm":
+{{ package_manager }}         → npm
+{{ package_manager_pascal }}  → Npm
+{{ package_manager_camel }}   → npm
+{{ package_manager_kebab }}   → npm
+{{ package_manager_snake }}   → npm`;
 
 const teraFileExamples = `// package.json.tera
 {
   "name": "{{ project_name_kebab }}",
+  "packageManager": "{{ package_manager }}",
   "version": "0.1.0"
 }
 
@@ -86,7 +124,9 @@ This project was generated from the react-vite-ts template.`;
 const pathRules = [
 	"Files ending in `.tera` are rendered through the Tera template engine. The `.tera` suffix is stripped from the output filename — `package.json.tera` becomes `package.json`.",
 	"Files without a `.tera` suffix are copied exactly as-is, with no rendering.",
-	"Path traversal is blocked at extraction time. A template cannot write files outside the target project directory, regardless of how paths are constructed.",
+	"Any path matched by an `exclude` block whose `when` expression is true at generation time is skipped entirely — it is never written or rendered.",
+	"Path traversal is blocked at extraction time. A template cannot write files outside the target project directory, regardless of how paths are constructed — this is enforced independently of anything the manifest declares.",
+	"If a target file already exists on disk (e.g. scaffolding into a non-empty directory with `.`), Anesis overwrites it and warns you afterwards which paths were overwritten.",
 ];
 
 export default function DocsTemplatesCreatingPage() {
@@ -106,14 +146,19 @@ export default function DocsTemplatesCreatingPage() {
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
 							.tera
 						</code>{" "}
-						are rendered with the user&apos;s project name substituted in at
-						generation time. Everything else is copied exactly as-is.
+						are rendered through Tera with the project name and any declared{" "}
+						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+							inputs
+						</code>{" "}
+						substituted in at generation time. Everything else is copied exactly
+						as-is.
 					</>
 				}
 				chips={[
 					"anesis.template.json manifest",
 					"Tera template rendering",
-					"project_name variables",
+					"Declared inputs + exclude blocks",
+					"project_name + input case variables",
 				]}
 			/>
 
@@ -123,7 +168,7 @@ export default function DocsTemplatesCreatingPage() {
 					title="Folder structure"
 					lead="Your template is a regular directory. The only required file is the manifest at the root — everything else is up to you."
 				>
-					<CodeBlock code={folderStructure} />
+					<CodeBlock code={folderStructure} lang="plaintext" />
 				</DocsSection>
 
 				<DocsSection
@@ -151,7 +196,7 @@ export default function DocsTemplatesCreatingPage() {
 					title="The anesis.template.json manifest"
 					lead="This file must be at the root of your template directory. The CLI reads it to populate the cache index and display metadata in the registry."
 				>
-					<CodeBlock code={manifestExample} />
+					<CodeBlock code={manifestExample} lang="json" />
 					<dl className="space-y-3">
 						{manifestFields.map((item) => (
 							<div
@@ -174,13 +219,14 @@ export default function DocsTemplatesCreatingPage() {
 				<DocsSection
 					id="variables"
 					title="Available template variables"
-					lead="Three forms of the project name are injected into the Tera context automatically. There are no other built-in variables."
+					lead="The project name is always injected, and every declared input adds itself plus four derived casing forms."
 				>
 					<CodeBlock code={teraVariables} />
 					<p>
 						<code>project_name_kebab</code> and <code>project_name_snake</code>{" "}
-						are derived automatically — you don&apos;t need to do any string
-						manipulation in your templates.
+						are derived automatically, and the same happens for every input you
+						declare — you don&apos;t need to do any string manipulation in your
+						templates.
 					</p>
 
 					<DocsSubheading id="variable-usage">
@@ -190,7 +236,7 @@ export default function DocsTemplatesCreatingPage() {
 						Use the Tera double-brace syntax anywhere in a <code>.tera</code>{" "}
 						file. The output filename has the <code>.tera</code> suffix removed.
 					</p>
-					<CodeBlock code={teraFileExamples} />
+					<CodeBlock code={teraFileExamples} lang="plaintext" />
 				</DocsSection>
 
 				<DocsSection
@@ -208,11 +254,13 @@ export default function DocsTemplatesCreatingPage() {
 				>
 					<Callout variant="tip" title="Local test loop">
 						<p>
-							Install from a local path with <code>anesis template install</code>{" "}
-							pointing at your directory, then run{" "}
+							Validate and cache your directory with{" "}
+							<code>anesis template link ./my-template</code>, then run{" "}
 							<code>anesis new test-project my-template</code> to verify the
-							output. Check that <code>.tera</code> files render correctly and
-							that all plain files are copied intact.
+							output. Check that <code>.tera</code> files render correctly, that
+							inputs and their derived case forms come through, that{" "}
+							<code>exclude</code> blocks skip the right paths, and that all plain
+							files are copied intact.
 						</p>
 					</Callout>
 					<p>

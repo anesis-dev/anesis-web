@@ -155,6 +155,18 @@ const stepRename = `{
   "to": "src/db/{{ driver_snake }}.ts"
 }`;
 
+const stepPackages = `{
+  "type": "packages",
+  "dependencies": ["drizzle-orm", "{{ driver }}"],
+  "dev_dependencies": ["drizzle-kit"]
+}`;
+
+const stepRun = `{
+  "type": "run",
+  "command": "npx drizzle-kit generate --dialect {{ driver }}",
+  "description": "Generate the initial Drizzle migration"
+}`;
+
 const topLevelFields = [
 	{ field: "schema_version", desc: 'Always "1" for the current format.' },
 	{
@@ -170,7 +182,7 @@ const topLevelFields = [
 	{ field: "author", desc: "The author's GitHub username or organization." },
 	{
 		field: "requires",
-		desc: "Array of addon IDs that must already be cached locally before this addon runs.",
+		desc: "Array of addon IDs that must already be applied in this project (present in anesis.lock) before this addon runs — not merely cached. Anesis refuses to run with a clear error naming the missing dependency.",
 	},
 ];
 
@@ -299,13 +311,54 @@ const stepTypes: {
 			"Rename a file or move it to a new location. Both the source and destination paths are rendered through Tera.",
 		code: stepRename,
 	},
+	{
+		name: "packages",
+		id: "step-packages",
+		summary:
+			"Add production and/or dev dependencies using whatever package manager the project already uses.",
+		code: stepPackages,
+		note: (
+			<>
+				Anesis detects the manager from lockfiles/manifests already in the
+				project root — <code>bun.lock(b)</code>, <code>pnpm-lock.yaml</code>,{" "}
+				<code>yarn.lock</code>, <code>package.json</code> (npm), or{" "}
+				<code>Cargo.toml</code> — and runs its native add command (
+				<code>npm install</code> for npm, <code>&lt;pm&gt; add</code>{" "}
+				otherwise, with each tool&apos;s own dev-dependency flag). The
+				manifest and lockfile are snapshotted first and restored if the
+				command fails, so a failed install doesn&apos;t leave a half-modified
+				package.json.
+			</>
+		),
+	},
+	{
+		name: "run",
+		id: "step-run",
+		summary:
+			"Execute an arbitrary shell command in the project root — for anything the other step types can't express, like running a code generator.",
+		code: stepRun,
+		note: (
+			<>
+				<code>command</code> is rendered through Tera first. Because this runs
+				unsandboxed code, Anesis always prints the exact resolved command and
+				asks for an explicit yes before executing it — unless{" "}
+				<code>--yes</code> or non-interactive mode is active. A run step is{" "}
+				<span className="font-medium text-foreground">not reversible</span>:
+				it's recorded in the rollback journal as an irreversible action, so{" "}
+				<code>anesis undo</code> skips it rather than trying to undo its
+				side effects.
+			</>
+		),
+	},
 ];
 
 const rollbackNote = [
 	"Steps are applied in order. If any step fails, Anesis asks whether to keep the partial changes or roll back everything that ran before the failure.",
 	"Copy and create steps restore the original file (or delete newly created files) on rollback.",
 	"Inject, replace, and append steps restore the file content to its pre-step state on rollback.",
+	"A packages step snapshots the package manifest/lockfile before running and restores them if the install command fails or a later step fails.",
 	"Delete steps are not rolled back — the file is gone. Place delete steps at the end of your step list if order matters.",
+	"Run steps are never rolled back — they're recorded as an irreversible action in the journal, so `anesis undo` skips them and leaves their side effects in place.",
 ];
 
 const safetyPoints = [
@@ -360,7 +413,7 @@ export default function DocsAddonsCreatingPage() {
 				chips={[
 					"anesis.addon.json",
 					"Variant detection",
-					"8 step types",
+					"10 step types",
 					"Rollback on failure",
 				]}
 			/>
@@ -371,7 +424,7 @@ export default function DocsAddonsCreatingPage() {
 					title="The manifest at a glance"
 					lead="anesis.addon.json must be at the root of your addon directory. All top-level fields are required except requires."
 				>
-					<CodeBlock code={manifestOverview} />
+					<CodeBlock code={manifestOverview} lang="json" />
 					<DocsSubheading id="top-level-fields">Top-level fields</DocsSubheading>
 					<FieldList items={topLevelFields} />
 				</DocsSection>
@@ -381,7 +434,7 @@ export default function DocsAddonsCreatingPage() {
 					title="Inputs — prompting users for information"
 					lead="Inputs are declared at two levels: the manifest level (asked once per addon run) and the command level (asked when a specific command runs). Both use the same structure."
 				>
-					<CodeBlock code={inputsExample} />
+					<CodeBlock code={inputsExample} lang="json" />
 					<DocsSubheading id="derived-variables">
 						Derived variable forms
 					</DocsSubheading>
@@ -397,7 +450,7 @@ export default function DocsAddonsCreatingPage() {
 					title="Detection — choosing the right variant"
 					lead="The detect array lets your addon behave differently depending on the target project's setup. Anesis evaluates each detect block in order and uses the first one that matches."
 				>
-					<CodeBlock code={detectExample} />
+					<CodeBlock code={detectExample} lang="json" />
 					<DocsSubheading id="detect-rules">Rule types</DocsSubheading>
 					<FieldList items={detectRules} />
 					<p>
@@ -413,7 +466,7 @@ export default function DocsAddonsCreatingPage() {
 					title="Variants — conditional command sets"
 					lead="Each variant holds a set of commands. The variant whose when matches the detected id is used. Include a variant with when: null as a fallback for projects that don't match any detect block."
 				>
-					<CodeBlock code={variantsExample} />
+					<CodeBlock code={variantsExample} lang="json" />
 					<p>
 						You can have as many variants as you need. Each variant can expose a
 						different set of commands — or the same command names with different
@@ -426,13 +479,13 @@ export default function DocsAddonsCreatingPage() {
 					title="Commands — the user-facing operations"
 					lead="Each command in a variant has a name, optional constraints, its own inputs, and a list of steps to execute."
 				>
-					<CodeBlock code={commandExample} />
+					<CodeBlock code={commandExample} lang="json" />
 					<FieldList items={commandFields} />
 				</DocsSection>
 
 				<DocsSection
 					id="steps"
-					title="Eight step types for all file operations"
+					title="Ten step types for all file and shell operations"
 					lead={
 						<>
 							Steps are executed in order. Every step that writes to a file
@@ -453,7 +506,7 @@ export default function DocsAddonsCreatingPage() {
 						<div key={step.id} className="space-y-3">
 							<DocsSubheading id={step.id}>{step.name}</DocsSubheading>
 							<p>{step.summary}</p>
-							<CodeBlock code={step.code} />
+							<CodeBlock code={step.code} lang="json" />
 							{step.note ? <p>{step.note}</p> : null}
 						</div>
 					))}

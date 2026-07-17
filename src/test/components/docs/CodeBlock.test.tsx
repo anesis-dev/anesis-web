@@ -3,10 +3,11 @@ import { CodeBlock } from "@/components/docs/CodeBlock";
 
 describe("CodeBlock", () => {
 	it("renders formatted code content", () => {
-		render(<CodeBlock code={'{ "name": "anesis" }'} />);
+		const { container } = render(<CodeBlock code={'{ "name": "anesis" }'} lang="json" />);
 
-		expect(screen.getByText('{ "name": "anesis" }')).toBeInTheDocument();
-		expect(screen.getByText('{ "name": "anesis" }').tagName).toBe("CODE");
+		const code = container.querySelector("code.hljs");
+		expect(code).toBeInTheDocument();
+		expect(code?.textContent).toBe('{ "name": "anesis" }');
 	});
 
 	it("copies code to the clipboard", async () => {

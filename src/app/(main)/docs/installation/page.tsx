@@ -2,15 +2,15 @@ import { DownloadIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { DocsHero } from "@/components/docs/DocsHero";
 import { CodeBlock } from "@/components/docs/CodeBlock";
-import { DocsSection, DocsSubheading } from "@/components/docs/prose";
+import { DocsSection, DocsSubheading, DocsList } from "@/components/docs/prose";
 
-const installUnix = `curl -sSL https://raw.githubusercontent.com/anesis-dev/anesis-cli/main/install.sh | bash`;
+const installUnix = `curl -sSL https://raw.githubusercontent.com/anesis-dev/anesis/main/install.sh | bash`;
 
-const installWindows = `irm https://raw.githubusercontent.com/anesis-dev/anesis-cli/main/install.ps1 | iex`;
+const installWindows = `irm https://raw.githubusercontent.com/anesis-dev/anesis/main/install.ps1 | iex`;
 
-const installNpm = `npm install -g @anesis-cli/anesis`;
+const installNpm = `npm install -g anesis-cli`;
 
-const installCargo = `cargo install anesis-cli`;
+const installCargo = `cargo install anesis`;
 
 const verifyInstall = `anesis --version`;
 
@@ -29,16 +29,22 @@ const pathZsh = `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc`;
 
 const manualInstall = `# Linux x86_64
-https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-linux-x86_64.tar.gz
+https://github.com/anesis-dev/anesis/releases/latest/download/anesis-linux-x86_64.tar.gz
 
 # Linux ARM64
-https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-linux-aarch64.tar.gz
+https://github.com/anesis-dev/anesis/releases/latest/download/anesis-linux-aarch64.tar.gz
 
 # macOS Apple Silicon
-https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-macos-aarch64.tar.gz
+https://github.com/anesis-dev/anesis/releases/latest/download/anesis-macos-aarch64.tar.gz
 
 # Windows x86_64
-https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-windows-x86_64.zip`;
+https://github.com/anesis-dev/anesis/releases/latest/download/anesis-windows-x86_64.zip`;
+
+const endpointOverrides = [
+	"`ANESIS_BACKEND_URL` — override the registry/API backend (defaults to https://anesis-server.onrender.com).",
+	"`ANESIS_FRONTEND_URL` — override the site used for the browser login callback (defaults to https://anesis-dev.vercel.app).",
+	"`ANESIS_TOKEN` — a personal access token that replaces the browser login flow entirely; see the AI agents page.",
+];
 
 export default function DocsInstallationPage() {
 	return (
@@ -51,8 +57,8 @@ export default function DocsInstallationPage() {
 					<>
 						The repository currently exposes four practical installation paths:
 						the Unix shell installer, the PowerShell installer, the npm wrapper
-						package <code>@anesis-cli/anesis</code>, and a direct cargo install
-						for Rust users.
+						package <code>anesis-cli</code>, and a direct cargo install for Rust
+						users (crate name <code>anesis</code>).
 					</>
 				}
 				chips={[
@@ -73,6 +79,12 @@ export default function DocsInstallationPage() {
 
 					<DocsSubheading id="windows">Windows PowerShell</DocsSubheading>
 					<CodeBlock code={installWindows} />
+
+					<p>
+						On Unix, the installer also detects your login shell (bash, zsh, or
+						fish) and installs its tab completions automatically — no extra step
+						needed.
+					</p>
 				</DocsSection>
 
 				<DocsSection
@@ -81,7 +93,7 @@ export default function DocsInstallationPage() {
 					lead={
 						<>
 							The npm wrapper package defined in the repository is{" "}
-							<code>@anesis-cli/anesis</code>.
+							<code>anesis-cli</code>.
 						</>
 					}
 				>
@@ -96,7 +108,7 @@ export default function DocsInstallationPage() {
 				<DocsSection
 					id="cargo"
 					title="Install with cargo"
-					lead="Use cargo when you already have the Rust toolchain and want the CLI directly from crates.io."
+					lead="Use cargo when you already have the Rust toolchain and want the CLI directly from crates.io. The crate name is anesis, not anesis-cli."
 				>
 					<CodeBlock code={installCargo} />
 					<p>
@@ -135,6 +147,8 @@ export default function DocsInstallationPage() {
 					<p>
 						After most commands, Anesis checks for a newer CLI release in the
 						background and prints a short notice when an update is available.
+						Commands that produce <code>--json</code> output, plus this one and{" "}
+						<code>anesis completions</code>, skip that check.
 					</p>
 				</DocsSection>
 
@@ -152,6 +166,14 @@ export default function DocsInstallationPage() {
 					lead="If you prefer to place the binary yourself, download the archive for your platform from GitHub Releases."
 				>
 					<CodeBlock code={manualInstall} />
+				</DocsSection>
+
+				<DocsSection
+					id="endpoints"
+					title="Endpoint overrides"
+					lead="Environment variables that change which backend and frontend the CLI talks to — useful for self-hosting or local development against the registry."
+				>
+					<DocsList items={endpointOverrides} />
 				</DocsSection>
 			</div>
 

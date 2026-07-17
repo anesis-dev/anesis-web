@@ -17,14 +17,17 @@ describe("DocsReferencePage", () => {
 	it("renders the schema preview and current local state reference", async () => {
 		vi.mocked(fetchTemplateSchema).mockResolvedValueOnce(`{\n  "title": "anesis"\n}`);
 
-		render(await DocsReferencePage());
+		const { container } = render(await DocsReferencePage());
 
 		expect(
 			screen.getByRole("heading", {
 				name: /local state, validation rules, and schema links/i,
 			}),
 		).toBeInTheDocument();
-		expect(screen.getByText('{ "title": "anesis" }', { exact: false })).toBeInTheDocument();
+		const codeBlocks = Array.from(container.querySelectorAll("code.hljs")).map(
+			(node) => node.textContent,
+		);
+		expect(codeBlocks).toContain('{\n  "title": "anesis"\n}');
 		expect(screen.getByText(/~\/\.anesis\/auth\.json/i)).toBeInTheDocument();
 		expect(screen.getByRole("link", { name: /view raw schema/i })).toHaveAttribute(
 			"href",

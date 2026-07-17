@@ -21,6 +21,16 @@ const urlRules = [
 	"Both the repository root URL and subdirectory URLs are valid.",
 ];
 
+const publishFlagsExample = `# Publish a private repo, referencing a stored GitHub credential
+anesis template publish https://github.com/owner/repo \\
+  --visibility private --credential-id <uuid>`;
+
+const publishFlags = [
+	"`--visibility <public|private|org-private>` — defaults to public when omitted.",
+	"`--credential-id <uuid>` — required to read a private GitHub repository during publish.",
+	"`--org-id <uuid>` — legacy organization target, kept only for backwards compatibility.",
+];
+
 const publishSteps = [
 	{
 		title: "Validate the URL locally",
@@ -83,6 +93,15 @@ export default function DocsTemplatesPublishingPage() {
 					lead="Pass the GitHub URL of your template directory. Both repo root and subdirectory URLs are accepted."
 				>
 					<CodeBlock code={publishExamples} />
+				</DocsSection>
+
+				<DocsSection
+					id="visibility"
+					title="Visibility and private repositories"
+					lead="Publish and update both accept the same visibility flags."
+				>
+					<DocsList items={publishFlags} />
+					<CodeBlock code={publishFlagsExample} />
 				</DocsSection>
 
 				<DocsSection

@@ -11,12 +11,12 @@ describe("DocsInstallationPage", () => {
 			}),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("npm install -g @anesis-cli/anesis", {
+			screen.getByText("npm install -g anesis-cli", {
 				exact: false,
 			}),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("cargo install anesis-cli", {
+			screen.getByText("cargo install anesis", {
 				exact: false,
 			}),
 		).toBeInTheDocument();

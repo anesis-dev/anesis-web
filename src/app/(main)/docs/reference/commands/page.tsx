@@ -29,8 +29,8 @@ const projectCommands: CommandRefData[] = [
 		command: "anesis new",
 		aliases: ["anesis n"],
 		summary:
-			"Create a new project directory from a registry template. Renders every .tera file with your project name and copies everything else verbatim.",
-		usage: "anesis new <name> <template_name>",
+			"Create a new project directory from a registry template, or from a stack (template + ordered addons). Renders every .tera file through the project name and any declared inputs; copies everything else verbatim.",
+		usage: "anesis new <name> [template_name] [flags]",
 		args: [
 			{
 				name: "<name>",
@@ -38,34 +38,166 @@ const projectCommands: CommandRefData[] = [
 					'Project directory to create. Use "." to scaffold into the current directory.',
 			},
 			{
-				name: "<template_name>",
-				description: "Template to use, e.g. react-vite-ts.",
+				name: "[template_name]",
+				description:
+					"Template to use, e.g. react-vite-ts. Omit to pick interactively; ignored when --stack is given.",
+			},
+		],
+		flags: [
+			{
+				name: "--stack <path-or-id>",
+				description:
+					"Scaffold from a stack manifest (anesis.stack.json) instead of a bare template: renders the stack's template, then applies its ordered addons.",
+			},
+			{
+				name: "-i, --installed",
+				description: "Only offer templates already downloaded to the local cache.",
+			},
+			{
+				name: "-y, --yes",
+				description: "Accept all defaults and skip confirmation prompts.",
+			},
+			{
+				name: "--input <NAME=VALUE>",
+				description:
+					"Provide an input value non-interactively. Repeatable for multiple inputs.",
 			},
 		],
 		example: `# New project in ./my-app
 anesis new my-app react-vite-ts
 
 # Scaffold into the current directory
-anesis new . react-vite-ts`,
+anesis new . react-vite-ts
+
+# Scaffold a template + a pinned set of addons
+anesis new my-app --stack nest-drizzle-stack
+
+# Fully non-interactive
+anesis new my-app react-vite-ts --yes --input use_ssl=true`,
 	},
 	{
 		id: "use",
 		command: "anesis use",
 		summary:
 			"Run a command exposed by an installed addon inside the current project. Anesis detects the project variant, prompts for inputs, applies the steps, and records the run in anesis.lock.",
-		usage: "anesis use <addon_id> <command>",
+		usage: "anesis use [addon_id] [command] [flags]",
 		args: [
 			{
-				name: "<addon_id>",
-				description: "Identifier of an installed addon, e.g. nest-drizzle.",
+				name: "[addon_id]",
+				description:
+					"Identifier of an installed addon, e.g. nest-drizzle. Omit to pick interactively.",
 			},
 			{
-				name: "<command>",
-				description: "Addon command to execute, e.g. install.",
+				name: "[command]",
+				description:
+					"Addon command to execute, e.g. install. Omit to list the addon's available commands.",
+			},
+		],
+		flags: [
+			{
+				name: "-i, --installed",
+				description: "Only offer addons already downloaded to the local cache.",
+			},
+			{
+				name: "-y, --yes",
+				description: "Accept all defaults and skip confirmation prompts.",
+			},
+			{
+				name: "--input <NAME=VALUE>",
+				description:
+					"Provide an input value non-interactively. Repeatable for multiple inputs.",
+			},
+			{
+				name: "--dry-run",
+				description:
+					"Show the plan — variant, inputs, steps — without changing any files.",
 			},
 		],
 		example: `# Apply the addon's "install" command to this project
-anesis use nest-drizzle install`,
+anesis use nest-drizzle install
+
+# See what it would do first
+anesis use nest-drizzle install --dry-run
+
+# List the commands an addon exposes
+anesis use nest-drizzle`,
+	},
+	{
+		id: "undo",
+		command: "anesis undo",
+		summary:
+			"Revert an applied addon's changes in the current project by replaying its rollback journal (from anesis.lock) in reverse order.",
+		usage: "anesis undo <addon_id> [flags]",
+		args: [
+			{ name: "<addon_id>", description: "Addon to revert, as recorded in anesis.lock." },
+		],
+		flags: [
+			{ name: "-y, --yes", description: "Skip the confirmation prompt." },
+		],
+		example: `anesis undo nest-drizzle`,
+	},
+	{
+		id: "outdated",
+		command: "anesis outdated",
+		summary:
+			"List applied addons (from anesis.lock) that have a newer version available in the registry.",
+		usage: "anesis outdated",
+		example: `anesis outdated`,
+	},
+	{
+		id: "project-update",
+		command: "anesis update",
+		summary:
+			"Upgrade an applied addon to the registry's latest version in this project: undoes the old version, installs the new one, then replays every command that had already run, with the same inputs. Distinct from `anesis addon update <url>`, which refreshes a registry entry instead.",
+		usage: "anesis update <addon_id> [flags]",
+		args: [{ name: "<addon_id>", description: "Applied addon to upgrade." }],
+		flags: [
+			{
+				name: "-y, --yes",
+				description: "Accept all defaults, skip confirmation prompts.",
+			},
+		],
+		example: `anesis update nest-drizzle`,
+	},
+	{
+		id: "search",
+		command: "anesis search",
+		summary:
+			"Interactively search the registry across templates, addons, and stacks in one picker.",
+		usage: "anesis search [query] [flags]",
+		args: [
+			{
+				name: "[query]",
+				description: "Pre-fill the filter; you can also type in the picker.",
+			},
+		],
+		flags: [
+			{
+				name: "--json",
+				description:
+					"Print matching results as JSON (kind, id, name, description) instead of opening the picker.",
+			},
+		],
+		example: `anesis search drizzle
+anesis search drizzle --json`,
+	},
+	{
+		id: "info",
+		command: "anesis info",
+		aliases: ["anesis doctor"],
+		summary: "Show the CLI version, local data paths, and login status.",
+		usage: "anesis info [flags]",
+		flags: [{ name: "--json", description: "Output as JSON." }],
+		example: `anesis info`,
+	},
+	{
+		id: "status",
+		command: "anesis status",
+		summary:
+			"Show the current project's template and the addons applied to it, read from anesis.json and anesis.lock.",
+		usage: "anesis status [flags]",
+		flags: [{ name: "--json", description: "Output as JSON." }],
+		example: `anesis status`,
 	},
 ];
 
@@ -76,17 +208,52 @@ const templateCommands: CommandRefData[] = [
 		aliases: ["anesis t i"],
 		summary:
 			"Download a template from the registry and cache it under ~/.anesis/cache/templates. Skips the download when the cached commit SHA already matches the registry.",
-		usage: "anesis template install <template_name>",
-		args: [{ name: "<template_name>", description: "Template to download." }],
+		usage: "anesis template install [template_name]",
+		args: [
+			{
+				name: "[template_name]",
+				description: "Template to download. Omit to pick interactively.",
+			},
+		],
 		example: `anesis template install react-vite-ts`,
+	},
+	{
+		id: "template-link",
+		command: "anesis template link",
+		summary:
+			"Validate a local directory's anesis.template.json and cache it under its manifest name, for local testing without publishing.",
+		usage: "anesis template link [path] [flags]",
+		args: [
+			{
+				name: "[path]",
+				description: "Directory to validate. Defaults to the current directory.",
+			},
+		],
+		flags: [
+			{
+				name: "-f, --force",
+				description: "Overwrite an existing cached template of the same name without asking.",
+			},
+		],
+		example: `anesis template link ./my-template --force`,
 	},
 	{
 		id: "template-list",
 		command: "anesis template list",
 		aliases: ["anesis t l"],
 		summary: "List every template currently cached on this machine.",
-		usage: "anesis template list",
+		usage: "anesis template list [flags]",
+		flags: [{ name: "--json", description: "Output as JSON." }],
 		example: `anesis template list`,
+	},
+	{
+		id: "template-info",
+		command: "anesis template info",
+		summary: "Show a template's manifest: description, version, and repository.",
+		usage: "anesis template info <template_name> [flags]",
+		args: [{ name: "<template_name>", description: "Template to inspect." }],
+		flags: [{ name: "--json", description: "Output as JSON." }],
+		example: `anesis template info react-vite-ts`,
 	},
 	{
 		id: "template-remove",
@@ -141,17 +308,73 @@ const addonCommands: CommandRefData[] = [
 		aliases: ["anesis a i"],
 		summary:
 			"Pre-download an addon into the local cache. Optional — running an addon command auto-installs it when missing.",
-		usage: "anesis addon install <addon_id>",
-		args: [{ name: "<addon_id>", description: "Addon to download." }],
+		usage: "anesis addon install [addon_id]",
+		args: [
+			{
+				name: "[addon_id]",
+				description: "Addon to download. Omit to pick interactively.",
+			},
+		],
 		example: `anesis addon install nest-drizzle`,
+	},
+	{
+		id: "addon-link",
+		command: "anesis addon link",
+		summary:
+			"Validate a local directory's anesis.addon.json and cache it under its manifest id, for local testing without publishing.",
+		usage: "anesis addon link [path] [flags]",
+		args: [
+			{
+				name: "[path]",
+				description: "Directory to validate. Defaults to the current directory.",
+			},
+		],
+		flags: [
+			{
+				name: "-f, --force",
+				description: "Overwrite an existing cached addon with the same id without asking.",
+			},
+		],
+		example: `anesis addon link ./my-addon --force`,
 	},
 	{
 		id: "addon-list",
 		command: "anesis addon list",
 		aliases: ["anesis a l"],
 		summary: "List every addon currently cached on this machine.",
-		usage: "anesis addon list",
+		usage: "anesis addon list [flags]",
+		flags: [{ name: "--json", description: "Output as JSON." }],
 		example: `anesis addon list`,
+	},
+	{
+		id: "addon-info",
+		command: "anesis addon info",
+		summary:
+			"Show an addon's manifest: description, version, variants, commands, inputs, and steps.",
+		usage: "anesis addon info <addon_id> [flags]",
+		args: [{ name: "<addon_id>", description: "Addon to inspect." }],
+		flags: [{ name: "--json", description: "Output as JSON." }],
+		example: `anesis addon info nest-drizzle`,
+	},
+	{
+		id: "addon-test",
+		command: "anesis addon test",
+		summary:
+			"Dry-run an addon command on a throwaway copy of a project and show the resulting diff — the addon author's test loop.",
+		usage: "anesis addon test <addon_id> <command> [flags]",
+		args: [
+			{ name: "<addon_id>", description: "Addon to test." },
+			{ name: "<command>", description: "Command to run." },
+		],
+		flags: [
+			{
+				name: "--project <path>",
+				description:
+					"Fixture project to test on. Defaults to the addon's bundled test-fixture/ directory.",
+			},
+		],
+		example: `anesis addon test nest-drizzle install
+anesis addon test nest-drizzle install --project ./fixtures/fastify-app`,
 	},
 	{
 		id: "addon-remove",
@@ -190,6 +413,68 @@ const addonCommands: CommandRefData[] = [
 	},
 ];
 
+const stackCommands: CommandRefData[] = [
+	{
+		id: "stack-install",
+		command: "anesis stack install",
+		aliases: ["anesis s i"],
+		summary:
+			"Download a stack manifest from the registry and cache it under ~/.anesis/cache/stacks. Optional — anesis new --stack auto-installs it when missing.",
+		usage: "anesis stack install <stack_id>",
+		args: [{ name: "<stack_id>", description: "Stack to download." }],
+		example: `anesis stack install nest-drizzle-stack`,
+	},
+	{
+		id: "stack-list",
+		command: "anesis stack list",
+		aliases: ["anesis s l"],
+		summary: "List every stack currently cached on this machine.",
+		usage: "anesis stack list [flags]",
+		flags: [{ name: "--json", description: "Output as JSON." }],
+		example: `anesis stack list`,
+	},
+	{
+		id: "stack-info",
+		command: "anesis stack info",
+		summary:
+			"Show a stack's composition: its template and its ordered list of addons with their commands.",
+		usage: "anesis stack info <stack_id> [flags]",
+		args: [{ name: "<stack_id>", description: "Stack to inspect." }],
+		flags: [{ name: "--json", description: "Output as JSON." }],
+		example: `anesis stack info nest-drizzle-stack`,
+	},
+	{
+		id: "stack-remove",
+		command: "anesis stack remove",
+		aliases: ["anesis s r"],
+		summary: "Delete a locally cached stack manifest.",
+		usage: "anesis stack remove <stack_id>",
+		args: [{ name: "<stack_id>", description: "Cached stack to remove." }],
+		example: `anesis stack remove nest-drizzle-stack`,
+	},
+	{
+		id: "stack-publish",
+		command: "anesis stack publish",
+		aliases: ["anesis s p"],
+		summary:
+			"Publish a GitHub repository as a registry stack. The backend fetches the tree, validates anesis.stack.json, and stores the entry.",
+		usage: "anesis stack publish <stack_url> [flags]",
+		args: [{ name: "<stack_url>", description: "GitHub URL of the stack repository." }],
+		flags: publishFlags,
+		example: `anesis stack publish https://github.com/owner/repo`,
+	},
+	{
+		id: "stack-update",
+		command: "anesis stack update",
+		aliases: ["anesis s u"],
+		summary: "Republish a stack from its GitHub repository, refreshing the registry entry.",
+		usage: "anesis stack update <stack_url> [flags]",
+		args: [{ name: "<stack_url>", description: "GitHub URL used at publish time." }],
+		flags: publishFlags,
+		example: `anesis stack update https://github.com/owner/repo`,
+	},
+];
+
 const accountCommands: CommandRefData[] = [
 	{
 		id: "login",
@@ -205,7 +490,8 @@ const accountCommands: CommandRefData[] = [
 		command: "anesis account",
 		summary:
 			"Show the currently logged-in account by fetching the user from the backend.",
-		usage: "anesis account",
+		usage: "anesis account [flags]",
+		flags: [{ name: "--json", description: "Output as JSON." }],
 		example: `anesis account`,
 	},
 	{
@@ -241,26 +527,41 @@ const maintenanceCommands: CommandRefData[] = [
 		],
 		example: `anesis completions zsh`,
 	},
+	{
+		id: "mcp",
+		command: "anesis mcp",
+		summary:
+			"Run a Model Context Protocol stdio server so AI agents can search the registry, scaffold projects, and apply addons or stacks.",
+		usage: "anesis mcp",
+		example: `anesis mcp`,
+	},
 ];
 
 const sections = [
 	{
 		id: "projects",
 		title: "Projects",
-		description: "Create projects and apply addons to them.",
+		description:
+			"Create projects, apply addons to them, and inspect or roll back what's been applied.",
 		commands: projectCommands,
 	},
 	{
 		id: "templates",
 		title: "Templates",
-		description: "Install, inspect, and publish project starters.",
+		description: "Install, link, inspect, and publish project starters.",
 		commands: templateCommands,
 	},
 	{
 		id: "addons",
 		title: "Addons",
-		description: "Install, inspect, and publish declarative code-mod packages.",
+		description: "Install, link, test, inspect, and publish declarative code-mod packages.",
 		commands: addonCommands,
+	},
+	{
+		id: "stacks",
+		title: "Stacks",
+		description: "Install, inspect, and publish template + ordered-addon bundles.",
+		commands: stackCommands,
 	},
 	{
 		id: "account",
@@ -270,8 +571,8 @@ const sections = [
 	},
 	{
 		id: "maintenance",
-		title: "Maintenance",
-		description: "Keep the CLI up to date and wire up your shell.",
+		title: "Maintenance & agents",
+		description: "Keep the CLI up to date, wire up your shell, and serve AI agents.",
 		commands: maintenanceCommands,
 	},
 ];
@@ -314,10 +615,22 @@ export default function DocsCommandsPage() {
 			<Callout variant="tip" title="Reading the signatures">
 				<p>
 					Tokens in <code>&lt;angle brackets&gt;</code> are required positional
-					arguments. Tokens marked <code>[flags]</code> are optional. Most
-					command groups also accept a single-letter alias, e.g.{" "}
+					arguments, <code>[square brackets]</code> are optional positional
+					arguments (often resolved via an interactive picker when omitted).
+					Tokens marked <code>[flags]</code> are optional. Most command groups
+					also accept a single-letter alias, e.g.{" "}
 					<code>anesis t i react-vite-ts</code> is the same as{" "}
 					<code>anesis template install react-vite-ts</code>.
+				</p>
+			</Callout>
+
+			<Callout variant="note" title="anesis update vs. anesis addon/template/stack update">
+				<p>
+					<code>anesis update &lt;addon-id&gt;</code> upgrades an addon already
+					applied in the current project. <code>anesis addon update &lt;url&gt;</code>{" "}
+					(and its template/stack equivalents) instead refreshes a registry
+					entry from its source repository. They act on different things —
+					your project versus the registry — despite the shared verb.
 				</p>
 			</Callout>
 
@@ -351,8 +664,10 @@ export default function DocsCommandsPage() {
 					>
 						anesis login
 					</Link>{" "}
-					first. Purely local commands such as <code>template list</code>,{" "}
-					<code>addon remove</code>, and re-running a cached addon work offline.
+					first — or set <code>ANESIS_TOKEN</code> for CI and agents. Purely
+					local commands such as <code>template list</code>,{" "}
+					<code>addon remove</code>, <code>template/addon link</code>,{" "}
+					<code>status</code>, and re-running a cached addon work offline.
 				</p>
 			</Callout>
 

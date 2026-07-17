@@ -22,10 +22,14 @@ describe("DocsCommandsPage", () => {
 		render(<DocsCommandsPage />);
 
 		expect(
-			screen.getByText("anesis new <name> <template_name>", { exact: false }),
+			screen.getByText("anesis new <name> [template_name] [flags]", {
+				exact: false,
+			}),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText("anesis use <addon_id> <command>", { exact: false }),
+			screen.getByText("anesis use [addon_id] [command] [flags]", {
+				exact: false,
+			}),
 		).toBeInTheDocument();
 		expect(
 			screen.getByText("anesis completions <shell>", { exact: false }),

@@ -45,5 +45,12 @@ next-env.d.ts
 .claude/
 .vscode/
 skills-lock.json
-
+CLAUDE.md
 graphify-out/
+
+
+
+architecture.md
+current_sprint.md
+edgecases.md
+techstack.md

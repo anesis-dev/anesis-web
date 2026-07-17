@@ -20,7 +20,19 @@ const newExample = `# Create a new project from a template
 anesis new my-app react-vite-ts
 
 # Use "." to scaffold into the current directory
-anesis new . react-vite-ts`;
+anesis new . react-vite-ts
+
+# Omit the template to pick one interactively
+anesis new my-app
+
+# Only offer templates you've already downloaded
+anesis new my-app --installed
+
+# Non-interactive: accept defaults and pass input values up front
+anesis new my-app react-vite-ts --yes --input use_ssl=true --input driver=postgres
+
+# Scaffold a template + a pinned set of addons from a stack
+anesis new my-app --stack nest-drizzle-stack`;
 
 const newSteps = [
 	{
@@ -29,15 +41,19 @@ const newSteps = [
 	},
 	{
 		title: "Ensure the template is available",
-		body: "If the template isn't already in the local cache, Anesis fetches it from the registry automatically. This step requires a valid login.",
+		body: "If the template isn't already in the local cache, Anesis fetches it from the registry automatically. This step requires a valid login. Pass --installed to only pick from templates already downloaded.",
+	},
+	{
+		title: "Collect inputs",
+		body: "If the template manifest declares an inputs array, Anesis prompts for each one (or reads it from --input NAME=VALUE / accepts the default with --yes) before generating any files.",
 	},
 	{
 		title: "Render and copy files",
-		body: "Files ending in .tera are rendered with your project name substituted in. All other files are copied exactly as-is.",
+		body: "Files ending in .tera are rendered through Tera with the project name and every input (plus its pascal/camel/kebab/snake forms) in scope. Any paths matched by the manifest's exclude blocks are skipped. All other files are copied exactly as-is.",
 	},
 	{
 		title: "Print next steps",
-		body: 'Once the project is written, Anesis prints "cd <project-name>" so you know where to go.',
+		body: 'Once the project is written, Anesis prints "cd <project-name>" so you know where to go. If any output file already existed on disk, it warns which paths were overwritten.',
 	},
 ];
 
@@ -58,6 +74,15 @@ const cacheFacts = [
 	"On install, Anesis compares the cached commit SHA against the latest value from the backend. If they match and the directory exists, the download is skipped.",
 	"`anesis template remove` deletes the cached directory and removes the entry from the index.",
 ];
+
+const linkExample = `# Validate a local directory as a template and cache it for testing
+anesis template link ./my-template
+
+# Overwrite an already-cached template of the same name without asking
+anesis template link ./my-template --force
+
+# Now scaffold from it like any other cached template
+anesis new test-project my-template`;
 
 export default function DocsTemplatesPage() {
 	return (
@@ -82,8 +107,9 @@ export default function DocsTemplatesPage() {
 				}
 				chips={[
 					"Local cache under ~/.anesis",
-					".tera file rendering",
+					".tera file rendering + inputs",
 					"Commit-aware cache reuse",
+					"Non-interactive: --yes, --input, --installed",
 				]}
 				actions={
 					<>
@@ -197,6 +223,32 @@ export default function DocsTemplatesPage() {
 				</DocsSection>
 
 				<DocsSection
+					id="link"
+					title="Testing a template locally with anesis template link"
+					lead="Validate a directory as a template and cache it under its manifest name, without publishing anything — the fastest local test loop."
+				>
+					<CodeBlock code={linkExample} />
+				</DocsSection>
+
+				<DocsSection
+					id="stacks"
+					title="Templates inside a stack"
+					lead="A stack pins a template together with an ordered set of addons, so you can scaffold both in one command."
+				>
+					<p>
+						<code>anesis new my-app --stack &lt;id&gt;</code> scaffolds the
+						stack&apos;s template exactly as described above, then applies each
+						addon in the stack in order. See{" "}
+						<Link
+							href="/docs/stacks"
+							className="font-medium text-primary hover:underline"
+						>
+							Using Stacks →
+						</Link>
+					</p>
+				</DocsSection>
+
+				<DocsSection
 					id="next-steps"
 					title="Next steps"
 					lead="Ready to build and share your own?"
@@ -209,9 +261,8 @@ export default function DocsTemplatesPage() {
 							>
 								Creating Templates
 							</Link>{" "}
-							— author an <code>anesis.template.json</code> manifest, structure
-							your template folder, and use Tera variables for project-name
-							rendering.
+							— author an <code>anesis.template.json</code> manifest, declare
+							inputs, and use Tera variables for rendering.
 						</li>
 						<li className="pl-1">
 							<Link

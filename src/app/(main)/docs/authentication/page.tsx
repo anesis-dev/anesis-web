@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ShieldCheckIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { DocsHero } from "@/components/docs/DocsHero";
@@ -17,18 +18,25 @@ const loginSteps = [
 ];
 
 const authRequired = [
-	"`anesis template install` always talks to the backend registry.",
-	"`anesis template publish` and `anesis template update` send authenticated mutations.",
-	"`anesis addon install`, `anesis addon publish`, and `anesis addon update` require the saved token.",
+	"`anesis template install`, `anesis addon install`, and `anesis stack install` always talk to the backend registry.",
+	"`anesis template publish/update`, `anesis addon publish/update`, and `anesis stack publish/update` send authenticated mutations.",
 	"`anesis account` fetches the current user from the backend.",
-	"`anesis new` and `anesis use <addon-id> <command>` require auth only when they must download an uncached template or addon first.",
+	"`anesis new`, `anesis use <addon-id> <command>`, and `anesis new --stack <id>` require auth only when they must download an uncached template, addon, or stack first.",
+	"`anesis search` and `anesis outdated` reach the backend but degrade gracefully (empty or partial results) without a session.",
 ];
 
 const localOnly = [
-	"`anesis template list` and `anesis template remove` operate on local cache files.",
-	"`anesis addon list` and `anesis addon remove` operate on local addon cache files.",
-	"`anesis new` can run without logging in when the template is already cached locally.",
-	"`anesis use <addon-id> <command>` can run without logging in when the addon is already cached locally.",
+	"`anesis template list/remove`, `anesis addon list/remove`, and `anesis stack list/remove` operate on local cache files only.",
+	"`anesis template link` and `anesis addon link` validate and cache a local directory — no network call.",
+	"`anesis new`, `anesis use <addon-id> <command>`, and `anesis new --stack <id>` can all run without logging in once the template/addon/stack is already cached locally.",
+	"`anesis undo`, `anesis update <addon-id>` (project-level upgrade), and `anesis status` operate on the current project's `anesis.lock`/`anesis.json`.",
+	"`anesis mcp` itself starts locally; individual tool calls follow the same rules as their underlying commands.",
+];
+
+const tokenAuth = [
+	"Set `ANESIS_TOKEN` to a personal access token (create one on `/account/tokens`) to skip the browser flow entirely — every authenticated command uses it instead.",
+	"`get_auth_user` checks `ANESIS_TOKEN` first, before falling back to `~/.anesis/auth.json`, so a token in the environment always takes priority.",
+	"This is the auth path used by CI and the `anesis mcp` server — see the AI Agents & MCP page for the full setup.",
 ];
 
 export default function DocsAuthenticationPage() {
@@ -118,6 +126,24 @@ export default function DocsAuthenticationPage() {
 						Commands that can run fully locally
 					</DocsSubheading>
 					<DocsList items={localOnly} />
+				</DocsSection>
+
+				<DocsSection
+					id="token-auth"
+					title="Token-based auth for CI and agents"
+					lead="A personal access token bypasses the browser flow entirely — the same session file is never touched."
+				>
+					<DocsList items={tokenAuth} />
+					<p>
+						See{" "}
+						<Link
+							href="/docs/ai-agents"
+							className="font-medium text-primary hover:underline"
+						>
+							AI Agents &amp; MCP
+						</Link>{" "}
+						for the full token setup and the <code>anesis mcp</code> server.
+					</p>
 				</DocsSection>
 			</div>
 

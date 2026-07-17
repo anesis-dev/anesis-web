@@ -21,7 +21,19 @@ const runCommandExample = `# Run an addon command from your project root
 anesis use nest-drizzle install
 
 # The general form is:
-anesis use <addon-id> <command>`;
+anesis use <addon-id> <command>
+
+# Omit the command to list what the addon exposes
+anesis use nest-drizzle
+
+# Omit the addon to pick one interactively (add --installed to only show cached ones)
+anesis use
+
+# Preview the plan (variant, inputs, steps) without touching any files
+anesis use nest-drizzle install --dry-run
+
+# Non-interactive: accept defaults and pass inputs up front
+anesis use nest-drizzle install --yes --input driver=postgres`;
 
 const autoInstallNote = `# If the addon isn't cached yet, Anesis installs it automatically:
 anesis use nest-drizzle install
@@ -49,8 +61,25 @@ anesis addon list
 # Remove an addon from the local cache
 anesis addon remove nest-drizzle`;
 
-const updateExample = `# Re-fetch an addon from its source URL
+const updateExample = `# Re-fetch the addon's registry entry from its source URL (cache-level update)
 anesis addon update https://github.com/owner/repo`;
+
+const linkExample = `# Validate a local directory as an addon and cache it for testing
+anesis addon link ./my-addon --force
+
+# Dry-run a command against the addon's bundled test-fixture/ (or your own project)
+anesis addon test my-addon install
+anesis addon test my-addon install --project ./some/existing/project`;
+
+const undoOutdatedExample = `# Revert everything "nest-drizzle" applied to this project, in reverse order
+anesis undo nest-drizzle
+
+# See which applied addons have a newer version in the registry
+anesis outdated
+
+# Upgrade an applied addon in place: undo the old version, install the new one,
+# and replay every command it had already run with the same inputs
+anesis update nest-drizzle`;
 
 const runSteps = [
 	"Loads the addon manifest (auto-installs if missing).",
@@ -63,8 +92,9 @@ const runSteps = [
 
 const lockFacts = [
 	"`anesis.lock` is created in the project root the first time an addon command runs successfully.",
-	"It records the addon id, version, chosen variant, and the names of all commands executed.",
+	"It records the addon id, version, chosen variant, the names of all commands executed, a rollback journal, and the resolved input values for that addon.",
 	'Commands marked with `"once": true` in the manifest will not run again if their name already appears in `anesis.lock`.',
+	"The rollback journal is what `anesis undo` replays in reverse, and the stored inputs are what `anesis update <addon-id>` reuses when it replays commands against the new version.",
 	"The lock file is project-specific — one per project directory. It is safe to commit to version control.",
 ];
 
@@ -110,6 +140,7 @@ export default function DocsAddonsPage() {
 					"anesis use <addon-id> <command>",
 					"Variant detection",
 					"anesis.lock tracking",
+					"undo / outdated / update",
 				]}
 				actions={
 					<>
@@ -202,8 +233,8 @@ export default function DocsAddonsPage() {
 
 				<DocsSection
 					id="update"
-					title="Updating an addon"
-					lead="Re-fetch the addon from its source URL when the addon author has pushed new changes."
+					title="Updating an addon's registry entry"
+					lead="Re-fetch the addon from its source URL when the addon author has pushed new changes. This is a maintainer action on the registry entry, not a per-project upgrade."
 				>
 					<CodeBlock code={updateExample} />
 					<p>
@@ -211,6 +242,31 @@ export default function DocsAddonsPage() {
 						in your projects. Those track what was applied, not the current addon
 						version.
 					</p>
+				</DocsSection>
+
+				<DocsSection
+					id="link-and-test"
+					title="Local development: link and test"
+					lead="Iterate on an addon without publishing it. anesis addon link validates a directory and caches it under its manifest id; anesis addon test runs one of its commands against a throwaway copy of a project and shows you the diff."
+				>
+					<CodeBlock code={linkExample} />
+				</DocsSection>
+
+				<DocsSection
+					id="undo-outdated-update"
+					title="Undo, outdated, and per-project update"
+					lead={
+						<>
+							These three operate on the current project, not the registry —
+							don&apos;t confuse{" "}
+							<code>anesis update &lt;addon-id&gt;</code> (upgrades what&apos;s
+							applied here) with{" "}
+							<code>anesis addon update &lt;url&gt;</code> (refreshes the registry
+							entry, shown above).
+						</>
+					}
+				>
+					<CodeBlock code={undoOutdatedExample} />
 				</DocsSection>
 
 				<DocsSection

@@ -55,8 +55,8 @@ export function AddonRegistryPage() {
 		{ search, official: officialOnly },
 	);
 
-	// Server handles search/official/pagination; for the default "recent" view we
-	// still surface official addons first within the current page.
+	
+	
 	const visibleAddons = useMemo(() => {
 		if (sort !== "recent") return addons;
 		return [...addons].sort((left, right) => {

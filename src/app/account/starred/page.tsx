@@ -1,10 +1,4 @@
-/**
- * Starred items page — Client Component (`/account/starred`).
- *
- * Shows all templates, addons, and stacks that the authenticated user has
- * starred. Paginated separately per section. Redirects to sign-in if the user
- * is not authenticated.
- */
+
 "use client";
 
 import Link from "next/link";

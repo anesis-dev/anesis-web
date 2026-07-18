@@ -272,7 +272,7 @@ const stepTypes: {
 			<>
 				Both <code>find</code> and <code>replace</code> are rendered through Tera.
 				Use glob targets to apply the same replacement across many files. Use{" "}
-				<code>// anesis:</code> comment markers in your template source to create
+				<code>
 				predictable insertion points.
 			</>
 		),

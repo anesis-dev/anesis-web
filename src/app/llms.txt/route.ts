@@ -1,5 +1,5 @@
-// Serves /llms.txt — a machine-readable index pointing AI agents at the docs
-// that matter for driving Anesis (token auth, non-interactive flags, MCP).
+
+
 export const dynamic = "force-static";
 
 export function GET(request: Request): Response {

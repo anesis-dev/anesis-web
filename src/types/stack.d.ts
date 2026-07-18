@@ -1,9 +1,4 @@
-/**
- * Stack domain types.
- *
- * A stack = a template plus an ordered list of addons (with pinned inputs).
- * `IStackConfig` is the embedded `anesis.stack.json` manifest stored in the DB.
- */
+
 export interface IStackAddonRef {
 	id: string;
 	command: string;

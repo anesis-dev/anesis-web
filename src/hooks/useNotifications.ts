@@ -7,11 +7,7 @@ import {
 } from "@/services/notification";
 import { INotification } from "@/types/notification";
 
-/**
- * Notification list + unread badge. `enabled` should track auth state so we
- * don't poll the endpoint for logged-out visitors. Unread count refetches on an
- * interval to keep the bell reasonably fresh.
- */
+
 export function useNotifications(enabled: boolean) {
 	const queryClient = useQueryClient();
 

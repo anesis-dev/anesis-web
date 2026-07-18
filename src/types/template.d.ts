@@ -1,13 +1,4 @@
-/**
- * Template domain types.
- *
- * `ITemplate` — full template registry row including embedded config, stats,
- * and star state.
- * `ITemplateConfig` — the `anesis.template.json` payload stored in the DB,
- * describing the template's author, repo, metadata, and target technologies.
- * `ITemplateUrlResponse` — returned by `GET /template/:ref/url`, used by the
- * CLI to download the template archive.
- */
+
 export interface IAuthor {
   name: string;
   github: string;

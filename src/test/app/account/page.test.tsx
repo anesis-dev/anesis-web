@@ -174,11 +174,11 @@ describe("AccountPage", () => {
 
 		render(<AccountPage />);
 
-		// Templates section renders every owned template (no preview cap).
+		
 		expect(screen.getAllByTestId("template-card")).toHaveLength(4);
 		expect(screen.getByText("template-4")).toBeInTheDocument();
 
-		// Addons section shows a capped preview of three with a manage link.
+		
 		expect(screen.getAllByTestId("addon-card")).toHaveLength(3);
 		expect(screen.queryByText("Addon 4")).not.toBeInTheDocument();
 		expect(screen.getByRole("link", { name: /manage addons/i })).toHaveAttribute(

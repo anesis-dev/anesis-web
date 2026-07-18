@@ -3,7 +3,7 @@ export interface IPaginationParams {
 	pageSize?: number;
 }
 
-/** Server-side catalog filters shared by the templates/addons/stacks lists. */
+
 export interface ICatalogFilters {
 	search?: string;
 	official?: boolean;

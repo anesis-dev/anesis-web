@@ -6,21 +6,21 @@ export interface CommandArg {
 }
 
 export interface CommandRefData {
-	/** Primary command shown as the heading, e.g. "anesis new". */
+	
 	command: string;
-	/** Short aliases, e.g. ["anesis n"]. */
+	
 	aliases?: string[];
-	/** One-line summary of what the command does. */
+	
 	summary: string;
-	/** Usage signature, e.g. "anesis new <name> <template>". */
+	
 	usage: string;
-	/** Positional arguments. */
+	
 	args?: CommandArg[];
-	/** Optional flags. */
+	
 	flags?: CommandArg[];
-	/** A runnable example. */
+	
 	example?: string;
-	/** Anchor id for deep links. */
+	
 	id: string;
 }
 
@@ -46,10 +46,7 @@ function ArgList({ title, items }: { title: string; items: CommandArg[] }) {
 	);
 }
 
-/**
- * Structured reference block for a single CLI command: heading, aliases, usage,
- * positional arguments, flags, and a copyable example. Used on the commands page.
- */
+
 export function CommandRef({ data }: { data: CommandRefData }) {
 	return (
 		<div id={data.id} className="scroll-mt-24 space-y-4 rounded-2xl border bg-card p-5 sm:p-6">

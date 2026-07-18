@@ -32,10 +32,7 @@ const variants: Record<
 	},
 };
 
-/**
- * Inline highlight for an important note, tip, or warning inside docs content.
- * Keeps cross-page callouts consistent instead of ad-hoc colored boxes.
- */
+
 export function Callout({
 	variant = "note",
 	title,

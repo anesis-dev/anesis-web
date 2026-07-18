@@ -1,11 +1,4 @@
-/**
- * Addon domain types.
- *
- * `IAddonConfig` — the embedded `anesis.addon.json` config stored in the DB.
- * `IAddon` — full addon registry row including stats and star state.
- * `IStarResponse` — returned by the star/unstar mutation endpoints.
- * `IAddonUrlResponse` — returned by `GET /addon/:ref/url`, used by the CLI.
- */
+
 export interface IAddonConfig {
 	schema_version: string;
 	id: string;

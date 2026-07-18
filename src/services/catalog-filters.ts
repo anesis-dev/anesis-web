@@ -1,6 +1,6 @@
 import { ICatalogFilters } from "@/types/pagination";
 
-/** Appends catalog filter query params (matching the server's `CatalogFilters`). */
+
 export function appendCatalogFilters(
 	params: URLSearchParams,
 	filters?: ICatalogFilters,
@@ -16,7 +16,7 @@ export function appendCatalogFilters(
 		params.set("technology", filters.technologies.join(","));
 }
 
-/** Stable queryKey fragment so filter changes refetch and cache independently. */
+
 export function catalogFiltersKey(filters?: ICatalogFilters) {
 	return {
 		search: filters?.search?.trim() || "",

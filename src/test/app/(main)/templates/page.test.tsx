@@ -95,7 +95,7 @@ describe("TemplatesRegistryPage", () => {
 		expect(screen.getAllByTestId("template-card")).toHaveLength(24);
 		expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
 
-		// Server pagination: clicking Next re-queries the hook for the next page.
+		
 		fireEvent.click(screen.getByRole("button", { name: "Next" }));
 		await waitFor(() =>
 			expect(useTemplates).toHaveBeenLastCalledWith(
@@ -104,7 +104,7 @@ describe("TemplatesRegistryPage", () => {
 			),
 		);
 
-		// Search is applied server-side and resets to the first page.
+		
 		fireEvent.change(
 			screen.getByPlaceholderText(/search by name or description/i),
 			{ target: { value: "special" } },

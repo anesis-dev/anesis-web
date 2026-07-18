@@ -1,12 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PaginationControls } from "@/components/PaginationControls";
 import { StackCard } from "@/components/stacks/StackCard";
+import { PublishStackDialog } from "@/components/stacks/PublishStackDialog";
+import { useAuth } from "@/hooks/useAuth";
 import { useStacks } from "@/hooks/useStacks";
 import { getDateTimestamp } from "@/lib/date";
-import { AlertCircleIcon, LayersIcon, SearchIcon } from "lucide-react";
+import { AlertCircleIcon, LayersIcon, SearchIcon, WandSparklesIcon } from "lucide-react";
 
 const PAGE_SIZE = 24;
 
@@ -24,6 +28,7 @@ function StackSkeleton() {
 }
 
 export function StacksRegistryPage() {
+	const { user, login } = useAuth();
 	const [search, setSearch] = useState("");
 	const [page, setPage] = useState(1);
 	const { stacks, isLoading, isError, pagination } = useStacks(
@@ -31,7 +36,7 @@ export function StacksRegistryPage() {
 		{ search },
 	);
 
-	// Server handles search/pagination; keep official stacks first within the page.
+	
 	const sorted = useMemo(
 		() =>
 			[...stacks].sort((left, right) => {
@@ -48,14 +53,35 @@ export function StacksRegistryPage() {
 
 	return (
 		<div className="mx-auto w-full max-w-6xl px-4 py-10">
-			<div className="flex items-center gap-3">
-				<LayersIcon className="size-6 text-primary" />
-				<h1 className="text-2xl font-semibold tracking-tight">Stacks</h1>
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+				<div className="flex flex-col gap-1">
+					<div className="flex items-center gap-3">
+						<LayersIcon className="size-6 text-primary" />
+						<h1 className="text-2xl font-semibold tracking-tight">Stacks</h1>
+					</div>
+					<p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+						A stack is a template plus an ordered list of addons with pinned inputs —
+						scaffold a batteries-included project in one command.
+					</p>
+				</div>
+
+				<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+					<Button variant="outline" asChild>
+						<Link href="/builder">
+							<WandSparklesIcon className="size-4" />
+							Build a stack
+						</Link>
+					</Button>
+					{user ? (
+						<PublishStackDialog className="w-full gap-1.5 sm:w-auto" />
+					) : (
+						<Button onClick={login} className="w-full gap-1.5 sm:w-auto">
+							<LayersIcon className="size-4" />
+							Login to publish
+						</Button>
+					)}
+				</div>
 			</div>
-			<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-				A stack is a template plus an ordered list of addons with pinned inputs — scaffold a
-				batteries-included project in one command.
-			</p>
 
 			<div className="relative mt-6 max-w-md">
 				<SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

@@ -1,9 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/**
- * Renders a plain string with `backtick` spans converted to inline <code>.
- * Lets content arrays stay as simple markdown-ish strings.
- */
+
 export function Markup({ children }: { children: string }) {
 	const parts = children.split(/(`[^`]+`)/g);
 	return (

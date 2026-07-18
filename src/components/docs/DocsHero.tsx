@@ -9,13 +9,7 @@ interface DocsHeroProps {
 	actions?: React.ReactNode;
 }
 
-/**
- * Shared header for every documentation page.
- *
- * Replaces the old per-page radial-gradient hero with a single flat, accessible
- * header so the docs section stays visually consistent. The eyebrow row uses the
- * primary accent only as a thin marker, never as a large gradient wash.
- */
+
 export function DocsHero({
 	eyebrow,
 	eyebrowIcon: EyebrowIcon,

@@ -9,7 +9,7 @@ const OPTIONS: { value: SortMode; label: string }[] = [
 	{ value: "trending", label: "Trending" },
 ];
 
-/** Registry sort control backed by the server `sort` param (recent/popular/trending). */
+
 export function SortSelect({
 	value,
 	onChange,

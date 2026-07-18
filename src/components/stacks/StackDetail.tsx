@@ -1,13 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { CommandCard } from "@/components/CommandCard";
+import { StarButton } from "@/components/StarButton";
+import { useAuth } from "@/hooks/useAuth";
 import { useStack } from "@/hooks/useStack";
 import { getTemplateLatestHref } from "@/lib/template-ref";
+import { starStack } from "@/services/stack";
 import { AlertCircleIcon, ArrowLeftIcon, PackageIcon } from "lucide-react";
 
 export function StackDetail({ stackRef }: { stackRef: string }) {
+	const { user } = useAuth();
+	const queryClient = useQueryClient();
 	const { stack, isLoading, isError } = useStack(stackRef);
+	const [isStarred, setIsStarred] = useState(false);
+	const [starCount, setStarCount] = useState(0);
+	const [starring, setStarring] = useState(false);
+
+	useEffect(() => {
+		setIsStarred(stack?.is_starred ?? false);
+		setStarCount(stack?.star_count ?? 0);
+	}, [stack?.is_starred, stack?.star_count]);
 
 	if (isLoading) {
 		return (
@@ -36,6 +51,21 @@ export function StackDetail({ stackRef }: { stackRef: string }) {
 	}
 
 	const { config } = stack;
+	const stackId = stack.stack_id;
+
+	async function handleStar() {
+		if (starring || !user) return;
+		setStarring(true);
+		try {
+			const result = await starStack(stackId);
+			setIsStarred(result.is_starred);
+			setStarCount(result.star_count);
+			await queryClient.invalidateQueries({ queryKey: ["stack", stackRef] });
+			await queryClient.invalidateQueries({ queryKey: ["stacks"] });
+		} finally {
+			setStarring(false);
+		}
+	}
 
 	return (
 		<div className="mx-auto w-full max-w-3xl px-4 py-10">
@@ -51,11 +81,20 @@ export function StackDetail({ stackRef }: { stackRef: string }) {
 					<h1 className="text-2xl font-semibold tracking-tight">{stack.name}</h1>
 					<p className="mt-1 text-sm text-muted-foreground">{stack.description}</p>
 				</div>
-				{stack.official ? (
-					<span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
-						official
-					</span>
-				) : null}
+				<div className="flex shrink-0 items-center gap-2">
+					{stack.official ? (
+						<span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
+							official
+						</span>
+					) : null}
+					<StarButton
+						isStarred={isStarred}
+						starCount={starCount}
+						onToggle={handleStar}
+						loading={starring}
+						disabled={!user}
+					/>
+				</div>
 			</div>
 
 			<CommandCard

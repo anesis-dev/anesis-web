@@ -5,7 +5,7 @@ export interface IApiToken {
 	created_at: string;
 }
 
-/** Returned only once, at creation — `token` is the plaintext secret. */
+
 export interface ICreatedToken {
 	id: string;
 	name: string;

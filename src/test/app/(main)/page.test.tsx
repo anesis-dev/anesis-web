@@ -9,6 +9,10 @@ vi.mock("@/hooks/useAddons", () => ({
 	useAddons: vi.fn(),
 }));
 
+vi.mock("@/hooks/useStacks", () => ({
+	useStacks: vi.fn(),
+}));
+
 vi.mock("@/components/templates/TemplateCard", () => ({
 	TemplateCard: () => <div data-testid="template-card" />,
 }));
@@ -16,7 +20,12 @@ vi.mock("@/components/templates/TemplateCard", () => ({
 vi.mock("@/components/addons/AddonCard", () => ({
 	AddonCard: () => <div data-testid="addon-card" />,
 }));
+
+vi.mock("@/components/stacks/StackCard", () => ({
+	StackCard: () => <div data-testid="stack-card" />,
+}));
 import { useAddons } from "@/hooks/useAddons";
+import { useStacks } from "@/hooks/useStacks";
 import { useTemplates } from "@/hooks/useTemplates";
 
 describe("Home", () => {
@@ -28,6 +37,11 @@ describe("Home", () => {
 		});
 		vi.mocked(useAddons).mockReturnValue({
 			addons: [],
+			isLoading: false,
+			isError: false,
+		});
+		vi.mocked(useStacks).mockReturnValue({
+			stacks: [],
 			isLoading: false,
 			isError: false,
 		});

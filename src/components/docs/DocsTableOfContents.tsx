@@ -17,11 +17,7 @@ function slugify(text: string) {
 		.replace(/^-+|-+$/g, "");
 }
 
-/**
- * Right-rail "On this page" navigation. Scans the rendered article for h2/h3
- * headings, assigns ids when missing, and highlights the section currently in
- * view. Renders nothing when a page has fewer than two headings.
- */
+
 export function DocsTableOfContents() {
 	const pathname = usePathname();
 	const [items, setItems] = useState<TocItem[]>([]);

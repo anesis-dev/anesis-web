@@ -80,7 +80,7 @@ describe("AddonRegistryPage", () => {
 		expect(screen.getAllByTestId("addon-card")).toHaveLength(10);
 		expect(screen.getByText("Special Addon")).toBeInTheDocument();
 
-		// Search is now applied server-side: typing must forward the term to the hook.
+		
 		fireEvent.change(
 			screen.getByPlaceholderText(/search by addon id, name, description or author/i),
 			{ target: { value: "special" } },

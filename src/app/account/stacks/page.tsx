@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/PaginationControls";
 import { OwnedStackCard } from "@/components/stacks/OwnedStackCard";
+import { PublishStackDialog } from "@/components/stacks/PublishStackDialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,23 +70,27 @@ export default function AccountStacksPage() {
 				</span>
 			</section>
 
-			<InputGroup className="h-11 max-w-md bg-background">
-				<InputGroupAddon>
-					<InputGroupText>
-						<SearchIcon className="size-4" />
-						Search
-					</InputGroupText>
-				</InputGroupAddon>
-				<InputGroupInput
-					value={search}
-					onChange={(event) => {
-						setSearch(event.target.value);
-						setPage(1);
-					}}
-					placeholder="Filter by name, id, description or template"
-					aria-label="Search your stacks"
-				/>
-			</InputGroup>
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<InputGroup className="h-11 max-w-md bg-background">
+					<InputGroupAddon>
+						<InputGroupText>
+							<SearchIcon className="size-4" />
+							Search
+						</InputGroupText>
+					</InputGroupAddon>
+					<InputGroupInput
+						value={search}
+						onChange={(event) => {
+							setSearch(event.target.value);
+							setPage(1);
+						}}
+						placeholder="Filter by name, id, description or template"
+						aria-label="Search your stacks"
+					/>
+				</InputGroup>
+
+				<PublishStackDialog className="h-11 w-full justify-center gap-1.5 sm:w-auto" />
+			</div>
 
 			{isError && (
 				<Alert variant="destructive">
@@ -106,7 +111,7 @@ export default function AccountStacksPage() {
 						</p>
 						<p className="text-sm text-muted-foreground">
 							{stacks.length === 0
-								? "Publish a stack with `anesis stack publish <github-url>` from a repo containing `anesis.stack.json`."
+								? "Publish a stack above, or run `anesis stack publish <github-url>` from a repo containing `anesis.stack.json`."
 								: "Try another search phrase or clear the filter."}
 						</p>
 					</div>

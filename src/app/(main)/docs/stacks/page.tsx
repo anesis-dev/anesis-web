@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRightIcon, LayersIcon, UploadIcon } from "lucide-react";
+import { ArrowRightIcon, LayersIcon, UploadIcon, WandSparklesIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { DocsHero } from "@/components/docs/DocsHero";
 import { CodeBlock } from "@/components/docs/CodeBlock";
@@ -94,10 +94,13 @@ export default function DocsStacksPage() {
 							</Link>
 						</Button>
 						<Button variant="outline" asChild>
-							<Link href="/docs/templates/creating">Creating templates</Link>
+							<Link href="/builder">
+								<WandSparklesIcon className="size-4" />
+								Open the builder
+							</Link>
 						</Button>
 						<Button variant="outline" asChild>
-							<Link href="/docs/addons/creating">Creating addons</Link>
+							<Link href="/docs/stacks/creating">Creating stacks</Link>
 						</Button>
 					</>
 				}
@@ -209,8 +212,23 @@ anesis stack update https://github.com/owner/repo`}
 						</li>
 						<li className="pl-1">
 							<UploadIcon className="mr-1 inline size-3.5 align-[-2px]" />
-							Once both exist in the registry, write the stack manifest and{" "}
-							<code>anesis stack publish</code> it.
+							Once both exist in the registry, see{" "}
+							<Link
+								href="/docs/stacks/creating"
+								className="font-medium text-primary hover:underline"
+							>
+								Creating Stacks
+							</Link>{" "}
+							for how to plan the composition and generate the manifest — the{" "}
+							<Link
+								href="/builder"
+								className="font-medium text-primary hover:underline"
+							>
+								builder
+							</Link>{" "}
+							can also add extra one-off terminal commands (like{" "}
+							<code>bun add tailwindcss</code>) alongside your addons before
+							you write <code>anesis stack publish</code>.
 						</li>
 					</ul>
 				</DocsSection>

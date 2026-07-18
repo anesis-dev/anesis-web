@@ -10,7 +10,7 @@ export function DocsSidebar() {
 
 	return (
 		<>
-			{/* Mobile: horizontal scroll of every page */}
+			{}
 			<div className="overflow-x-auto border-b lg:hidden">
 				<nav className="flex min-w-max gap-2 p-3 sm:p-4">
 					{docsNav.map((item) => {
@@ -35,7 +35,7 @@ export function DocsSidebar() {
 				</nav>
 			</div>
 
-			{/* Desktop: grouped, sectioned sidebar */}
+			{}
 			<aside className="hidden lg:flex lg:w-64 lg:shrink-0 xl:w-72">
 				<div className="sticky top-0 flex h-dvh w-full flex-col border-r bg-card/60">
 					<div className="px-5 py-4">
@@ -44,7 +44,7 @@ export function DocsSidebar() {
 						</p>
 					</div>
 
-					<nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 pb-8">
+					<nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-2 pb-8">
 						{docsNavSections.map((section) => (
 							<div key={section.label} className="flex flex-col gap-1">
 								<p className="px-3 pb-1 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground/80">

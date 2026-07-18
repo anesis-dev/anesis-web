@@ -39,3 +39,7 @@ export function validateTemplatePublishUrl(input: string): string | null {
 export function validateAddonPublishUrl(input: string): string | null {
 	return validateGitHubTreeUrl(input, "addon");
 }
+
+export function validateStackPublishUrl(input: string): string | null {
+	return validateGitHubTreeUrl(input, "stack");
+}

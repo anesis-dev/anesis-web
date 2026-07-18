@@ -1,14 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangleIcon, CheckIcon, DownloadIcon, LayersIcon } from "lucide-react";
+import {
+	AlertTriangleIcon,
+	ArrowDownIcon,
+	ArrowUpIcon,
+	CheckIcon,
+	DownloadIcon,
+	LayersIcon,
+	PlusIcon,
+	XIcon,
+} from "lucide-react";
 import { CommandCard } from "@/components/CommandCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { PublishStackDialog } from "@/components/stacks/PublishStackDialog";
 import { useAllTemplates } from "@/hooks/useAllTemplates";
 import { useAllAddons } from "@/hooks/useAllAddons";
 import { useAddonManifest } from "@/hooks/useAddonManifest";
-import { orderByRequires } from "@/lib/stack-plan";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { IAddon } from "@/types/addon";
 import { AddonManifest, AddonManifestInput } from "@/types/addon-manifest";
@@ -23,8 +33,14 @@ function slugify(value: string): string {
 	);
 }
 
-// Inputs the "install" command actually collects: manifest-level (shared) plus
-// the install command's own inputs, de-duplicated by name.
+
+
+type SequenceItem =
+	| { kind: "addon"; key: string; id: string }
+	| { kind: "command"; key: string; value: string };
+
+
+
 function installInputs(manifest: AddonManifest): AddonManifestInput[] {
 	const byName = new Map<string, AddonManifestInput>();
 	for (const input of manifest.inputs ?? []) byName.set(input.name, input);
@@ -143,20 +159,22 @@ function AddonConfigCard({
 }
 
 export function BuilderPage() {
+	const { user, login } = useAuth();
 	const { templates, isLoading: templatesLoading } = useAllTemplates();
 	const { addons, isLoading: addonsLoading } = useAllAddons();
 
 	const [projectName, setProjectName] = useState("my-app");
 	const [templateName, setTemplateName] = useState<string | null>(null);
-	const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+	const [sequence, setSequence] = useState<SequenceItem[]>([]);
 	const [manifests, setManifests] = useState<Record<string, AddonManifest>>({});
 	const [inputValues, setInputValues] = useState<
 		Record<string, Record<string, string>>
 	>({});
+	const [commandDraft, setCommandDraft] = useState("");
 
 	const appName = slugify(projectName);
 
-	// De-duplicate addons by id (the catalog returns one row per version).
+	
 	const uniqueAddons = useMemo(() => {
 		const seen = new Set<string>();
 		return addons.filter((addon) => {
@@ -172,10 +190,23 @@ export function BuilderPage() {
 		return map;
 	}, [uniqueAddons]);
 
+	const addonSequence = useMemo(
+		() => sequence.filter((item): item is Extract<SequenceItem, { kind: "addon" }> =>
+			item.kind === "addon",
+		),
+		[sequence],
+	);
+	const selectedAddonIds = useMemo(
+		() => addonSequence.map((item) => item.id),
+		[addonSequence],
+	);
+
 	function toggleAddon(id: string) {
-		setSelectedAddons((prev) =>
-			prev.includes(id) ? prev.filter((entry) => entry !== id) : [...prev, id],
-		);
+		setSequence((prev) => {
+			const exists = prev.some((item) => item.kind === "addon" && item.id === id);
+			if (exists) return prev.filter((item) => !(item.kind === "addon" && item.id === id));
+			return [...prev, { kind: "addon", key: `addon:${id}`, id }];
+		});
 	}
 
 	const handleManifest = useCallback((addonId: string, manifest: AddonManifest) => {
@@ -194,41 +225,119 @@ export function BuilderPage() {
 		[],
 	);
 
-	// Addons required by a selection but not selected themselves.
+	
 	const missingRequires = useMemo(() => {
 		const missing = new Set<string>();
-		for (const id of selectedAddons) {
+		for (const id of selectedAddonIds) {
 			for (const req of manifests[id]?.requires ?? []) {
-				if (!selectedAddons.includes(req)) missing.add(req);
+				if (!selectedAddonIds.includes(req)) missing.add(req);
 			}
 		}
 		return [...missing];
-	}, [selectedAddons, manifests]);
+	}, [selectedAddonIds, manifests]);
 
 	function addMissingRequires() {
-		setSelectedAddons((prev) => [...new Set([...prev, ...missingRequires])]);
+		setSequence((prev) => {
+			const next = [...prev];
+			for (const reqId of missingRequires) {
+				const dependentIndex = next.findIndex(
+					(item) =>
+						item.kind === "addon" && (manifests[item.id]?.requires ?? []).includes(reqId),
+				);
+				const insertAt = dependentIndex === -1 ? next.length : dependentIndex;
+				next.splice(insertAt, 0, { kind: "addon", key: `addon:${reqId}`, id: reqId });
+			}
+			return next;
+		});
 	}
 
-	const orderedAddons = useMemo(
-		() => orderByRequires(selectedAddons, (id) => manifests[id]?.requires ?? []),
-		[selectedAddons, manifests],
-	);
+	
+	
+	const orderIssueByAddonId = useMemo(() => {
+		const positionById = new Map(addonSequence.map((item, index) => [item.id, index]));
+		const issues = new Map<string, string>();
+		addonSequence.forEach((item, index) => {
+			for (const req of manifests[item.id]?.requires ?? []) {
+				const reqIndex = positionById.get(req);
+				if (reqIndex !== undefined && reqIndex > index) {
+					issues.set(item.id, req);
+					break;
+				}
+			}
+		});
+		return issues;
+	}, [addonSequence, manifests]);
+
+	function fixOrderIssue(addonId: string, requiresId: string) {
+		setSequence((prev) => {
+			const reqIndex = prev.findIndex(
+				(item) => item.kind === "addon" && item.id === requiresId,
+			);
+			if (reqIndex === -1) return prev;
+			const reqItem = prev[reqIndex];
+			const withoutReq = [...prev.slice(0, reqIndex), ...prev.slice(reqIndex + 1)];
+			const targetIndex = withoutReq.findIndex(
+				(item) => item.kind === "addon" && item.id === addonId,
+			);
+			if (targetIndex === -1) return prev;
+			return [
+				...withoutReq.slice(0, targetIndex),
+				reqItem,
+				...withoutReq.slice(targetIndex),
+			];
+		});
+	}
+
+	function addCommand() {
+		const value = commandDraft.trim();
+		if (!value) return;
+		const key = `command:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+		setSequence((prev) => [...prev, { kind: "command", key, value }]);
+		setCommandDraft("");
+	}
+
+	function removeSequenceItem(item: SequenceItem) {
+		if (item.kind === "addon") {
+			toggleAddon(item.id);
+			return;
+		}
+		setSequence((prev) => prev.filter((entry) => entry.key !== item.key));
+	}
+
+	function moveSequenceItem(index: number, direction: -1 | 1) {
+		setSequence((prev) => {
+			const target = index + direction;
+			if (target < 0 || target >= prev.length) return prev;
+			const next = [...prev];
+			[next[index], next[target]] = [next[target], next[index]];
+			return next;
+		});
+	}
+
+	const configureStepNumber = 4;
+	const sequenceStepNumber =
+		addonSequence.length > 0 ? configureStepNumber + 1 : configureStepNumber;
+	const shipStepNumber = sequenceStepNumber + 1;
 
 	const command = useMemo(() => {
 		if (!templateName) return "";
 		const lines = [`anesis new ${appName} ${templateName}`];
-		if (orderedAddons.length > 0) {
+		if (sequence.length > 0) {
 			lines.push(`cd ${appName}`);
-			for (const id of orderedAddons) {
-				const resolved = resolveInputs(manifests[id], inputValues[id]);
-				const flags = Object.entries(resolved)
-					.map(([key, value]) => `--input ${key}=${value}`)
-					.join(" ");
-				lines.push(`anesis use ${id} install${flags ? ` ${flags}` : ""}`);
+			for (const item of sequence) {
+				if (item.kind === "addon") {
+					const resolved = resolveInputs(manifests[item.id], inputValues[item.id]);
+					const flags = Object.entries(resolved)
+						.map(([key, value]) => `--input ${key}=${value}`)
+						.join(" ");
+					lines.push(`anesis use ${item.id} install${flags ? ` ${flags}` : ""}`);
+				} else {
+					lines.push(item.value);
+				}
 			}
 		}
 		return lines.join("\n");
-	}, [appName, templateName, orderedAddons, manifests, inputValues]);
+	}, [appName, templateName, sequence, manifests, inputValues]);
 
 	function downloadStack() {
 		if (!templateName) return;
@@ -238,7 +347,7 @@ export function BuilderPage() {
 			name: projectName || appName,
 			description: "Generated with the Anesis builder",
 			template: templateName,
-			addons: orderedAddons.map((id) => {
+			addons: addonSequence.map(({ id }) => {
 				const resolved = resolveInputs(manifests[id], inputValues[id]);
 				return Object.keys(resolved).length > 0
 					? { id, command: "install", inputs: resolved }
@@ -261,8 +370,9 @@ export function BuilderPage() {
 			<div className="flex flex-col gap-1">
 				<h1 className="text-2xl font-bold tracking-tight">Stack builder</h1>
 				<p className="text-sm text-muted-foreground">
-					Pick a template, add the addons you want, and copy the commands or save
-					it as a reusable stack.
+					Pick a template, add the addons you want, reorder the run sequence to
+					match what actually depends on what, and copy the commands or save it
+					as a reusable stack.
 				</p>
 			</div>
 
@@ -312,7 +422,7 @@ export function BuilderPage() {
 				<h2 className="text-sm font-semibold">
 					3. Addons{" "}
 					<span className="font-normal text-muted-foreground">
-						({selectedAddons.length} selected)
+						({selectedAddonIds.length} selected)
 					</span>
 				</h2>
 				{addonsLoading ? (
@@ -320,7 +430,7 @@ export function BuilderPage() {
 				) : (
 					<div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
 						{uniqueAddons.map((addon) => {
-							const active = selectedAddons.includes(addon.addon_id);
+							const active = selectedAddonIds.includes(addon.addon_id);
 							return (
 								<button
 									key={addon.addon_id}
@@ -364,11 +474,11 @@ export function BuilderPage() {
 				) : null}
 			</section>
 
-			{selectedAddons.length > 0 ? (
+			{selectedAddonIds.length > 0 ? (
 				<section className="flex flex-col gap-3">
-					<h2 className="text-sm font-semibold">4. Configure addons</h2>
+					<h2 className="text-sm font-semibold">{configureStepNumber}. Configure addons</h2>
 					<div className="flex flex-col gap-3">
-						{orderedAddons.map((id) => {
+						{selectedAddonIds.map((id) => {
 							const addon = addonById.get(id);
 							if (!addon) return null;
 							return (
@@ -386,9 +496,128 @@ export function BuilderPage() {
 			) : null}
 
 			<section className="flex flex-col gap-3">
-				<h2 className="text-sm font-semibold">
-					{selectedAddons.length > 0 ? "5. Ship it" : "4. Ship it"}
-				</h2>
+				<h2 className="text-sm font-semibold">{sequenceStepNumber}. Order &amp; extra commands</h2>
+				<p className="text-sm text-muted-foreground">
+					This is the exact order things run in, right after scaffolding.
+					Reorder addons to match real dependencies, or slot in one-off
+					terminal commands anywhere — e.g. run{" "}
+					<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+						bun add tailwindcss
+					</code>{" "}
+					before an addon that expects it, instead of last. Custom commands
+					aren&apos;t part of the <code>anesis.stack.json</code> manifest, so
+					downloading or publishing only keeps the addon order.
+				</p>
+
+				{sequence.length > 0 ? (
+					<ul className="flex flex-col gap-1.5">
+						{sequence.map((item, index) => {
+							const addon = item.kind === "addon" ? addonById.get(item.id) : null;
+							const addonId = item.kind === "addon" ? item.id : null;
+							const issue = addonId ? orderIssueByAddonId.get(addonId) : undefined;
+							return (
+								<li
+									key={item.key}
+									className="flex flex-col gap-1.5 rounded-md border bg-muted/30 px-3 py-2"
+								>
+									<div className="flex items-center justify-between gap-2">
+										<span className="flex min-w-0 items-center gap-2 text-xs">
+											<span className="font-mono text-muted-foreground">
+												{index + 1}
+											</span>
+											{item.kind === "addon" ? (
+												<span className="truncate font-medium">
+													{addon?.name ?? item.id}
+												</span>
+											) : (
+												<span className="truncate font-mono">{item.value}</span>
+											)}
+										</span>
+										<span className="flex shrink-0 items-center gap-1">
+											<button
+												type="button"
+												onClick={() => moveSequenceItem(index, -1)}
+												disabled={index === 0}
+												aria-label={`Move earlier: ${item.kind === "addon" ? (addon?.name ?? item.id) : item.value}`}
+												className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+											>
+												<ArrowUpIcon className="size-3.5" />
+											</button>
+											<button
+												type="button"
+												onClick={() => moveSequenceItem(index, 1)}
+												disabled={index === sequence.length - 1}
+												aria-label={`Move later: ${item.kind === "addon" ? (addon?.name ?? item.id) : item.value}`}
+												className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+											>
+												<ArrowDownIcon className="size-3.5" />
+											</button>
+											<button
+												type="button"
+												onClick={() => removeSequenceItem(item)}
+												aria-label={`Remove: ${item.kind === "addon" ? (addon?.name ?? item.id) : item.value}`}
+												className="text-muted-foreground hover:text-destructive"
+											>
+												<XIcon className="size-3.5" />
+											</button>
+										</span>
+									</div>
+									{issue ? (
+										<div className="flex flex-wrap items-center justify-between gap-2 rounded border border-amber-500/40 bg-amber-500/5 px-2 py-1 text-xs text-amber-700 dark:text-amber-400">
+											<span>
+												Requires{" "}
+												<span className="font-medium">
+													{addonById.get(issue)?.name ?? issue}
+												</span>
+												, which runs later in this list
+											</span>
+											<button
+												type="button"
+												onClick={() => addonId && fixOrderIssue(addonId, issue)}
+												className="shrink-0 font-medium underline"
+											>
+												Fix order
+											</button>
+										</div>
+									) : null}
+								</li>
+							);
+						})}
+					</ul>
+				) : (
+					<p className="text-xs text-muted-foreground">
+						Select addons above, or add a command below.
+					</p>
+				)}
+
+				<div className="flex gap-2">
+					<Input
+						value={commandDraft}
+						onChange={(event) => setCommandDraft(event.target.value)}
+						onKeyDown={(event) => {
+							if (event.key === "Enter") {
+								event.preventDefault();
+								addCommand();
+							}
+						}}
+						placeholder="bun add tailwindcss"
+						className="font-mono text-sm"
+					/>
+					<Button
+						type="button"
+						variant="outline"
+						onClick={addCommand}
+						disabled={!commandDraft.trim()}
+						className="shrink-0 gap-1.5"
+					>
+						<PlusIcon className="size-4" />
+						Add
+					</Button>
+				</div>
+			</section>
+
+			<section className="flex flex-col gap-3">
+				<h2 className="text-sm font-semibold">{shipStepNumber}. Ship it</h2>
 				{templateName ? (
 					<>
 						<CommandCard
@@ -405,6 +634,24 @@ export function BuilderPage() {
 							<DownloadIcon className="size-4" />
 							Download anesis.stack.json
 						</Button>
+
+						<div className="flex flex-col gap-2 rounded-lg border border-dashed p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+							<p className="text-muted-foreground">
+								Commit the downloaded file to a GitHub repo, then publish it to
+								the registry so others can scaffold it directly.
+							</p>
+							{user ? (
+								<PublishStackDialog
+									label="Publish stack"
+									variant="outline"
+									className="w-full gap-1.5 sm:w-auto"
+								/>
+							) : (
+								<Button onClick={login} variant="outline" className="w-full gap-1.5 sm:w-auto">
+									Login to publish
+								</Button>
+							)}
+						</div>
 					</>
 				) : (
 					<div className="flex items-center gap-2 rounded-lg border border-dashed p-4 text-sm text-muted-foreground">

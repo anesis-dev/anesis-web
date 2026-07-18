@@ -1,10 +1,4 @@
-/**
- * API tokens page — Client Component (`/account/tokens`).
- *
- * Personal access tokens let CI and AI agents authenticate the CLI without a
- * browser login (via the `ANESIS_TOKEN` env var). The plaintext token is shown
- * exactly once, right after creation.
- */
+
 "use client";
 
 import Link from "next/link";

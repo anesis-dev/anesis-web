@@ -1,14 +1,16 @@
 import { api } from "@/api/client";
+import { parseStarResponse } from "@/lib/api-contracts";
 import {
 	ICatalogFilters,
 	IPaginatedResponse,
 	IPaginationParams,
 } from "@/types/pagination";
+import { IStarResponse } from "@/types/addon";
 import { IStack } from "@/types/stack";
 import { appendCatalogFilters } from "@/services/catalog-filters";
 
-// The server returns snake_case pagination fields (`page_size`, `total_pages`);
-// normalize them to the camelCase shape the web app uses.
+
+
 interface RawPage {
 	data: IStack[];
 	total: number;
@@ -80,8 +82,8 @@ export async function publishStack(
 	return api.post<{ message: string; stack_id: string }>("/stack/publish", { url, visibility });
 }
 
-// Official status and visibility key off the stack row UUID (`stack.id`);
-// delete keys off the business id (`stack.stack_id`) — mirrors the server routes.
+
+
 export async function updateStackOfficialStatus(
 	id: string,
 	official: boolean,
@@ -98,4 +100,10 @@ export async function updateStackVisibility(
 
 export async function deleteStack(stackId: string): Promise<void> {
 	await api.delete<void>(`/stack/${encodeURIComponent(stackId)}`);
+}
+
+export async function starStack(stackId: string): Promise<IStarResponse> {
+	return parseStarResponse(
+		await api.post<unknown>(`/stack/${encodeURIComponent(stackId)}/star`, {}),
+	);
 }

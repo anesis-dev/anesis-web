@@ -54,13 +54,13 @@ function SkeletonCard() {
 export function TemplatesRegistryPage() {
 	const [filters, setFilters] = useState<TemplateFiltersState>(DEFAULT_FILTERS);
 	const [page, setPage] = useState(1);
-	// ponytail: TemplateFiltersState is structurally assignable to ICatalogFilters.
+	
 	const { templates, isLoading, isError, pagination } = useTemplates(
 		{ page, pageSize: PAGE_SIZE },
 		filters,
 	);
-	// Facet options come from the full catalog so the dropdowns stay complete
-	// regardless of the current server-filtered page.
+	
+	
 	const { templates: allTemplates } = useAllTemplates();
 	const { user } = useAuth();
 	const totalCount = pagination?.total ?? templates.length;

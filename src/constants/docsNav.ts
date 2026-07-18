@@ -24,10 +24,7 @@ export interface DocsNavSection {
 	items: DocsNavItem[];
 }
 
-/**
- * Grouped documentation navigation rendered in the sidebar. Each section gets a
- * header label, and each item carries an icon — mirroring a sectioned docs IA.
- */
+
 export const docsNavSections: DocsNavSection[] = [
 	{
 		label: "Getting Started",
@@ -79,7 +76,14 @@ export const docsNavSections: DocsNavSection[] = [
 	},
 	{
 		label: "Stacks",
-		items: [{ title: "Using Stacks", href: "/docs/stacks", icon: LayersIcon }],
+		items: [
+			{ title: "Using Stacks", href: "/docs/stacks", icon: LayersIcon },
+			{
+				title: "Creating Stacks",
+				href: "/docs/stacks/creating",
+				icon: PencilRulerIcon,
+			},
+		],
 	},
 	{
 		label: "Reference",
@@ -103,10 +107,7 @@ export const docsNavSections: DocsNavSection[] = [
 	},
 ];
 
-/**
- * Flattened, ordered list derived from {@link docsNavSections}. Used by the
- * previous/next pagination and the command palette search.
- */
+
 export const docsNav: DocsNavItem[] = docsNavSections.flatMap(
 	(section) => section.items,
 );

@@ -10,8 +10,8 @@ class ApiError extends Error {
 	}
 }
 
-// Server-side (SSR/build) can't reliably resolve the relative `/api/backend`
-// rewrite used by the browser — hit the backend directly instead.
+
+
 function requestBaseUrl(): string {
 	if (typeof window === "undefined" && process.env.API_PROXY_URL) {
 		return process.env.API_PROXY_URL.replace(/\/+$/, "");

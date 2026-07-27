@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { LayoutTemplateIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
@@ -12,7 +13,7 @@ anesis template publish https://github.com/owner/repo
 anesis template publish https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
 
 const updateExample = `# Update an existing registry entry
-anesis template update https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
+anesis template republish https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
 
 const urlRules = [
 	"The host must be `github.com` — other Git hosts are not supported.",
@@ -53,8 +54,15 @@ const publishSteps = [
 const updateNotes = [
 	"Use the same URL that was passed to `anesis template publish`.",
 	"The backend re-fetches the tree, re-reads the manifest, and updates the stored commit SHA.",
-	"Users who already have the old version cached will get the new version on their next `anesis template install` or `anesis template update`.",
+	"Users who already have the old version cached will get the new version on their next `anesis template install` or `anesis template republish`.",
 ];
+
+export const metadata: Metadata = {
+	title: "Publishing templates",
+	description:
+		"Publish a template to the Anesis registry, release new versions, and manage visibility.",
+	alternates: { canonical: "/docs/templates/publishing" },
+};
 
 export default function DocsTemplatesPublishingPage() {
 	return (
@@ -71,7 +79,7 @@ export default function DocsTemplatesPublishingPage() {
 				<DocsSection
 					id="auth"
 					title="Authentication required"
-					lead="Both anesis template publish and anesis template update require a saved login session."
+					lead="Both anesis template publish and anesis template republish require a saved login session."
 				>
 					<p>
 						Run <code>anesis login</code> before publishing. The CLI sends your

@@ -28,6 +28,7 @@ import {
 import { ITemplate } from "@/types/template";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -50,25 +51,6 @@ type Notice =
 	| { type: "success"; message: string }
 	| { type: "error"; message: string }
 	| null;
-
-function Badge({
-	children,
-	className,
-}: {
-	children: React.ReactNode;
-	className?: string;
-}) {
-	return (
-		<span
-			className={cn(
-				"inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium",
-				className,
-			)}
-		>
-			{children}
-		</span>
-	);
-}
 
 export function OwnedTemplateCard({
 	template,
@@ -199,16 +181,20 @@ export function OwnedTemplateCard({
 					<div className="flex min-w-0 flex-1 flex-col gap-3">
 						<div className="flex flex-wrap items-center gap-2">
 							{template.official ? (
-								<Badge className="border-primary/20 bg-primary/10 text-primary">
+								<Badge variant="outline" className="border-primary/20 bg-primary/10 text-primary">
 									<ShieldCheckIcon className="mr-1 size-3" />
 									Official
 								</Badge>
 							) : (
-								<Badge className="border-border/70 bg-background/80 text-muted-foreground">
+								<Badge
+									variant="outline"
+									className="border-border/70 bg-background/80 text-muted-foreground"
+								>
 									Community
 								</Badge>
 							)}
 							<Badge
+								variant="outline"
 								className={cn(
 									"border-border/70 bg-background/80",
 									template.visibility === "private" &&
@@ -224,11 +210,17 @@ export function OwnedTemplateCard({
 								)}
 								{template.visibility ?? "public"}
 							</Badge>
-							<Badge className="border-border/70 bg-background/80 font-mono text-muted-foreground">
+							<Badge
+								variant="outline"
+								className="border-border/70 bg-background/80 font-mono text-muted-foreground"
+							>
 								v{template.version}
 							</Badge>
 							{versionCount > 1 ? (
-								<Badge className="border-border/70 bg-background/80 text-muted-foreground">
+								<Badge
+									variant="outline"
+									className="border-border/70 bg-background/80 text-muted-foreground"
+								>
 									{versionCount} versions
 								</Badge>
 							) : null}
@@ -276,7 +268,7 @@ export function OwnedTemplateCard({
 
 				<div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
 					<Link
-						href={`/user/${template.config.author.github}`}
+						href={`/user/${template.config?.author?.github ?? ""}`}
 						className="flex min-w-0 items-center gap-1.5 transition-colors hover:text-foreground"
 					>
 						<GitHubIcon className="size-3.5 shrink-0" />

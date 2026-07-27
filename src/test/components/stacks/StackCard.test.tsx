@@ -16,11 +16,14 @@ const mockStack: IStack = {
 	description: "Next.js template with auth and CI addons pinned.",
 	commit_sha: "abc123",
 	official: true,
+	version: "1.0.0",
 	config: {
 		schema_version: "1",
 		id: "full-stack",
 		name: "Full Stack",
 		description: "Next.js template with auth and CI addons pinned.",
+		version: "1.0.0",
+		author: { name: "Anesis", github: "anesis-dev" },
 		template: "next-starter",
 		addons: [{ id: "auth-addon", command: "install" }],
 	},
@@ -35,13 +38,23 @@ describe("StackCard", () => {
 		renderWithQueryClient(<StackCard stack={mockStack} />);
 
 		expect(screen.getByText("Full Stack")).toBeInTheDocument();
-		expect(screen.getByText("official")).toBeInTheDocument();
+		expect(screen.getByText("Official")).toBeInTheDocument();
 		expect(screen.getByText("next-starter")).toBeInTheDocument();
-		expect(screen.getByText("1 addons")).toBeInTheDocument();
+		expect(screen.getByText("auth-addon")).toBeInTheDocument();
+		expect(screen.getByText("v1.0.0")).toBeInTheDocument();
 
 		expect(screen.getByRole("link", { name: "Full Stack" })).toHaveAttribute(
 			"href",
 			"/stacks/full-stack",
+		);
+	});
+
+	it("links the author to their profile", () => {
+		renderWithQueryClient(<StackCard stack={mockStack} />);
+
+		expect(screen.getByRole("link", { name: "@anesis-dev" })).toHaveAttribute(
+			"href",
+			"/user/anesis-dev",
 		);
 	});
 });

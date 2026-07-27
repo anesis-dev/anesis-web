@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
 	ArrowRightIcon,
@@ -32,7 +33,7 @@ anesis new my-app --installed
 anesis new my-app react-vite-ts --yes --input use_ssl=true --input driver=postgres
 
 # Scaffold a template + a pinned set of addons from a stack
-anesis new my-app --stack nest-drizzle-stack`;
+anesis new my-app --stack nest-saas`;
 
 const newSteps = [
 	{
@@ -66,7 +67,7 @@ anesis template remove react-vite-ts
 # The template can be re-installed at any time`;
 
 const updateExample = `# Re-fetch a template and update the registry entry
-anesis template update https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
+anesis template republish https://github.com/owner/repo/tree/main/templates/react-vite-ts`;
 
 const cacheFacts = [
 	"Templates are stored at `~/.anesis/cache/templates/<name>/` after the first install.",
@@ -83,6 +84,13 @@ anesis template link ./my-template --force
 
 # Now scaffold from it like any other cached template
 anesis new test-project my-template`;
+
+export const metadata: Metadata = {
+	title: "Using templates",
+	description:
+		"Scaffold a new project from an Anesis template, pin a version, and understand what the CLI generates.",
+	alternates: { canonical: "/docs/templates" },
+};
 
 export default function DocsTemplatesPage() {
 	return (

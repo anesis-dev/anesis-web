@@ -1,12 +1,13 @@
+import type { Metadata } from "next";
 import { DownloadIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { DocsHero } from "@/components/docs/DocsHero";
 import { CodeBlock } from "@/components/docs/CodeBlock";
 import { DocsSection, DocsSubheading, DocsList } from "@/components/docs/prose";
 
-const installUnix = `curl -sSL https://raw.githubusercontent.com/anesis-dev/anesis/main/install.sh | bash`;
+const installUnix = `curl -sSL https://raw.githubusercontent.com/anesis-dev/anesis-cli/main/install.sh | bash`;
 
-const installWindows = `irm https://raw.githubusercontent.com/anesis-dev/anesis/main/install.ps1 | iex`;
+const installWindows = `irm https://raw.githubusercontent.com/anesis-dev/anesis-cli/main/install.ps1 | iex`;
 
 const installNpm = `npm install -g anesis-cli`;
 
@@ -29,22 +30,35 @@ const pathZsh = `echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc`;
 
 const manualInstall = `# Linux x86_64
-https://github.com/anesis-dev/anesis/releases/latest/download/anesis-linux-x86_64.tar.gz
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-linux-x86_64.tar.gz
 
 # Linux ARM64
-https://github.com/anesis-dev/anesis/releases/latest/download/anesis-linux-aarch64.tar.gz
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-linux-aarch64.tar.gz
 
 # macOS Apple Silicon
-https://github.com/anesis-dev/anesis/releases/latest/download/anesis-macos-aarch64.tar.gz
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-macos-aarch64.tar.gz
+
+# macOS Intel
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-macos-x86_64.tar.gz
 
 # Windows x86_64
-https://github.com/anesis-dev/anesis/releases/latest/download/anesis-windows-x86_64.zip`;
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/anesis-windows-x86_64.zip
+
+# Checksums for all of the above
+https://github.com/anesis-dev/anesis-cli/releases/latest/download/SHA256SUMS`;
 
 const endpointOverrides = [
 	"`ANESIS_BACKEND_URL` — override the registry/API backend (defaults to https://anesis-server.onrender.com).",
 	"`ANESIS_FRONTEND_URL` — override the site used for the browser login callback (defaults to https://anesis-dev.vercel.app).",
 	"`ANESIS_TOKEN` — a personal access token that replaces the browser login flow entirely; see the AI agents page.",
 ];
+
+export const metadata: Metadata = {
+	title: "Installation",
+	description:
+		"Install the Anesis CLI on Linux, macOS, or Windows via the install script, npm, or cargo — with checksum-verified release binaries.",
+	alternates: { canonical: "/docs/installation" },
+};
 
 export default function DocsInstallationPage() {
 	return (

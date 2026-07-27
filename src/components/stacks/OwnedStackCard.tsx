@@ -12,6 +12,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { authorLogin } from "@/lib/author";
 import { deleteStack, updateStackVisibility } from "@/services/stack";
 import { IStack } from "@/types/stack";
 import {
@@ -26,6 +27,7 @@ import {
 export function OwnedStackCard({ stack }: { stack: IStack }) {
 	const queryClient = useQueryClient();
 	const [busy, setBusy] = useState<null | "visibility" | "delete">(null);
+	const ownerLogin = authorLogin(stack.config?.author);
 	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const isPrivate = stack.visibility === "private";
@@ -51,7 +53,7 @@ export function OwnedStackCard({ stack }: { stack: IStack }) {
 		setBusy("delete");
 		setError(null);
 		try {
-			await deleteStack(stack.stack_id);
+			await deleteStack(stack.stack_id, stack.version);
 			await refresh();
 			setConfirmDelete(false);
 		} catch (err) {
@@ -71,6 +73,9 @@ export function OwnedStackCard({ stack }: { stack: IStack }) {
 					{stack.name}
 				</Link>
 				<div className="flex items-center gap-1.5">
+					<span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
+						v{stack.version}
+					</span>
 					{stack.official ? (
 						<span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
 							official
@@ -92,6 +97,11 @@ export function OwnedStackCard({ stack }: { stack: IStack }) {
 					{stack.config?.template}
 				</span>
 				<span>{stack.config?.addons?.length ?? 0} addons</span>
+				{ownerLogin && (
+					<Link href={`/user/${ownerLogin}`} className="hover:underline">
+						@{ownerLogin}
+					</Link>
+				)}
 			</div>
 
 			{error ? <p className="text-xs text-destructive">{error}</p> : null}
@@ -140,9 +150,10 @@ export function OwnedStackCard({ stack }: { stack: IStack }) {
 					<DialogHeader>
 						<DialogTitle>Delete stack</DialogTitle>
 						<DialogDescription>
-							This removes{" "}
+							This removes version{" "}
+							<span className="font-mono text-foreground">{stack.version}</span> of{" "}
 							<span className="font-mono text-foreground">{stack.stack_id}</span> from
-							the registry.
+							the registry. Other published versions are not affected.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>

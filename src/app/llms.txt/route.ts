@@ -1,11 +1,9 @@
-
-
 export const dynamic = "force-static";
 
 export function GET(request: Request): Response {
-	const origin = new URL(request.url).origin;
+    const origin = new URL(request.url).origin;
 
-	const body = `# Anesis
+    const body = `# Anesis
 
 > Anesis is a project scaffolding platform: a registry of templates (full starter projects) and addons (incremental code-mods), consumed by the \`anesis\` CLI. The CLI is fully scriptable — non-interactive flags, JSON output, token auth, and an MCP server — so AI agents can scaffold and extend projects unattended.
 
@@ -22,7 +20,7 @@ export function GET(request: Request): Response {
 - [CLI Commands](${origin}/docs/reference/commands)
 `;
 
-	return new Response(body, {
-		headers: { "Content-Type": "text/plain; charset=utf-8" },
-	});
+    return new Response(body, {
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
 }

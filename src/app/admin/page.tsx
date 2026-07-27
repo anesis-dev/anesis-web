@@ -213,7 +213,7 @@ export default function AdminDashboard() {
 														{t.config.metadata.displayName}
 													</td>
 													<td className="py-3 px-4 font-mono text-xs text-muted-foreground">
-														@{t.config.author.github}
+														@{t.config?.author?.github ?? "unknown"}
 													</td>
 													<td className="py-3 px-4 text-muted-foreground">
 														{t.config.specialization || "—"}

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { TemplateReadme } from "@/components/templates/TemplateReadme";
+import { TemplateReadme } from "@/components/templates/TemplateReadmeContent";
 
 describe("TemplateReadme", () => {
 	it("renders a loading state", () => {

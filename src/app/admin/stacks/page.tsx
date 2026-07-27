@@ -95,7 +95,7 @@ export default function AdminStacksPage() {
 		setBusyAction(`delete:${stack.id}`);
 		setNotice(null);
 		try {
-			await deleteStack(stack.stack_id);
+			await deleteStack(stack.stack_id, stack.version);
 			await refresh();
 			setPendingDelete(null);
 			setNotice({ type: "success", message: `${stack.name} was deleted from the registry.` });

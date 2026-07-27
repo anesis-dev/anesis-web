@@ -1,0 +1,30 @@
+version: 2
+
+updates:
+  # `apps/web` has no `cargo audit` equivalent, so Dependabot's advisory feed is
+  # the only thing watching this dependency tree.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # `eslint-config-next` crashes on eslint 10; unpin only once that is fixed
+      # upstream. See the note in package.json.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore(ci)"

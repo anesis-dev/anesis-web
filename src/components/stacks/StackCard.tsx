@@ -1,18 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { PackageIcon } from "lucide-react";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import { StarButton } from "@/components/StarButton";
+import { DownloadIcon, PackageIcon } from "lucide-react";
+import { RegistryCard } from "@/components/registry/RegistryCard";
+import { authorLogin } from "@/lib/author";
 import { useAuth } from "@/hooks/useAuth";
 import { starStack } from "@/services/stack";
 import { IStack } from "@/types/stack";
@@ -23,6 +15,7 @@ export function StackCard({ stack }: { stack: IStack }) {
 	const [isStarred, setIsStarred] = useState(stack.is_starred ?? false);
 	const [starCount, setStarCount] = useState(stack.star_count ?? 0);
 	const [starring, setStarring] = useState(false);
+	const ownerLogin = authorLogin(stack.config?.author);
 
 	useEffect(() => {
 		setIsStarred(stack.is_starred ?? false);
@@ -43,49 +36,35 @@ export function StackCard({ stack }: { stack: IStack }) {
 	}
 
 	return (
-		<Card className="relative gap-3 py-4 h-full transition-colors hover:border-foreground/30">
-			<Link
-				href={`/stacks/${encodeURIComponent(stack.stack_id)}`}
-				className="absolute inset-0 rounded-[inherit]"
-				aria-label={stack.name}
-			/>
-
-			<CardHeader className="gap-1 pb-0">
-				<div className="flex items-start justify-between gap-2">
-					<CardTitle className="text-sm font-semibold leading-snug">
-						{stack.name}
-					</CardTitle>
-					{stack.official ? (
-						<span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-							official
-						</span>
-					) : null}
-				</div>
-				<CardDescription className="line-clamp-2 text-xs leading-relaxed">
-					{stack.description || "No description."}
-				</CardDescription>
-			</CardHeader>
-
-			<CardContent>
-				<div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-					<span className="inline-flex items-center gap-1">
-						<PackageIcon className="size-3.5" />
-						{stack.config?.template}
+		<RegistryCard
+			href={`/stacks/${encodeURIComponent(stack.stack_id)}`}
+			title={stack.name}
+			description={stack.description}
+			official={stack.official}
+			isPrivate={stack.visibility === "private"}
+			owner={
+				ownerLogin ? { label: `@${ownerLogin}`, href: `/user/${ownerLogin}` } : null
+			}
+			version={stack.version}
+			versionCount={stack.versionCount}
+			meta={[{ icon: <PackageIcon className="size-3.5" />, label: stack.config?.template }]}
+			tags={stack.config?.addons?.map((addon) => addon.id)}
+			isStarred={isStarred}
+			starCount={starCount}
+			onToggleStar={handleStar}
+			starring={starring}
+			starDisabled={!user}
+			footerExtras={
+				(stack.download_count ?? 0) > 0 ? (
+					<span
+						className="flex items-center gap-1 text-[11px] text-muted-foreground"
+						title={`${stack.download_count} installs`}
+					>
+						<DownloadIcon className="size-3" />
+						{stack.download_count}
 					</span>
-					<span>{stack.config?.addons?.length ?? 0} addons</span>
-				</div>
-			</CardContent>
-
-			<CardFooter className="mt-auto flex items-center justify-end gap-3 border-t pt-3">
-				<StarButton
-					isStarred={isStarred}
-					starCount={starCount}
-					onToggle={handleStar}
-					loading={starring}
-					disabled={!user}
-					variant="icon"
-				/>
-			</CardFooter>
-		</Card>
+				) : undefined
+			}
+		/>
 	);
 }

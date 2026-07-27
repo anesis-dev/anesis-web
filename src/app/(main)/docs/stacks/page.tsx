@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRightIcon, LayersIcon, UploadIcon, WandSparklesIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
@@ -8,28 +9,36 @@ import { Button } from "@/components/ui/button";
 
 const manifestExample = `{
   "schema_version": "1",
-  "id": "nest-drizzle-stack",
-  "name": "NestJS + Drizzle",
-  "description": "NestJS starter with Drizzle ORM already wired up.",
-  "template": "nestjs",
+  "id": "nest-saas",
+  "name": "NestJS SaaS Starter",
+  "description": "NestJS backend with Prisma, JWT auth, Swagger docs and request validation.",
+  "version": "1.0.0",
+  "author": { "name": "Maksym Zhuk", "github": "anesis-dev" },
+  "template": "nest-express",
   "addons": [
-    { "id": "dotenv", "command": "install" },
-    {
-      "id": "nest-drizzle",
-      "command": "install",
-      "inputs": { "driver": "postgres", "use_ssl": "false" }
-    }
+    { "id": "nest-prisma-v7", "command": "install" },
+    { "id": "nest-auth-jwt", "command": "install" },
+    { "id": "nest-swagger", "command": "install" },
+    { "id": "nest-validation", "command": "install" }
   ]
 }`;
 
 const scaffoldExample = `# Scaffold a project directly from a stack (auto-installs if uncached)
-anesis new my-app --stack nest-drizzle-stack
+anesis new my-app --stack nest-saas
 
 # Or install first, then scaffold
-anesis stack install nest-drizzle-stack
-anesis new my-app --stack nest-drizzle-stack`;
+anesis stack install nest-saas
+anesis new my-app --stack nest-saas`;
 
 const manifestFields = [
+	{
+		field: "version",
+		desc: "Semver version of the stack. Publishing a new version adds an entry; the registry lists the latest with a version count, and re-publishing an existing version is rejected.",
+	},
+	{
+		field: "author",
+		desc: "Object with `name` and `github` — the GitHub handle links the stack to its author and shows on every stack card.",
+	},
 	{
 		field: "template",
 		desc: "The template name to scaffold first — the same value you'd pass to `anesis new <name> <template>`.",
@@ -61,6 +70,13 @@ const cacheFacts = [
 	"`anesis stack list` and `anesis stack remove` operate on the local cache only, no login required.",
 	"`anesis stack info <id>` prints the template and ordered addon list; it prefers the freshest registry copy but falls back to the local cache if the registry is unreachable.",
 ];
+
+export const metadata: Metadata = {
+	title: "Using stacks",
+	description:
+		"Install a template and a curated set of addons together with an Anesis stack.",
+	alternates: { canonical: "/docs/stacks" },
+};
 
 export default function DocsStacksPage() {
 	return (
@@ -164,7 +180,7 @@ export default function DocsStacksPage() {
 				>
 					<CodeBlock
 						code={`anesis stack publish https://github.com/owner/repo
-anesis stack update https://github.com/owner/repo`}
+anesis stack republish https://github.com/owner/repo`}
 					/>
 					<p>
 						Both accept <code>--visibility</code>, <code>--credential-id</code>,

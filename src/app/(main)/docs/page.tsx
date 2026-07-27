@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
 	ArrowRightIcon,
@@ -22,11 +23,11 @@ import { Button } from "@/components/ui/button";
 const quickStart = `anesis login
 anesis new my-app react-vite-ts
 cd my-app
-anesis addon install nest-drizzle
-anesis use nest-drizzle install
+anesis addon install nest-prisma-v7
+anesis use nest-prisma-v7 install
 
 # Or scaffold a template + a pinned set of addons in one shot
-anesis new my-app --stack nest-drizzle-stack`;
+anesis new my-app --stack nest-saas`;
 
 const pillars = [
 	{
@@ -113,6 +114,13 @@ const pillars = [
 	},
 ];
 
+export const metadata: Metadata = {
+	title: "Documentation",
+	description:
+		"Learn how to install Anesis, scaffold projects from templates, extend them with addons, and publish your own to the registry.",
+	alternates: { canonical: "/docs" },
+};
+
 export default function DocsOverviewPage() {
 	return (
 		<div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 lg:px-8">
@@ -173,7 +181,7 @@ export default function DocsOverviewPage() {
 					</p>
 					<p>
 						<span className="font-medium text-foreground">Addons</span> extend an
-						existing project. Run <code>anesis use nest-drizzle install</code> and
+						existing project. Run <code>anesis use nest-prisma-v7 install</code> and
 						Anesis reads the addon manifest, detects your project variant, prompts
 						for inputs, and applies declarative file operations — tracked so they
 						can be undone with <code>anesis undo</code>.

@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { useAddons } from "@/hooks/useAddons";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date";
+import { authorName } from "@/lib/author";
 import { deleteAddon, updateAddonOfficialStatus } from "@/services/addon";
 import { IAddon } from "@/types/addon";
 import {
@@ -286,7 +287,7 @@ export default function AdminAddonsPage() {
 										</td>
 										<td className="py-3 px-4 font-medium">{addon.name}</td>
 										<td className="py-3 px-4 text-muted-foreground">
-											{addon.config.author}
+											{authorName(addon.config.author)}
 										</td>
 										<td className="py-3 px-4 font-mono text-xs">
 											{addon.version}

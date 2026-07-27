@@ -1,4 +1,5 @@
 import { IAddon } from "@/types/addon";
+import { IStack } from "@/types/stack";
 import { IGitHubUser } from "@/types/github";
 import { ITemplate } from "@/types/template";
 import { IUser } from "@/types/user";
@@ -182,5 +183,61 @@ export function createGitHubUser(
 	return {
 		...mockGitHubUser,
 		...overrides,
+	};
+}
+
+export const mockStack: IStack = {
+	id: "44444444-4444-4444-4444-444444444444",
+	owner_id: "22222222-2222-2222-2222-222222222222",
+	url: "https://github.com/anesis-dev/stack/tree/main/nest-saas",
+	stack_id: "nest-saas",
+	name: "Nest SaaS",
+	description: "NestJS + Prisma + Docker, wired together.",
+	commit_sha: "abcdef1234567890abcdef1234567890abcdef12",
+	official: true,
+	version: "1.0.0",
+	config: {
+		schema_version: "1",
+		id: "nest-saas",
+		name: "Nest SaaS",
+		description: "NestJS + Prisma + Docker, wired together.",
+		version: "1.0.0",
+		author: { name: "Anesis", github: "anesis-dev" },
+		template: "nest-express",
+		addons: [
+			{ id: "nest-prisma-v7", command: "install" },
+			{ id: "docker-compose", command: "install" },
+		],
+	},
+	created_at: "2026-04-01T10:00:00Z",
+	updated_at: "2026-04-03T10:00:00Z",
+	star_count: 7,
+	is_starred: false,
+	download_count: 42,
+	unique_downloaders: 12,
+};
+
+type StackOverrides = Partial<Omit<IStack, "config">> & {
+	config?: Partial<IStack["config"]>;
+};
+
+export function createStack(overrides: StackOverrides = {}): IStack {
+	const stackId = overrides.stack_id ?? overrides.config?.id ?? mockStack.stack_id;
+	const name = overrides.name ?? overrides.config?.name ?? mockStack.name;
+	const version = overrides.version ?? overrides.config?.version ?? mockStack.version;
+
+	return {
+		...mockStack,
+		...overrides,
+		stack_id: stackId,
+		name,
+		version,
+		config: {
+			...mockStack.config,
+			...overrides.config,
+			id: stackId,
+			name,
+			version,
+		},
 	};
 }

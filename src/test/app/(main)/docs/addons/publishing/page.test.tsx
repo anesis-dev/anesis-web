@@ -14,7 +14,7 @@ describe("DocsAddonsPublishingPage", () => {
 		render(<DocsAddonsPublishingPage />);
 
 		expect(screen.getAllByText(/anesis addon publish https:\/\/github\.com\/owner\/repo/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/anesis addon update/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis addon republish/i).length).toBeGreaterThan(0);
 	});
 
 	it("documents the GitHub URL rules", () => {

@@ -1,50 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { authorLogin } from "@/lib/author";
 import { getAddonHref } from "@/lib/addon-ref";
 import { IAddon } from "@/types/addon";
-import {
-	Card,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-} from "@/components/ui/card";
-import { GitHubIcon } from "@/components/icons/GitHubIcon";
-import { cn } from "@/lib/utils";
-import { DownloadIcon, LockIcon, ShieldCheckIcon } from "lucide-react";
-import { StarButton } from "@/components/StarButton";
+import { RegistryCard } from "@/components/registry/RegistryCard";
+import { OfficialBadge } from "@/components/ui/badge";
+import { DownloadIcon } from "lucide-react";
 import { starAddon } from "@/services/addon";
 import { useAuth } from "@/hooks/useAuth";
 
-function Tag({
-	children,
-	className,
-}: {
-	children: React.ReactNode;
-	className?: string;
-}) {
-	return (
-		<span
-			className={cn(
-				"inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-medium bg-muted text-muted-foreground",
-				className,
-			)}
-		>
-			{children}
-		</span>
-	);
-}
-
 export function AddonStatusBadge({ official }: { official: boolean }) {
-	return official ? (
-		<span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-			<ShieldCheckIcon className="size-2.5" />
-			Official
-		</span>
-	) : null;
+	return official ? <OfficialBadge /> : null;
 }
 
 interface AddonCardProps {
@@ -54,6 +22,7 @@ interface AddonCardProps {
 
 export function AddonCard({ addon, visibility }: AddonCardProps) {
 	const { config } = addon;
+	const ownerLogin = authorLogin(config?.author);
 	const detailsHref = getAddonHref(addon);
 
 	const { user } = useAuth();
@@ -81,65 +50,34 @@ export function AddonCard({ addon, visibility }: AddonCardProps) {
 	}
 
 	return (
-		<Card className="relative gap-3 py-4 h-full transition-colors hover:border-foreground/30">
-			<Link
-				href={detailsHref}
-				className="absolute inset-0 rounded-[inherit]"
-				aria-label={config.name}
-			/>
-
-			<CardHeader className="gap-1 pb-0">
-				<div className="flex items-start justify-between gap-2">
-					<CardTitle className="text-sm font-semibold leading-snug">
-						{config.name}
-					</CardTitle>
-					<div className="flex items-center gap-1 shrink-0">
-						<AddonStatusBadge official={addon.official} />
-						{(visibility ?? addon.visibility) === "private" && (
-							<span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
-								<LockIcon className="size-2.5" />
-								Private
-							</span>
-						)}
-					</div>
-				</div>
-				<CardDescription className="line-clamp-2 text-xs leading-relaxed">
-					{config.description}
-				</CardDescription>
-			</CardHeader>
-
-			<CardFooter className="mt-auto flex items-center justify-between gap-3 border-t pt-3">
-				<Link
-					href={`/user/${config.author}`}
-					className="relative z-10 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-				>
-					<GitHubIcon className="size-3 shrink-0" />
-					<span className="truncate">@{config.author}</span>
-				</Link>
-
-				<div className="flex items-center gap-2 shrink-0">
-					{(addon.download_count ?? 0) > 0 && (
-						<span
-							className="flex items-center gap-1 text-[11px] text-muted-foreground"
-							title={`${addon.download_count} installs`}
-						>
-							<DownloadIcon className="size-3" />
-							{addon.download_count}
-						</span>
-					)}
-					<StarButton
-						isStarred={isStarred}
-						starCount={starCount}
-						onToggle={handleStar}
-						loading={starring}
-						disabled={!user}
-						variant="icon"
-					/>
-					<span className="font-mono text-[11px] text-muted-foreground">
-						v{addon.version}
+		<RegistryCard
+			href={detailsHref}
+			title={config.name}
+			description={config.description}
+			official={addon.official}
+			isPrivate={(visibility ?? addon.visibility) === "private"}
+			owner={
+				ownerLogin
+					? { label: `@${ownerLogin}`, href: `/user/${ownerLogin}` }
+					: null
+			}
+			version={addon.version}
+			isStarred={isStarred}
+			starCount={starCount}
+			onToggleStar={handleStar}
+			starring={starring}
+			starDisabled={!user}
+			footerExtras={
+				(addon.download_count ?? 0) > 0 ? (
+					<span
+						className="flex items-center gap-1 text-[11px] text-muted-foreground"
+						title={`${addon.download_count} installs`}
+					>
+						<DownloadIcon className="size-3" />
+						{addon.download_count}
 					</span>
-				</div>
-			</CardFooter>
-		</Card>
+				) : undefined
+			}
+		/>
 	);
 }

@@ -98,8 +98,13 @@ export async function updateStackVisibility(
 	await api.patch<void>(`/stack/${encodeURIComponent(id)}/visibility`, { visibility });
 }
 
-export async function deleteStack(stackId: string): Promise<void> {
-	await api.delete<void>(`/stack/${encodeURIComponent(stackId)}`);
+export async function deleteStack(
+	stackId: string,
+	version: string,
+): Promise<void> {
+	await api.delete<void>(
+		`/stack/${encodeURIComponent(stackId)}/${encodeURIComponent(version)}`,
+	);
 }
 
 export async function starStack(stackId: string): Promise<IStarResponse> {

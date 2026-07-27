@@ -4,9 +4,15 @@ import Logo from "./Logo";
 
 const footerDocLinks = [
 	{ title: "Installation", href: "/docs/installation" },
-	{ title: "CLI", href: "/docs/cli" },
+	{ title: "CLI reference", href: "/docs/reference/commands" },
 	{ title: "Templates", href: "/docs/templates" },
 	{ title: "Addons", href: "/docs/addons" },
+];
+
+const legalLinks = [
+	{ title: "Terms of Service", href: "/terms" },
+	{ title: "Privacy Policy", href: "/privacy" },
+	{ title: "Changelog", href: "/changelog" },
 ];
 
 const navItems = [
@@ -27,7 +33,7 @@ export default function Footer() {
 					</p>
 				</div>
 
-				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 					<div>
 						<p className="mb-2 text-xs font-medium uppercase text-primary">
 							Product
@@ -64,6 +70,23 @@ export default function Footer() {
 
 					<div>
 						<p className="mb-2 text-xs font-medium uppercase text-primary">
+							Legal
+						</p>
+						<div className="flex flex-col gap-2">
+							{legalLinks.map((item) => (
+								<Link
+									key={item.href}
+									href={item.href}
+									className="text-sm text-muted-foreground transition-colors hover:text-primary"
+								>
+									{item.title}
+								</Link>
+							))}
+						</div>
+					</div>
+
+					<div>
+						<p className="mb-2 text-xs font-medium uppercase text-primary">
 							Links
 						</p>
 						<div className="flex flex-col gap-2">
@@ -86,7 +109,7 @@ export default function Footer() {
 					<p>
 						Source-available under the{" "}
 						<Link
-							href="https://github.com/anesis-dev/anesis/blob/main/LICENSE.md"
+							href="https://github.com/anesis-dev/anesis-cli/blob/main/LICENSE.md"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-foreground/80 underline-offset-4 transition-colors hover:text-primary hover:underline"

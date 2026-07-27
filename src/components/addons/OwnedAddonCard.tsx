@@ -35,6 +35,7 @@ import { getAddonHref, getAddonRef } from "@/lib/addon-ref";
 import { cn } from "@/lib/utils";
 import { deleteAddon, updateAddon } from "@/services/addon";
 import { IAddon } from "@/types/addon";
+import { authorName } from "@/lib/author";
 
 type Notice =
 	| { type: "success"; message: string }
@@ -190,7 +191,7 @@ export function OwnedAddonCard({ addon }: { addon: IAddon }) {
 				<div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
 					<span className="flex min-w-0 items-center gap-1.5">
 						<UserIcon className="size-3.5 shrink-0" />
-						<span className="truncate">{addon.config.author}</span>
+						<span className="truncate">{authorName(addon.config.author)}</span>
 					</span>
 					<span className="font-mono">{addon.version}</span>
 					<span>Synced {formatDate(addon.updated_at)}</span>

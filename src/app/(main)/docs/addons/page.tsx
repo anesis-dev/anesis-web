@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRightIcon, BoxesIcon, PencilRulerIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
@@ -12,31 +13,31 @@ import {
 import { Button } from "@/components/ui/button";
 
 const installExample = `# Install an addon by its registry ID
-anesis addon install nest-drizzle
+anesis addon install nest-prisma-v7
 
 # Anesis downloads the addon and caches it at:
-# ~/.anesis/cache/addons/nest-drizzle/`;
+# ~/.anesis/cache/addons/nest-prisma-v7/`;
 
 const runCommandExample = `# Run an addon command from your project root
-anesis use nest-drizzle install
+anesis use nest-prisma-v7 install
 
 # The general form is:
 anesis use <addon-id> <command>
 
 # Omit the command to list what the addon exposes
-anesis use nest-drizzle
+anesis use nest-prisma-v7
 
 # Omit the addon to pick one interactively (add --installed to only show cached ones)
 anesis use
 
 # Preview the plan (variant, inputs, steps) without touching any files
-anesis use nest-drizzle install --dry-run
+anesis use nest-prisma-v7 install --dry-run
 
 # Non-interactive: accept defaults and pass inputs up front
-anesis use nest-drizzle install --yes --input driver=postgres`;
+anesis use nest-prisma-v7 generate --yes --input resource_name=post`;
 
 const autoInstallNote = `# If the addon isn't cached yet, Anesis installs it automatically:
-anesis use nest-drizzle install
+anesis use nest-prisma-v7 install
 # → addon not found locally, installing...
 # → prompting for inputs...
 # → applying steps...`;
@@ -45,24 +46,24 @@ const typicalFlow = `# 1. Log in (required for registry access)
 anesis login
 
 # 2. Install an addon (optional — running a command auto-installs)
-anesis addon install nest-drizzle
+anesis addon install nest-prisma-v7
 
 # 3. Create a new project
-anesis new my-project nestjs
+anesis new my-project nest-express
 cd my-project
 
 # 4. Run addon commands from inside the project
-anesis use nest-drizzle install
-anesis use nest-drizzle generate`;
+anesis use nest-prisma-v7 install
+anesis use nest-prisma-v7 generate`;
 
 const listRemoveExample = `# See which addons are cached locally
 anesis addon list
 
 # Remove an addon from the local cache
-anesis addon remove nest-drizzle`;
+anesis addon remove nest-prisma-v7`;
 
 const updateExample = `# Re-fetch the addon's registry entry from its source URL (cache-level update)
-anesis addon update https://github.com/owner/repo`;
+anesis addon republish https://github.com/owner/repo`;
 
 const linkExample = `# Validate a local directory as an addon and cache it for testing
 anesis addon link ./my-addon --force
@@ -71,15 +72,15 @@ anesis addon link ./my-addon --force
 anesis addon test my-addon install
 anesis addon test my-addon install --project ./some/existing/project`;
 
-const undoOutdatedExample = `# Revert everything "nest-drizzle" applied to this project, in reverse order
-anesis undo nest-drizzle
+const undoOutdatedExample = `# Revert everything "nest-prisma-v7" applied to this project, in reverse order
+anesis undo nest-prisma-v7
 
 # See which applied addons have a newer version in the registry
 anesis outdated
 
 # Upgrade an applied addon in place: undo the old version, install the new one,
 # and replay every command it had already run with the same inputs
-anesis update nest-drizzle`;
+anesis update nest-prisma-v7`;
 
 const runSteps = [
 	"Loads the addon manifest (auto-installs if missing).",
@@ -115,6 +116,13 @@ const inputTypes = [
 			"Multiple-choice prompt with a list of options. Used when there are a fixed set of valid choices (e.g. a database driver).",
 	},
 ];
+
+export const metadata: Metadata = {
+	title: "Using addons",
+	description:
+		"Apply Anesis addons to a scaffolded project, run addon commands, check for updates, and revert changes with anesis undo.",
+	alternates: { canonical: "/docs/addons" },
+};
 
 export default function DocsAddonsPage() {
 	return (
@@ -261,7 +269,7 @@ export default function DocsAddonsPage() {
 							don&apos;t confuse{" "}
 							<code>anesis update &lt;addon-id&gt;</code> (upgrades what&apos;s
 							applied here) with{" "}
-							<code>anesis addon update &lt;url&gt;</code> (refreshes the registry
+							<code>anesis addon republish &lt;url&gt;</code> (refreshes the registry
 							entry, shown above).
 						</>
 					}

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { HydrationBoundary } from "@tanstack/react-query";
 import { StacksRegistryPage } from "@/components/stacks/StacksRegistryPage";
 import { catalogFiltersKey } from "@/services/catalog-filters";
@@ -5,6 +6,13 @@ import { fetchStacks } from "@/services/stack";
 import { dehydrateQuery } from "@/lib/prefetch";
 
 const PAGE_SIZE = 24;
+
+export const metadata: Metadata = {
+	title: "Stacks",
+	description:
+		"Browse Anesis stacks — a template plus a curated set of addons, installed together in a single command.",
+	alternates: { canonical: "/stacks" },
+};
 
 export default async function StacksPage() {
 	const state = await dehydrateQuery({

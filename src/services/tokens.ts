@@ -5,8 +5,14 @@ export async function fetchTokens(): Promise<IApiToken[]> {
 	return api.get<IApiToken[]>("/token");
 }
 
-export async function createToken(name: string): Promise<ICreatedToken> {
-	return api.post<ICreatedToken>("/token", { name });
+export async function createToken(
+	name: string,
+	expiresInDays: number | null = null,
+): Promise<ICreatedToken> {
+	return api.post<ICreatedToken>("/token", {
+		name,
+		expires_in_days: expiresInDays,
+	});
 }
 
 export async function deleteToken(id: string): Promise<void> {

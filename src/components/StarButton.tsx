@@ -49,6 +49,12 @@ export function StarButton({
 				onClick={handleClick}
 				disabled={loading || disabled}
 				title={disabled ? "Log in to star" : displayStarred ? "Unstar" : "Star"}
+				aria-label={
+					disabled
+						? "Log in to star"
+						: `${displayStarred ? "Unstar" : "Star"} (${displayCount})`
+				}
+				aria-pressed={displayStarred}
 				className={cn(
 					"relative z-10 flex items-center gap-1 rounded px-1 py-0.5 text-[11px] font-medium transition-colors",
 					disabled || loading
@@ -71,6 +77,12 @@ export function StarButton({
 				onClick={handleClick}
 				disabled={loading || disabled}
 				title={disabled ? "Log in to star" : displayStarred ? "Unstar" : "Star this"}
+				aria-label={
+					disabled
+						? "Log in to star"
+						: `${displayStarred ? "Unstar" : "Star"} (${displayCount})`
+				}
+				aria-pressed={displayStarred}
 				className={cn(
 					"inline-flex items-center gap-1.5 rounded-l-md border px-3 py-1.5 text-sm font-medium transition-colors",
 					disabled || loading

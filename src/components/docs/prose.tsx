@@ -21,11 +21,6 @@ export function Markup({ children }: { children: string }) {
 	);
 }
 
-/**
- * A flowing documentation section: an h2 heading (anchored for the on-this-page
- * nav), an optional lead paragraph, and stacked prose content. Sections are
- * separated by a top divider so the page reads top-to-bottom without cards.
- */
 export function DocsSection({
 	id,
 	title,
@@ -59,7 +54,6 @@ export function DocsSection({
 	);
 }
 
-/** An anchored h3 subheading used inside a {@link DocsSection}. */
 export function DocsSubheading({
 	id,
 	children,
@@ -77,7 +71,6 @@ export function DocsSubheading({
 	);
 }
 
-/** A prose bullet or numbered list. Items may contain `backtick` code. */
 export function DocsList({
 	items,
 	ordered = false,

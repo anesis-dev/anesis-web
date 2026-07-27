@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { TerminalIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
@@ -70,7 +71,7 @@ anesis new my-app react-vite-ts
 anesis new . react-vite-ts
 
 # Scaffold a template + a pinned set of addons
-anesis new my-app --stack nest-drizzle-stack
+anesis new my-app --stack nest-saas
 
 # Fully non-interactive
 anesis new my-app react-vite-ts --yes --input use_ssl=true`,
@@ -85,7 +86,7 @@ anesis new my-app react-vite-ts --yes --input use_ssl=true`,
 			{
 				name: "[addon_id]",
 				description:
-					"Identifier of an installed addon, e.g. nest-drizzle. Omit to pick interactively.",
+					"Identifier of an installed addon, e.g. nest-prisma-v7. Omit to pick interactively.",
 			},
 			{
 				name: "[command]",
@@ -114,13 +115,13 @@ anesis new my-app react-vite-ts --yes --input use_ssl=true`,
 			},
 		],
 		example: `# Apply the addon's "install" command to this project
-anesis use nest-drizzle install
+anesis use nest-prisma-v7 install
 
 # See what it would do first
-anesis use nest-drizzle install --dry-run
+anesis use nest-prisma-v7 install --dry-run
 
 # List the commands an addon exposes
-anesis use nest-drizzle`,
+anesis use nest-prisma-v7`,
 	},
 	{
 		id: "undo",
@@ -134,21 +135,28 @@ anesis use nest-drizzle`,
 		flags: [
 			{ name: "-y, --yes", description: "Skip the confirmation prompt." },
 		],
-		example: `anesis undo nest-drizzle`,
+		example: `anesis undo nest-prisma-v7`,
 	},
 	{
 		id: "outdated",
 		command: "anesis outdated",
 		summary:
 			"List applied addons (from anesis.lock) that have a newer version available in the registry.",
-		usage: "anesis outdated",
-		example: `anesis outdated`,
+		usage: "anesis outdated [flags]",
+		flags: [
+			{
+				name: "--json",
+				description:
+					"Output as JSON: one entry per applied addon with its current and latest version, plus an error field when the registry could not be reached.",
+			},
+		],
+		example: `anesis outdated --json`,
 	},
 	{
 		id: "project-update",
 		command: "anesis update",
 		summary:
-			"Upgrade an applied addon to the registry's latest version in this project: undoes the old version, installs the new one, then replays every command that had already run, with the same inputs. Distinct from `anesis addon update <url>`, which refreshes a registry entry instead.",
+			"Upgrade an applied addon to the registry's latest version in this project: undoes the old version, installs the new one, then replays every command that had already run, with the same inputs. Distinct from `anesis addon republish <url>`, which refreshes a registry entry instead.",
 		usage: "anesis update <addon_id> [flags]",
 		args: [{ name: "<addon_id>", description: "Applied addon to upgrade." }],
 		flags: [
@@ -157,7 +165,7 @@ anesis use nest-drizzle`,
 				description: "Accept all defaults, skip confirmation prompts.",
 			},
 		],
-		example: `anesis update nest-drizzle`,
+		example: `anesis update nest-prisma-v7`,
 	},
 	{
 		id: "search",
@@ -178,8 +186,8 @@ anesis use nest-drizzle`,
 					"Print matching results as JSON (kind, id, name, description) instead of opening the picker.",
 			},
 		],
-		example: `anesis search drizzle
-anesis search drizzle --json`,
+		example: `anesis search prisma
+anesis search prisma --json`,
 	},
 	{
 		id: "info",
@@ -287,17 +295,17 @@ anesis template publish https://github.com/owner/repo \\
   --visibility private --credential-id <uuid>`,
 	},
 	{
-		id: "template-update",
-		command: "anesis template update",
-		aliases: ["anesis t u"],
+		id: "template-republish",
+		command: "anesis template republish",
+		aliases: ["anesis t rp", "anesis template update (deprecated)"],
 		summary:
 			"Re-fetch a previously published template and refresh its stored commit SHA. Use the same URL you published with.",
-		usage: "anesis template update <template_url> [flags]",
+		usage: "anesis template republish <template_url> [flags]",
 		args: [
 			{ name: "<template_url>", description: "GitHub URL used at publish time." },
 		],
 		flags: publishFlags,
-		example: `anesis template update https://github.com/owner/repo`,
+		example: `anesis template republish https://github.com/owner/repo`,
 	},
 ];
 
@@ -315,7 +323,7 @@ const addonCommands: CommandRefData[] = [
 				description: "Addon to download. Omit to pick interactively.",
 			},
 		],
-		example: `anesis addon install nest-drizzle`,
+		example: `anesis addon install nest-prisma-v7`,
 	},
 	{
 		id: "addon-link",
@@ -354,7 +362,7 @@ const addonCommands: CommandRefData[] = [
 		usage: "anesis addon info <addon_id> [flags]",
 		args: [{ name: "<addon_id>", description: "Addon to inspect." }],
 		flags: [{ name: "--json", description: "Output as JSON." }],
-		example: `anesis addon info nest-drizzle`,
+		example: `anesis addon info nest-prisma-v7`,
 	},
 	{
 		id: "addon-test",
@@ -373,8 +381,8 @@ const addonCommands: CommandRefData[] = [
 					"Fixture project to test on. Defaults to the addon's bundled test-fixture/ directory.",
 			},
 		],
-		example: `anesis addon test nest-drizzle install
-anesis addon test nest-drizzle install --project ./fixtures/fastify-app`,
+		example: `anesis addon test nest-prisma-v7 install
+anesis addon test nest-prisma-v7 install --project ./fixtures/fastify-app`,
 	},
 	{
 		id: "addon-remove",
@@ -383,7 +391,7 @@ anesis addon test nest-drizzle install --project ./fixtures/fastify-app`,
 		summary: "Delete a cached addon and remove its entry from the addon index.",
 		usage: "anesis addon remove <addon_id>",
 		args: [{ name: "<addon_id>", description: "Cached addon to remove." }],
-		example: `anesis addon remove nest-drizzle`,
+		example: `anesis addon remove nest-prisma-v7`,
 	},
 	{
 		id: "addon-publish",
@@ -399,17 +407,17 @@ anesis addon test nest-drizzle install --project ./fixtures/fastify-app`,
 		example: `anesis addon publish https://github.com/owner/repo`,
 	},
 	{
-		id: "addon-update",
-		command: "anesis addon update",
-		aliases: ["anesis a u"],
+		id: "addon-republish",
+		command: "anesis addon republish",
+		aliases: ["anesis a rp", "anesis addon update (deprecated)"],
 		summary:
 			"Re-fetch a previously published addon and refresh its stored commit SHA.",
-		usage: "anesis addon update <addon_url> [flags]",
+		usage: "anesis addon republish <addon_url> [flags]",
 		args: [
 			{ name: "<addon_url>", description: "GitHub URL used at publish time." },
 		],
 		flags: publishFlags,
-		example: `anesis addon update https://github.com/owner/repo`,
+		example: `anesis addon republish https://github.com/owner/repo`,
 	},
 ];
 
@@ -422,7 +430,28 @@ const stackCommands: CommandRefData[] = [
 			"Download a stack manifest from the registry and cache it under ~/.anesis/cache/stacks. Optional — anesis new --stack auto-installs it when missing.",
 		usage: "anesis stack install <stack_id>",
 		args: [{ name: "<stack_id>", description: "Stack to download." }],
-		example: `anesis stack install nest-drizzle-stack`,
+		example: `anesis stack install nest-saas`,
+	},
+	{
+		id: "stack-link",
+		command: "anesis stack link",
+		summary:
+			"Validate a local anesis.stack.json and cache it under its manifest id, so it can be scaffolded with anesis new --stack before it is published.",
+		usage: "anesis stack link [path] [flags]",
+		args: [
+			{
+				name: "[path]",
+				description:
+					"Directory or manifest to validate. Defaults to the current directory.",
+			},
+		],
+		flags: [
+			{
+				name: "--force",
+				description: "Overwrite an existing cached stack without asking.",
+			},
+		],
+		example: `anesis stack link ./my-stack`,
 	},
 	{
 		id: "stack-list",
@@ -441,7 +470,7 @@ const stackCommands: CommandRefData[] = [
 		usage: "anesis stack info <stack_id> [flags]",
 		args: [{ name: "<stack_id>", description: "Stack to inspect." }],
 		flags: [{ name: "--json", description: "Output as JSON." }],
-		example: `anesis stack info nest-drizzle-stack`,
+		example: `anesis stack info nest-saas`,
 	},
 	{
 		id: "stack-remove",
@@ -450,7 +479,7 @@ const stackCommands: CommandRefData[] = [
 		summary: "Delete a locally cached stack manifest.",
 		usage: "anesis stack remove <stack_id>",
 		args: [{ name: "<stack_id>", description: "Cached stack to remove." }],
-		example: `anesis stack remove nest-drizzle-stack`,
+		example: `anesis stack remove nest-saas`,
 	},
 	{
 		id: "stack-publish",
@@ -464,14 +493,14 @@ const stackCommands: CommandRefData[] = [
 		example: `anesis stack publish https://github.com/owner/repo`,
 	},
 	{
-		id: "stack-update",
-		command: "anesis stack update",
-		aliases: ["anesis s u"],
+		id: "stack-republish",
+		command: "anesis stack republish",
+		aliases: ["anesis s rp", "anesis stack update (deprecated)"],
 		summary: "Republish a stack from its GitHub repository, refreshing the registry entry.",
-		usage: "anesis stack update <stack_url> [flags]",
+		usage: "anesis stack republish <stack_url> [flags]",
 		args: [{ name: "<stack_url>", description: "GitHub URL used at publish time." }],
 		flags: publishFlags,
-		example: `anesis stack update https://github.com/owner/repo`,
+		example: `anesis stack republish https://github.com/owner/repo`,
 	},
 ];
 
@@ -577,6 +606,13 @@ const sections = [
 	},
 ];
 
+export const metadata: Metadata = {
+	title: "CLI commands",
+	description:
+		"Full command reference for the Anesis CLI: new, template, addon, stack, use, undo, outdated, update, search, login, mcp, and more.",
+	alternates: { canonical: "/docs/reference/commands" },
+};
+
 export default function DocsCommandsPage() {
 	return (
 		<div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-5 py-10 lg:px-8">
@@ -624,13 +660,20 @@ export default function DocsCommandsPage() {
 				</p>
 			</Callout>
 
-			<Callout variant="note" title="anesis update vs. anesis addon/template/stack update">
+			<Callout variant="note" title="The three update verbs">
 				<p>
 					<code>anesis update &lt;addon-id&gt;</code> upgrades an addon already
-					applied in the current project. <code>anesis addon update &lt;url&gt;</code>{" "}
-					(and its template/stack equivalents) instead refreshes a registry
-					entry from its source repository. They act on different things —
-					your project versus the registry — despite the shared verb.
+					applied in the current project.{" "}
+					<code>anesis upgrade</code> (alias <code>self-update</code>) replaces
+					the anesis binary itself.{" "}
+					<code>anesis addon republish &lt;url&gt;</code> (and its
+					template/stack equivalents) refreshes a registry entry from its source
+					repository.
+				</p>
+				<p>
+					<code>republish</code> was called <code>update</code> before 1.0.0.
+					The old spelling still works as a hidden alias, so existing scripts
+					keep running.
 				</p>
 			</Callout>
 

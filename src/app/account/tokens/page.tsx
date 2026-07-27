@@ -12,11 +12,24 @@ import { ICreatedToken } from "@/types/token";
 import { GitHubIcon } from "@/components/icons/GitHubIcon";
 import { KeyRoundIcon, CopyIcon, CheckIcon, Trash2Icon } from "lucide-react";
 
+function isExpired(expiresAt: string | null): boolean {
+	return expiresAt !== null && new Date(expiresAt).getTime() <= Date.now();
+}
+
+function describeExpiry(expiresAt: string | null): string {
+	if (expiresAt === null) return "never expires";
+	const date = new Date(expiresAt);
+	return isExpired(expiresAt)
+		? `expired ${date.toLocaleDateString()}`
+		: `expires ${date.toLocaleDateString()}`;
+}
+
 export default function AccountTokensPage() {
 	const { user, login } = useAuth();
 	const { tokens, isLoading, createToken, deleteToken, isCreating, isDeleting } =
 		useTokens();
 	const [name, setName] = useState("");
+	const [expiry, setExpiry] = useState<string>("90");
 	const [created, setCreated] = useState<ICreatedToken | null>(null);
 	const [copied, setCopied] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -53,7 +66,10 @@ export default function AccountTokensPage() {
 		const trimmed = name.trim();
 		if (!trimmed) return;
 		try {
-			const token = await createToken(trimmed);
+			const token = await createToken({
+				name: trimmed,
+				expiresInDays: expiry === "never" ? null : Number(expiry),
+			});
 			setCreated(token);
 			setCopied(false);
 			setName("");
@@ -123,6 +139,17 @@ export default function AccountTokensPage() {
 					maxLength={100}
 					className="flex-1"
 				/>
+				<select
+					value={expiry}
+					onChange={(e) => setExpiry(e.target.value)}
+					aria-label="Token expiry"
+					className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+				>
+					<option value="30">Expires in 30 days</option>
+					<option value="90">Expires in 90 days</option>
+					<option value="365">Expires in 1 year</option>
+					<option value="never">Never expires</option>
+				</select>
 				<Button type="submit" disabled={isCreating || !name.trim()}>
 					{isCreating ? "Creating…" : "Create token"}
 				</Button>
@@ -145,13 +172,22 @@ export default function AccountTokensPage() {
 							className="flex items-center justify-between gap-4 px-4 py-3"
 						>
 							<div className="min-w-0">
-								<p className="truncate font-medium text-sm">{token.name}</p>
+								<p className="flex items-center gap-2 truncate font-medium text-sm">
+									{token.name}
+									{isExpired(token.expires_at) && (
+										<span className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-destructive">
+											Expired
+										</span>
+									)}
+								</p>
 								<p className="text-xs text-muted-foreground">
 									Created {new Date(token.created_at).toLocaleDateString()}
 									{" · "}
 									{token.last_used_at
 										? `last used ${new Date(token.last_used_at).toLocaleDateString()}`
 										: "never used"}
+									{" · "}
+									{describeExpiry(token.expires_at)}
 								</p>
 							</div>
 							<Button

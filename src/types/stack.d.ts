@@ -10,6 +10,8 @@ export interface IStackConfig {
 	id: string;
 	name: string;
 	description: string;
+	version: string;
+	author: { name: string; github: string };
 	template: string;
 	addons: IStackAddonRef[];
 }
@@ -24,6 +26,8 @@ export interface IStack {
 	commit_sha: string;
 	official: boolean;
 	config: IStackConfig;
+	version: string;
+	versionCount?: number;
 	created_at: string;
 	updated_at: string;
 	download_count?: number;

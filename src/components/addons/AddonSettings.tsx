@@ -38,11 +38,6 @@ type Notice =
 	| { type: "error"; message: string }
 	| null;
 
-function visibilityIcon(visibility?: string) {
-	if (visibility === "private") return LockIcon;
-	return GlobeIcon;
-}
-
 export function AddonSettings({
 	addon,
 	isAdmin = false,
@@ -62,8 +57,6 @@ export function AddonSettings({
 	const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
 	const [isChangingVisibility, setIsChangingVisibility] = useState(false);
 	const [pendingVisibility, setPendingVisibility] = useState(addon.visibility ?? "public");
-
-	const VisibilityIcon = visibilityIcon(addon.visibility);
 
 	async function refreshAddonQueries() {
 		await Promise.all([
@@ -237,7 +230,11 @@ export function AddonSettings({
 					<Dialog open={isVisibilityOpen} onOpenChange={setIsVisibilityOpen}>
 						<DialogTrigger asChild>
 							<Button type="button" variant="outline" disabled={busy}>
-								<VisibilityIcon className="size-3.5" />
+								{addon.visibility === "private" ? (
+									<LockIcon className="size-3.5" />
+								) : (
+									<GlobeIcon className="size-3.5" />
+								)}
 								Change visibility
 							</Button>
 						</DialogTrigger>

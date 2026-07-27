@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldCheckIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
@@ -38,6 +39,13 @@ const tokenAuth = [
 	"`get_auth_user` checks `ANESIS_TOKEN` first, before falling back to `~/.anesis/auth.json`, so a token in the environment always takes priority.",
 	"This is the auth path used by CI and the `anesis mcp` server — see the AI Agents & MCP page for the full setup.",
 ];
+
+export const metadata: Metadata = {
+	title: "Authentication",
+	description:
+		"Sign in to Anesis with GitHub, or authenticate CI and AI agents with a personal access token via ANESIS_TOKEN.",
+	alternates: { canonical: "/docs/authentication" },
+};
 
 export default function DocsAuthenticationPage() {
 	return (

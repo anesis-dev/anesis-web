@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { BoxesIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { DocsHero } from "@/components/docs/DocsHero";
@@ -272,7 +273,7 @@ const stepTypes: {
 			<>
 				Both <code>find</code> and <code>replace</code> are rendered through Tera.
 				Use glob targets to apply the same replacement across many files. Use{" "}
-				<code>// anesis:</code> comment markers in your template source to create
+				<code>{"// anesis:"}</code> comment markers in your template source to create
 				predictable insertion points.
 			</>
 		),
@@ -344,7 +345,7 @@ const stepTypes: {
 				asks for an explicit yes before executing it — unless{" "}
 				<code>--yes</code> or non-interactive mode is active. A run step is{" "}
 				<span className="font-medium text-foreground">not reversible</span>:
-				it's recorded in the rollback journal as an irreversible action, so{" "}
+				it&apos;s recorded in the rollback journal as an irreversible action, so{" "}
 				<code>anesis undo</code> skips it rather than trying to undo its
 				side effects.
 			</>
@@ -359,6 +360,63 @@ const rollbackNote = [
 	"A packages step snapshots the package manifest/lockfile before running and restores them if the install command fails or a later step fails.",
 	"Delete steps are not rolled back — the file is gone. Place delete steps at the end of your step list if order matters.",
 	"Run steps are never rolled back — they're recorded as an irreversible action in the journal, so `anesis undo` skips them and leaves their side effects in place.",
+];
+
+const injectionMarkers = [
+	{
+		field: "anesis:top-imports",
+		desc: "Entry file, bundler config, NestJS app.module.ts, Rust main.rs / state.rs / routers/mod.rs. Inject import or use statements after it.",
+	},
+	{
+		field: "anesis:providers-*",
+		desc: "A start/end pair in the React entry file and in Next's layout.tsx. Open after the start marker and close before the end marker to wrap the app — several addons then nest correctly whatever order they were installed in.",
+	},
+	{
+		field: "anesis:css-imports",
+		desc: "src/index.css, or src/app/globals.css on Next. Inject @import rules after it; the marker is the file's first line, so an @import lands legally ahead of any other rule.",
+	},
+	{
+		field: "anesis:build-plugins",
+		desc: "Inside the plugins array of vite.config.*, rsbuild.config.* and farm.config.ts. Inject an array entry before it.",
+	},
+	{
+		field: "anesis:next-config",
+		desc: "Inside the exported object in next.config.ts.",
+	},
+	{
+		field: "anesis:module-imports",
+		desc: "Inside imports: [ ] in a NestJS app.module.ts.",
+	},
+	{
+		field: "anesis:dependencies",
+		desc: "End of [dependencies] in Cargo.toml. Inject crates with their feature lists — cargo add cannot express features through a packages step.",
+	},
+	{
+		field: "anesis:modules",
+		desc: "Rust main.rs, for mod x; declarations.",
+	},
+	{
+		field: "anesis:startup",
+		desc: "Rust main.rs, before the state is built. Anchor with before for anything that must run first, such as initialising logging; after for everything else.",
+	},
+	{
+		field: "anesis:state-*",
+		desc: "anesis:state-fields in state.rs and anesis:state-init in main.rs — a field on AppState and its initialiser.",
+	},
+	{
+		field: "anesis:routes / :layers",
+		desc: "Rust routers/mod.rs, for .route(...) and .layer(...) entries.",
+	},
+	{
+		field: "anesis:handler-*",
+		desc: "anesis:handler-modules and anesis:handler-exports in Rust handlers/mod.rs.",
+	},
+];
+
+const markerPractice = [
+	"Inject against these with `if_not_found: \"error\"`. A missing marker is a bug in the template, and skipping silently ships a half-applied addon.",
+	"React entry files are `src/main.tsx`, `src/main.jsx`, `src/index.tsx` or `src/index.jsx` depending on the template. Target them with the glob `src/*.[jt]sx` and `if_not_found: \"skip\"` — only the entry file carries the markers, so its `App.tsx` sibling is skipped harmlessly.",
+	"Templates that need a different filename per language (`.ts` vs `.js`) are better served by two variants selected on `file_exists: tsconfig.json` than by shipping a TypeScript file into a JavaScript project.",
 ];
 
 const safetyPoints = [
@@ -390,6 +448,13 @@ function FieldList({
 		</dl>
 	);
 }
+
+export const metadata: Metadata = {
+	title: "Creating addons",
+	description:
+		"Write an anesis.addon.json manifest with copy, patch, packages, and run steps — and make every step reversible.",
+	alternates: { canonical: "/docs/addons/creating" },
+};
 
 export default function DocsAddonsCreatingPage() {
 	return (
@@ -510,6 +575,16 @@ export default function DocsAddonsCreatingPage() {
 							{step.note ? <p>{step.note}</p> : null}
 						</div>
 					))}
+				</DocsSection>
+
+				<DocsSection
+					id="markers"
+					title="Injection markers the official templates provide"
+					lead="Every template in the registry carries the same named anchors, so one addon can target the same place across Vite, Rsbuild, Farm, Next, NestJS and Axum without knowing how each template is written."
+				>
+					<FieldList items={injectionMarkers} />
+					<DocsSubheading id="markers-practice">In practice</DocsSubheading>
+					<DocsList items={markerPractice} />
 				</DocsSection>
 
 				<DocsSection

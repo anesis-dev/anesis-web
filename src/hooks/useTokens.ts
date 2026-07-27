@@ -18,8 +18,12 @@ export function useTokens() {
 		},
 	});
 
-	const createMutation = useMutation<ICreatedToken, Error, string>({
-		mutationFn: (name: string) => createToken(name),
+	const createMutation = useMutation<
+		ICreatedToken,
+		Error,
+		{ name: string; expiresInDays: number | null }
+	>({
+		mutationFn: ({ name, expiresInDays }) => createToken(name, expiresInDays),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["tokens"] });
 		},

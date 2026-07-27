@@ -39,11 +39,6 @@ type Notice =
 	| { type: "error"; message: string }
 	| null;
 
-function visibilityIcon(visibility?: string) {
-	if (visibility === "private") return LockIcon;
-	return GlobeIcon;
-}
-
 export function TemplateSettings({
 	template,
 	isAdmin = false,
@@ -64,8 +59,6 @@ export function TemplateSettings({
 	const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
 	const [isChangingVisibility, setIsChangingVisibility] = useState(false);
 	const [pendingVisibility, setPendingVisibility] = useState(template.visibility ?? "public");
-
-	const VisibilityIcon = visibilityIcon(template.visibility);
 
 	async function refreshTemplateQueries() {
 		await Promise.all([
@@ -296,7 +289,11 @@ export function TemplateSettings({
 					<Dialog open={isVisibilityOpen} onOpenChange={setIsVisibilityOpen}>
 						<DialogTrigger asChild>
 							<Button type="button" variant="outline" disabled={busy}>
-								<VisibilityIcon className="size-3.5" />
+								{template.visibility === "private" ? (
+									<LockIcon className="size-3.5" />
+								) : (
+									<GlobeIcon className="size-3.5" />
+								)}
 								Change visibility
 							</Button>
 						</DialogTrigger>

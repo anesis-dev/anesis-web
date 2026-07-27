@@ -31,7 +31,7 @@ npm install
 2. Configure environment variables:
 
 ```bash
-cp .env .env.local
+cp .env.example .env.local
 ```
 
 Current local API target:
@@ -54,6 +54,10 @@ the `httpOnly` auth cookie in a first-party context:
 NEXT_PUBLIC_API_URL=/api/backend
 API_PROXY_URL=https://anesis-server.onrender.com
 ```
+
+`NEXT_PUBLIC_API_URL` is required in a production build — it no longer falls back
+to `http://localhost:4000`, because that fallback silently pointed every
+visitor's browser at their own machine.
 
 `API_PROXY_URL` is used by `next.config.ts` to rewrite `/api/backend/*` to the
 server. The server's `WEB_CALLBACK_URL` must point at the same rewritten

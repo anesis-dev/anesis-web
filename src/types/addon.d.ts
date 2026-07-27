@@ -5,7 +5,12 @@ export interface IAddonConfig {
 	name: string;
 	version: string;
 	description: string;
-	author: string;
+	/**
+	 * Object form from 1.0 onwards, matching templates and stacks. The bare
+	 * string is still produced by addons published before that; use
+	 * `authorName`/`authorLogin` from `@/lib/author` rather than reading it raw.
+	 */
+	author: string | { name: string; github: string };
 }
 
 export interface IAddon {

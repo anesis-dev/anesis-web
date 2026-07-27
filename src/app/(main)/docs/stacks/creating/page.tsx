@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRightIcon, LayersIcon, PencilRulerIcon, WandSparklesIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
@@ -16,17 +17,17 @@ const planningPoints = [
 
 const manifestExample = `{
   "schema_version": "1",
-  "id": "nest-drizzle-stack",
-  "name": "NestJS + Drizzle",
-  "description": "NestJS starter with Drizzle ORM already wired up.",
-  "template": "nestjs",
+  "id": "nest-saas",
+  "name": "NestJS SaaS Starter",
+  "description": "NestJS backend with Prisma, JWT auth, Swagger docs and request validation.",
+  "version": "1.0.0",
+  "author": { "name": "Maksym Zhuk", "github": "anesis-dev" },
+  "template": "nest-express",
   "addons": [
-    { "id": "dotenv", "command": "install" },
-    {
-      "id": "nest-drizzle",
-      "command": "install",
-      "inputs": { "driver": "postgres", "use_ssl": "false" }
-    }
+    { "id": "nest-prisma-v7", "command": "install" },
+    { "id": "nest-auth-jwt", "command": "install" },
+    { "id": "nest-swagger", "command": "install" },
+    { "id": "nest-validation", "command": "install" }
   ]
 }`;
 
@@ -34,6 +35,8 @@ const idRules = [
 	"`id` is the identifier used everywhere in the CLI — `anesis new my-app --stack <id>`, `anesis stack install <id>`, etc. Keep it URL-safe: lowercase letters, numbers, and hyphens.",
 	"`name` is the human-readable title shown in the registry UI — spaces and casing are fine here.",
 	"`description` is a one-line summary shown on stack cards and the detail page.",
+	"`version` is a semver string (`major.minor.patch`). Publishing a new version adds a new entry; the registry shows the latest and a version count. Re-publishing an existing version is rejected.",
+	"`author` is an object with `name` and `github` — the GitHub handle links the stack to your profile and is shown on every stack card.",
 	"`addons` must be in the exact order you want them applied — the CLI does not reorder or sort the array for you.",
 ];
 
@@ -51,6 +54,13 @@ const beforePublishChecks = [
 	"If you added extra terminal commands in the builder, fold anything essential into an actual addon (or note it in your stack's README) — the published manifest won't carry them.",
 	"Push the finished `anesis.stack.json` (plus an optional README) to a GitHub repo before publishing — the registry stores a reference to that repo and commit, not the file itself.",
 ];
+
+export const metadata: Metadata = {
+	title: "Creating stacks",
+	description:
+		"Define an anesis.stack.json manifest that combines a template with the addons and commands to apply to it.",
+	alternates: { canonical: "/docs/stacks/creating" },
+};
 
 export default function DocsStacksCreatingPage() {
 	return (
@@ -168,7 +178,7 @@ export default function DocsStacksCreatingPage() {
 				>
 					<CodeBlock
 						code={`anesis stack publish https://github.com/owner/repo
-anesis stack update https://github.com/owner/repo`}
+anesis stack republish https://github.com/owner/repo`}
 					/>
 					<p>
 						See{" "}

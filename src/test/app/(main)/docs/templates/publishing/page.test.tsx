@@ -14,7 +14,7 @@ describe("DocsTemplatesPublishingPage", () => {
 		render(<DocsTemplatesPublishingPage />);
 
 		expect(screen.getAllByText(/anesis template publish https:\/\/github\.com\/owner\/repo/i).length).toBeGreaterThan(0);
-		expect(screen.getAllByText(/anesis template update/i).length).toBeGreaterThan(0);
+		expect(screen.getAllByText(/anesis template republish/i).length).toBeGreaterThan(0);
 	});
 
 	it("documents the GitHub URL rules", () => {

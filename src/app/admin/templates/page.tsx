@@ -245,7 +245,7 @@ export default function AdminTemplatesPage() {
 			(t) =>
 				t.name.toLowerCase().includes(q) ||
 				t.config.metadata.displayName.toLowerCase().includes(q) ||
-				t.config.author.github.toLowerCase().includes(q) ||
+				(t.config?.author?.github ?? "").toLowerCase().includes(q) ||
 				t.config.specialization.toLowerCase().includes(q),
 		);
 	}, [templates, search]);
@@ -471,10 +471,10 @@ export default function AdminTemplatesPage() {
 										</td>
 										<td className="py-3 px-4">
 											<Link
-												href={`/user/${t.config.author.github}`}
+												href={`/user/${t.config?.author?.github ?? ""}`}
 												className="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
 											>
-												@{t.config.author.github}
+												@{t.config?.author?.github ?? "unknown"}
 											</Link>
 										</td>
 										<td className="py-3 px-4 text-muted-foreground">

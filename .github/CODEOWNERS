@@ -1,0 +1,16 @@
+# Every change needs a review from the maintainer.
+# Ordered most-general first; the last matching rule wins.
+
+*                       @Maksym-Zhuk
+
+# Security-relevant surfaces: the CSP and proxy config, the auth flow, token
+# management, and the legal pages GitHub OAuth review depends on.
+/next.config.ts         @Maksym-Zhuk
+/vercel.json            @Maksym-Zhuk
+/src/app/api/           @Maksym-Zhuk
+/src/app/auth/          @Maksym-Zhuk
+/src/app/account/tokens/ @Maksym-Zhuk
+/src/app/(main)/terms/  @Maksym-Zhuk
+/src/app/(main)/privacy/ @Maksym-Zhuk
+/src/config/env.ts      @Maksym-Zhuk
+/.github/               @Maksym-Zhuk

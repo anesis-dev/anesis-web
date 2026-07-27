@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { DatabaseIcon, GitBranchIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
@@ -77,6 +78,13 @@ const cacheFields = [
 	"`anesis.json` tracks `template_name`, `template_sha`, and `addons` (ids applied via `anesis new --stack`).",
 	"`anesis.lock` stores, per addon: `id`, `version`, `variant`, `commands_executed`, a `journal` of rollback actions, and the resolved `inputs` used for that addon.",
 ];
+
+export const metadata: Metadata = {
+	title: "Reference",
+	description:
+		"Reference documentation for the Anesis CLI, manifest schemas, and environment variables.",
+	alternates: { canonical: "/docs/reference" },
+};
 
 export default async function DocsReferencePage() {
 	let schemaPreview: string | null = null;
@@ -179,7 +187,7 @@ export default async function DocsReferencePage() {
 						</Button>
 						<Button variant="outline" asChild>
 							<Link
-								href="https://github.com/anesis-dev/anesis"
+								href="https://github.com/anesis-dev/anesis-cli"
 								target="_blank"
 								rel="noopener noreferrer"
 							>

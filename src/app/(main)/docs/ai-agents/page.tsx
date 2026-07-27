@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { BotIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
 import { DocsHero } from "@/components/docs/DocsHero";
@@ -36,6 +37,13 @@ const mcpConfig = `{
     }
   }
 }`;
+
+export const metadata: Metadata = {
+	title: "AI agents & MCP",
+	description:
+		"Use Anesis from AI agents: token auth, non-interactive flags, JSON output, and the anesis mcp stdio server.",
+	alternates: { canonical: "/docs/ai-agents" },
+};
 
 export default function DocsAiAgentsPage() {
 	return (

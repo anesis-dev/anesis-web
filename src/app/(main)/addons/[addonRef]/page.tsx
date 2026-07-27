@@ -1,1 +1,1 @@
-export { default } from "../registry/[addonRef]/page";
+export { default, generateMetadata } from "../registry/[addonRef]/page";

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BoxesIcon } from "lucide-react";
 import { DocsPagination } from "@/components/docs/DocsPagination";
@@ -9,10 +10,10 @@ const publishExample = `# Publish an addon whose manifest is at the repo root
 anesis addon publish https://github.com/owner/repo
 
 # Publish an addon in a subdirectory
-anesis addon publish https://github.com/owner/repo/tree/main/addons/nest-drizzle`;
+anesis addon publish https://github.com/owner/repo/tree/main/addons/nest-prisma-v7`;
 
 const updateExample = `# Update an existing registry entry with the latest commit
-anesis addon update https://github.com/owner/repo/tree/main/addons/nest-drizzle`;
+anesis addon republish https://github.com/owner/repo/tree/main/addons/nest-prisma-v7`;
 
 const urlRules = [
 	"The host must be `github.com` — other Git hosts are not supported.",
@@ -50,6 +51,13 @@ const publishSteps = [
 	},
 ];
 
+export const metadata: Metadata = {
+	title: "Publishing addons",
+	description:
+		"Publish an addon to the Anesis registry and release new versions of it.",
+	alternates: { canonical: "/docs/addons/publishing" },
+};
+
 export default function DocsAddonsPublishingPage() {
 	return (
 		<div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-10 lg:px-8">
@@ -65,7 +73,7 @@ export default function DocsAddonsPublishingPage() {
 				<DocsSection
 					id="auth"
 					title="Authentication required"
-					lead="Both anesis addon publish and anesis addon update require a saved login session."
+					lead="Both anesis addon publish and anesis addon republish require a saved login session."
 				>
 					<p>
 						Run <code>anesis login</code> before publishing. The CLI sends your

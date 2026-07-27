@@ -10,16 +10,48 @@ class ApiError extends Error {
     }
 }
 
-function requestBaseUrl(): string {
-    if (typeof window === "undefined" && process.env.API_PROXY_URL) {
-        return process.env.API_PROXY_URL.replace(/\/+$/, "");
+// Server-side fetches must not stall a render (or a prerender during `next
+// build`) when the backend is unreachable but the socket stays open. The
+// browser has no such constraint - React Query owns retries/timeouts there.
+const SERVER_REQUEST_TIMEOUT_MS = 10_000;
+
+const isServer = typeof window === "undefined";
+
+// Origin of *this* Next.js server, used to turn a same-origin apiUrl such as
+// "/api/backend" into something Node's fetch will accept.
+function selfOrigin(): string {
+    if (process.env.VERCEL_URL) {
+        return `https://${process.env.VERCEL_URL}`;
     }
+    return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
+}
+
+function requestBaseUrl(): string {
+    if (!isServer) {
+        return env.apiUrl;
+    }
+
+    // Direct backend origin, bypassing the /api/backend rewrite entirely.
+    const proxyUrl = process.env.API_PROXY_URL?.replace(/\/+$/, "");
+    if (proxyUrl) {
+        return proxyUrl;
+    }
+
+    // env.apiUrl may be a same-origin path ("/api/backend"); Node's fetch
+    // rejects relative URLs, so resolve it against our own origin.
+    if (env.apiUrl.startsWith("/")) {
+        return `${selfOrigin()}${env.apiUrl}`;
+    }
+
     return env.apiUrl;
 }
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     const res = await fetch(`${requestBaseUrl()}${path}`, {
         credentials: "include",
+        ...(isServer && !options?.signal
+            ? { signal: AbortSignal.timeout(SERVER_REQUEST_TIMEOUT_MS) }
+            : {}),
         ...options,
         headers: {
             "Content-Type": "application/json",

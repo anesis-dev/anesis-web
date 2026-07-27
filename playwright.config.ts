@@ -15,6 +15,9 @@ export default defineConfig({
 		command: "bun run build && bun run start",
 		url: "http://localhost:3000",
 		reuseExistingServer: !process.env.CI,
-		timeout: 120_000,
+		// CI runs a cold build every time (no Turbopack cache across jobs), which
+		// is noticeably slower than a local rebuild - give it headroom beyond the
+		// default 120s so a slow runner doesn't time out mid-build.
+		timeout: 300_000,
 	},
 });

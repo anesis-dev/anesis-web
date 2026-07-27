@@ -40,6 +40,8 @@ jobs:
 
       - name: Build
         run: bun run build
+        env:
+          NEXT_PUBLIC_API_URL: /api/backend
 
   security:
     # This repo has no `cargo audit` counterpart, so its dependency tree was the
@@ -84,6 +86,8 @@ jobs:
       - name: Run e2e tests
         # playwright.config.ts's webServer builds + starts the app itself.
         run: bun run e2e
+        env:
+          NEXT_PUBLIC_API_URL: /api/backend
 
       - name: Upload Playwright report
         if: failure()

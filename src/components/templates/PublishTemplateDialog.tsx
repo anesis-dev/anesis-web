@@ -20,8 +20,6 @@ import {
 	CheckCircleIcon,
 	AlertCircleIcon,
 	LoaderIcon,
-	GlobeIcon,
-	LockIcon,
 } from "lucide-react";
 import { VariantProps } from "class-variance-authority";
 import { buttonVariants } from "@/components/ui/button";
@@ -45,7 +43,6 @@ export function PublishTemplateDialog({
 }) {
 	const [open, setOpen] = useState(false);
 	const [url, setUrl] = useState("");
-	const [visibility, setVisibility] = useState<"public" | "private">("public");
 	const [state, setState] = useState<DialogState>({ status: "idle" });
 	const queryClient = useQueryClient();
 
@@ -54,7 +51,6 @@ export function PublishTemplateDialog({
 		if (!isOpen) {
 			setTimeout(() => {
 				setUrl("");
-				setVisibility("public");
 				setState({ status: "idle" });
 			}, 200);
 		}
@@ -72,7 +68,7 @@ export function PublishTemplateDialog({
 
 		setState({ status: "loading" });
 		try {
-			const result = await publishTemplate(url.trim(), visibility);
+			const result = await publishTemplate(url.trim());
 			setState({ status: "success", name: result.name });
 			await Promise.all([
 				queryClient.invalidateQueries({ queryKey: ["templates"] }),
@@ -148,44 +144,6 @@ export function PublishTemplateDialog({
 									<span>{state.message}</span>
 								</div>
 							)}
-						</div>
-
-						<div className="flex flex-col gap-1.5">
-							<p className="text-sm font-medium">Visibility</p>
-							<div className="grid grid-cols-2 gap-2">
-								<button
-									type="button"
-									onClick={() => setVisibility("public")}
-									disabled={state.status === "loading"}
-									className={`flex items-center gap-2 rounded-md border px-3 py-2.5 text-sm transition-colors ${
-										visibility === "public"
-											? "border-primary bg-primary/5 text-primary"
-											: "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
-									}`}
-								>
-									<GlobeIcon className="size-4 shrink-0" />
-									<div className="text-left">
-										<p className="font-medium leading-none">Public</p>
-										<p className="mt-0.5 text-xs opacity-70">Visible to everyone</p>
-									</div>
-								</button>
-								<button
-									type="button"
-									onClick={() => setVisibility("private")}
-									disabled={state.status === "loading"}
-									className={`flex items-center gap-2 rounded-md border px-3 py-2.5 text-sm transition-colors ${
-										visibility === "private"
-											? "border-primary bg-primary/5 text-primary"
-											: "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
-									}`}
-								>
-									<LockIcon className="size-4 shrink-0" />
-									<div className="text-left">
-										<p className="font-medium leading-none">Private</p>
-										<p className="mt-0.5 text-xs opacity-70">Only you can see it</p>
-									</div>
-								</button>
-							</div>
 						</div>
 
 						<DialogFooter>

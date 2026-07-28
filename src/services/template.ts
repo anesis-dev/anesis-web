@@ -97,12 +97,11 @@ export async function fetchTemplateUrl(
 
 export async function publishTemplate(
 	url: string,
-	visibility: "public" | "private" = "public",
 ): Promise<{ message: string; name: string }> {
 	return parsePublishTemplateResponse(
 		await api.post<unknown>("/template/publish", {
 			url,
-			visibility,
+			visibility: "public",
 		}),
 	);
 }

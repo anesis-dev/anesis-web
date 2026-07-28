@@ -112,6 +112,20 @@ function parseUser(value: unknown, path: string): IUser {
 	};
 }
 
+function parseAddonConfigAuthor(
+	value: unknown,
+	path: string,
+): IAddonConfig["author"] {
+	if (typeof value === "string") return value;
+
+	const author = expectRecord(value, path);
+
+	return {
+		name: expectString(author.name, `${path}.name`),
+		github: expectString(author.github, `${path}.github`),
+	};
+}
+
 function parseAddonConfig(value: unknown, path: string): IAddonConfig {
 	const config = expectRecord(value, path);
 
@@ -124,7 +138,7 @@ function parseAddonConfig(value: unknown, path: string): IAddonConfig {
 		name: expectString(config.name, `${path}.name`),
 		version: expectString(config.version, `${path}.version`),
 		description: expectString(config.description, `${path}.description`),
-		author: expectString(config.author, `${path}.author`),
+		author: parseAddonConfigAuthor(config.author, `${path}.author`),
 	};
 }
 

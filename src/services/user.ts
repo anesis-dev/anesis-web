@@ -1,6 +1,6 @@
 import { ApiError, api } from "@/api/client";
-import { parseMeResponse, parseUsersResponse } from "@/lib/api-contracts";
-import { IUser } from "@/types/user";
+import { parseMeResponse, parsePublicUserResponse, parseUsersResponse } from "@/lib/api-contracts";
+import { IPublicUser, IUser } from "@/types/user";
 
 export async function fetchMe(): Promise<IUser> {
 	return parseMeResponse(await api.get<unknown>("/user/info"));
@@ -10,14 +10,14 @@ export async function fetchAllUsers(): Promise<IUser[]> {
 	return parseUsersResponse(await api.get<unknown>("/user/all"));
 }
 
-export async function fetchUserByLogin(login: string): Promise<IUser> {
+export async function fetchUserByLogin(login: string): Promise<IPublicUser> {
 	const path = `/user/by-login/${encodeURIComponent(login)}`;
 
 	try {
-		return parseMeResponse(await api.get<unknown>(path));
+		return parsePublicUserResponse(await api.get<unknown>(path));
 	} catch (error) {
 		if (error instanceof ApiError && [404, 405].includes(error.status)) {
-			return parseMeResponse(await api.post<unknown>(path));
+			return parsePublicUserResponse(await api.post<unknown>(path));
 		}
 
 		throw error;

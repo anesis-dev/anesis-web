@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { UserProfileClient } from "@/components/user/UserProfileClient";
 import { registryMetadata, unresolvedMetadata } from "@/lib/registry-metadata";
+import { safeDecodeURIComponent } from "@/lib/safe-decode-uri";
 import { fetchGitHubUser } from "@/services/github";
 
 export async function generateMetadata({
@@ -9,10 +10,9 @@ export async function generateMetadata({
 	params: Promise<{ login: string }>;
 }): Promise<Metadata> {
 	const { login } = await params;
-	const decoded = decodeURIComponent(login);
 
 	try {
-		const user = await fetchGitHubUser(decoded);
+		const user = await fetchGitHubUser(safeDecodeURIComponent(login));
 		const displayName = user.name || user.login;
 		return registryMetadata({
 			title: `${displayName} (@${user.login}) — Anesis`,

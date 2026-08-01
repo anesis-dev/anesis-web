@@ -1,5 +1,9 @@
 import { api } from "@/api/client";
-import { parseStarResponse } from "@/lib/api-contracts";
+import {
+	parseStackResponse,
+	parseStacksPageResponse,
+	parseStarResponse,
+} from "@/lib/api-contracts";
 import {
 	ICatalogFilters,
 	IPaginatedResponse,
@@ -8,26 +12,6 @@ import {
 import { IStarResponse } from "@/types/addon";
 import { IStack } from "@/types/stack";
 import { appendCatalogFilters } from "@/services/catalog-filters";
-
-
-
-interface RawPage {
-	data: IStack[];
-	total: number;
-	page: number;
-	page_size: number;
-	total_pages: number;
-}
-
-function normalizePage(raw: RawPage): IPaginatedResponse<IStack> {
-	return {
-		data: raw.data ?? [],
-		total: raw.total ?? 0,
-		page: raw.page ?? 1,
-		pageSize: raw.page_size ?? 20,
-		totalPages: raw.total_pages ?? 1,
-	};
-}
 
 function paginationQuery(
 	pagination: IPaginationParams,
@@ -44,21 +28,25 @@ export async function fetchStacks(
 	pagination: IPaginationParams = {},
 	filters?: ICatalogFilters,
 ): Promise<IPaginatedResponse<IStack>> {
-	return normalizePage(
-		await api.get<RawPage>(`/stack/all?${paginationQuery(pagination, filters)}`),
+	return parseStacksPageResponse(
+		await api.get<unknown>(`/stack/all?${paginationQuery(pagination, filters)}`),
 	);
 }
 
 export async function fetchMyStacks(
 	pagination: IPaginationParams = {},
 ): Promise<IPaginatedResponse<IStack>> {
-	return normalizePage(await api.get<RawPage>(`/stack/my?${paginationQuery(pagination)}`));
+	return parseStacksPageResponse(
+		await api.get<unknown>(`/stack/my?${paginationQuery(pagination)}`),
+	);
 }
 
 export async function fetchStarredStacks(
 	pagination: IPaginationParams = {},
 ): Promise<IPaginatedResponse<IStack>> {
-	return normalizePage(await api.get<RawPage>(`/stack/starred?${paginationQuery(pagination)}`));
+	return parseStacksPageResponse(
+		await api.get<unknown>(`/stack/starred?${paginationQuery(pagination)}`),
+	);
 }
 
 export async function fetchAllStacks(): Promise<IStack[]> {
@@ -72,7 +60,7 @@ export async function fetchAllStacks(): Promise<IStack[]> {
 }
 
 export async function fetchStack(stackRef: string): Promise<IStack> {
-	return api.get<IStack>(`/stack/${encodeURIComponent(stackRef)}`);
+	return parseStackResponse(await api.get<unknown>(`/stack/${encodeURIComponent(stackRef)}`));
 }
 
 export async function publishStack(

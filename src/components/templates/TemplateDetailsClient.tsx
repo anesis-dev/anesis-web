@@ -26,6 +26,7 @@ import {
 import { authorLogin } from "@/lib/author";
 import { formatDate } from "@/lib/date";
 import { parseGitHubTreeUrl } from "@/lib/github-tree-url";
+import { safeDecodeURIComponent } from "@/lib/safe-decode-uri";
 import { useAuth } from "@/hooks/useAuth";
 import { useTemplate } from "@/hooks/useTemplate";
 import { useTemplateVersions } from "@/hooks/useTemplateVersions";
@@ -92,7 +93,7 @@ export function TemplateDetailsClient({
 }) {
 	const { user } = useAuth();
 	const queryClient = useQueryClient();
-	const joinedRef = templateRef.map((segment) => decodeURIComponent(segment)).join("/");
+	const joinedRef = templateRef.map((segment) => safeDecodeURIComponent(segment)).join("/");
 	const { template, isLoading, isError } = useTemplate(joinedRef);
 	const { versions } = useTemplateVersions(template?.name ?? "");
 	const {

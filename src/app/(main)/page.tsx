@@ -40,6 +40,9 @@ const features = [
 	},
 ];
 
+// ISR for the server-rendered FeaturedRegistry cards.
+export const revalidate = 60;
+
 export const metadata: Metadata = {
 	description:
 		"Anesis is a template-first CLI and web registry for scaffolding projects, publishing starters, and extending them with reusable, versioned addons.",

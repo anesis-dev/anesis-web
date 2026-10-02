@@ -22,8 +22,10 @@ export default function Logo({ className, variant = "mark" }: LogoProps) {
 			<Image
 				src="/Logo.png"
 				alt=""
-				width={760}
-				height={595}
+				// Rendered size, not the file's 760x595: next/image builds the srcset
+				// from these, so the real size made every page fetch a ~828px logo.
+				width={isFullLogo ? 64 : 56}
+				height={isFullLogo ? 50 : 44}
 				className={cn(
 					"object-contain drop-shadow-[0_0_18px_rgba(45,106,79,0.40)]",
 					isFullLogo ? "h-14 w-16" : "h-10 w-14",

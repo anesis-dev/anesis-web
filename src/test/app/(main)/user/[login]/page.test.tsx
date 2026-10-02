@@ -1,7 +1,12 @@
 import { Suspense } from "react";
-import { act, render, screen } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import UserProfilePage from "@/app/(main)/user/[login]/page";
 import { createGitHubUser, createTemplate } from "@/test/fixtures";
+import { renderWithQueryClient } from "@/test/render";
+
+vi.mock("@/lib/prefetch", () => ({
+	dehydrateQuery: vi.fn().mockResolvedValue({ mutations: [], queries: [] }),
+}));
 
 vi.mock("@/hooks/useAuth", () => ({
 	useAuth: vi.fn(),
@@ -83,7 +88,7 @@ function setDefaultHooks() {
 
 async function renderPage(login: string) {
 	await act(async () => {
-		render(
+		renderWithQueryClient(
 			<Suspense fallback={null}>
 				<UserProfilePage params={Promise.resolve({ login })} />
 			</Suspense>,

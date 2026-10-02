@@ -4,20 +4,13 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-	Command,
-	CommandDialog,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-	CommandList,
-	CommandSeparator,
-} from "@/components/ui/command";
-import { nav } from "@/constants/nav";
-import { accountMenu } from "@/constants/accountMenu";
-import { docsNav } from "@/constants/docsNav";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
+
+const SearchDialog = dynamic(
+	() => import("./SearchDialog").then((m) => m.SearchDialog),
+	{ ssr: false },
+);
 
 export function Search({
 	className,
@@ -27,9 +20,14 @@ export function Search({
 	variant?: "full" | "icon";
 }) {
 	const [open, setOpen] = React.useState(false);
+	const hasOpened = useLatch(open);
 	const router = useRouter();
 
 	React.useEffect(() => {
+		// Header renders two Search instances (desktop + mobile) and the dialog
+		// portals to <body>, so only one may own the shortcut or Ctrl+K opens two.
+		if (variant !== "full") return;
+
 		const down = (e: KeyboardEvent) => {
 			const target = e.target;
 			const isEditableTarget =
@@ -50,7 +48,7 @@ export function Search({
 		};
 		document.addEventListener("keydown", down);
 		return () => document.removeEventListener("keydown", down);
-	}, []);
+	}, [variant]);
 
 	function handleSelect(url: string) {
 		router.push(url.startsWith("/") ? url : `/${url}`);
@@ -86,55 +84,22 @@ export function Search({
 				</Button>
 			)}
 
-			<CommandDialog open={open} onOpenChange={setOpen}>
-				<CommandInput placeholder="Search pages..." />
-				<CommandList>
-					<CommandEmpty>No results found.</CommandEmpty>
-
-					<CommandGroup heading="Navigation">
-						{nav.map((item) => (
-							<CommandItem
-								key={item.url}
-								value={item.title}
-								onSelect={() => handleSelect(item.url)}
-								className="cursor-pointer"
-							>
-								{item.title}
-							</CommandItem>
-						))}
-					</CommandGroup>
-
-					<CommandSeparator />
-
-					<CommandGroup heading="Documentation">
-						{docsNav.map((item) => (
-							<CommandItem
-								key={item.href}
-								value={`docs ${item.title}`}
-								onSelect={() => handleSelect(item.href)}
-								className="cursor-pointer"
-							>
-								{item.title}
-							</CommandItem>
-						))}
-					</CommandGroup>
-
-					<CommandSeparator />
-
-					<CommandGroup heading="Account">
-						{accountMenu.map((item) => (
-							<CommandItem
-								key={item.url}
-								value={item.title}
-								onSelect={() => handleSelect(item.url)}
-								className="cursor-pointer"
-							>
-								{item.title}
-							</CommandItem>
-						))}
-					</CommandGroup>
-				</CommandList>
-			</CommandDialog>
+			{/* Mounted on first open only: keeps cmdk + the dialog out of the
+			    bundle every page loads. Stays mounted so the close animation runs. */}
+			{hasOpened ? (
+				<SearchDialog
+					open={open}
+					onOpenChange={setOpen}
+					onSelect={handleSelect}
+				/>
+			) : null}
 		</>
 	);
+}
+
+// true from the first time `value` is true onwards.
+function useLatch(value: boolean) {
+	const [latched, setLatched] = React.useState(value);
+	if (value && !latched) setLatched(true);
+	return latched;
 }

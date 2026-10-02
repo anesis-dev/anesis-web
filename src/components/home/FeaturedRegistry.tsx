@@ -1,15 +1,13 @@
-"use client";
-
+import { Suspense } from "react";
 import Link from "next/link";
-import { useMemo } from "react";
 import { ArrowRightIcon, LoaderIcon } from "lucide-react";
 import { AddonCard } from "@/components/addons/AddonCard";
 import { StackCard } from "@/components/stacks/StackCard";
 import { TemplateCard } from "@/components/templates/TemplateCard";
 import { Button } from "@/components/ui/button";
-import { useAddons } from "@/hooks/useAddons";
-import { useStacks } from "@/hooks/useStacks";
-import { useTemplates } from "@/hooks/useTemplates";
+import { fetchAddons } from "@/services/addon";
+import { fetchStacks } from "@/services/stack";
+import { fetchTemplates } from "@/services/template";
 import { getDateTimestamp } from "@/lib/date";
 
 function TemplateSkeleton() {
@@ -89,38 +87,104 @@ function byOfficialThenRecent(
 	return getDateTimestamp(b.created_at) - getDateTimestamp(a.created_at);
 }
 
+// Fetched on the server so the browser gets 4 rendered cards per section
+// instead of downloading 100 records and sorting them after hydration.
+// ponytail: "featured" = official first, then newest, out of the first 100;
+// move to a backend sort param if the registry outgrows one page.
+async function featured<T extends { official: boolean; created_at: string }>(
+	load: () => Promise<{ data: T[] }>,
+): Promise<T[]> {
+	try {
+		const { data } = await load();
+		return [...data].sort(byOfficialThenRecent).slice(0, 4);
+	} catch {
+		return [];
+	}
+}
+
+function SkeletonGrid({ Skeleton }: { Skeleton: () => React.ReactNode }) {
+	return (
+		<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+			{Array.from({ length: 4 }).map((_, index) => (
+				<Skeleton key={index} />
+			))}
+		</div>
+	);
+}
+
+function EmptyState({ title, children }: { title: string; children: React.ReactNode }) {
+	return (
+		<div className="flex min-h-56 flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-primary/25 bg-card/40 text-center">
+			<LoaderIcon className="size-6 text-muted-foreground" />
+			<div>
+				<p className="text-sm font-medium">{title}</p>
+				<p className="mt-1 text-xs text-muted-foreground">{children}</p>
+			</div>
+		</div>
+	);
+}
+
+export async function FeaturedAddons() {
+	const addons = await featured(() => fetchAddons({ page: 1, pageSize: 100 }));
+	if (addons.length === 0) {
+		return (
+			<EmptyState title="No addons yet">
+				Once addons are published, they will show up here.
+			</EmptyState>
+		);
+	}
+	return (
+		<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+			{addons.map((addon) => (
+				<AddonCard key={addon.id} addon={addon} />
+			))}
+		</div>
+	);
+}
+
+async function FeaturedTemplates() {
+	const templates = await featured(() =>
+		fetchTemplates({ page: 1, pageSize: 100 }),
+	);
+	if (templates.length === 0) {
+		return (
+			<EmptyState title="No templates yet">
+				Once templates are published, they will show up here.
+			</EmptyState>
+		);
+	}
+	return (
+		<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+			{templates.map((template) => (
+				<TemplateCard key={template.id} template={template} />
+			))}
+		</div>
+	);
+}
+
+async function FeaturedStacks() {
+	const stacks = await featured(() => fetchStacks({ page: 1, pageSize: 100 }));
+	if (stacks.length === 0) {
+		return (
+			<EmptyState title="No stacks yet">
+				Build one in the{" "}
+				<Link href="/builder" className="text-primary hover:underline">
+					stack builder
+				</Link>{" "}
+				and publish it to the registry.
+			</EmptyState>
+		);
+	}
+	return (
+		<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+			{stacks.map((stack) => (
+				<StackCard key={stack.stack_id} stack={stack} />
+			))}
+		</div>
+	);
+}
+
 export function FeaturedRegistry() {
-	const { templates, isLoading: templatesLoading } = useTemplates({
-		pageSize: 100,
-	});
-	const { addons, isLoading: addonsLoading } = useAddons({ pageSize: 100 });
-	const { stacks, isLoading: stacksLoading } = useStacks({ pageSize: 100 });
-
-	const featuredTemplates = useMemo(
-		() => [...templates].sort(byOfficialThenRecent).slice(0, 4),
-		[templates],
-	);
-
-	const featuredAddons = useMemo(
-		() => [...addons].sort(byOfficialThenRecent).slice(0, 4),
-		[addons],
-	);
-
-	const featuredStacks = useMemo(
-		() =>
-			[...stacks]
-				.sort((a, b) => {
-					if (a.official !== b.official) {
-						return Number(b.official) - Number(a.official);
-					}
-					return (
-						getDateTimestamp(b.created_at) - getDateTimestamp(a.created_at)
-					);
-				})
-				.slice(0, 4),
-		[stacks],
-	);
-
 	return (
 		<>
 			<section className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-5 py-18 sm:px-6 lg:gap-12 lg:px-8 lg:py-24">
@@ -148,29 +212,9 @@ export function FeaturedRegistry() {
 					</Button>
 				</div>
 
-				{addonsLoading ? (
-					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-						{Array.from({ length: 4 }).map((_, index) => (
-							<AddonSkeleton key={index} />
-						))}
-					</div>
-				) : featuredAddons.length > 0 ? (
-					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-						{featuredAddons.map((addon) => (
-							<AddonCard key={addon.id} addon={addon} />
-						))}
-					</div>
-				) : (
-					<div className="flex min-h-56 flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-primary/25 bg-card/40 text-center">
-						<LoaderIcon className="size-6 text-muted-foreground" />
-						<div>
-							<p className="text-sm font-medium">No addons yet</p>
-							<p className="mt-1 text-xs text-muted-foreground">
-								Once addons are published, they will show up here.
-							</p>
-						</div>
-					</div>
-				)}
+				<Suspense fallback={<SkeletonGrid Skeleton={AddonSkeleton} />}>
+					<FeaturedAddons />
+				</Suspense>
 			</section>
 
 			<section className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-5 pb-18 sm:px-6 lg:gap-12 lg:px-8 lg:pb-24">
@@ -195,29 +239,9 @@ export function FeaturedRegistry() {
 					</Button>
 				</div>
 
-				{templatesLoading ? (
-					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-						{Array.from({ length: 4 }).map((_, index) => (
-							<TemplateSkeleton key={index} />
-						))}
-					</div>
-				) : featuredTemplates.length > 0 ? (
-					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-						{featuredTemplates.map((template) => (
-							<TemplateCard key={template.id} template={template} />
-						))}
-					</div>
-				) : (
-					<div className="flex min-h-56 flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-primary/25 bg-card/40 text-center">
-						<LoaderIcon className="size-6 text-muted-foreground" />
-						<div>
-							<p className="text-sm font-medium">No templates yet</p>
-							<p className="mt-1 text-xs text-muted-foreground">
-								Once templates are published, they will show up here.
-							</p>
-						</div>
-					</div>
-				)}
+				<Suspense fallback={<SkeletonGrid Skeleton={TemplateSkeleton} />}>
+					<FeaturedTemplates />
+				</Suspense>
 			</section>
 
 			<section className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-5 pb-18 sm:px-6 lg:gap-12 lg:px-8 lg:pb-24">
@@ -244,33 +268,9 @@ export function FeaturedRegistry() {
 					</Button>
 				</div>
 
-				{stacksLoading ? (
-					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-						{Array.from({ length: 4 }).map((_, index) => (
-							<StackSkeleton key={index} />
-						))}
-					</div>
-				) : featuredStacks.length > 0 ? (
-					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-						{featuredStacks.map((stack) => (
-							<StackCard key={stack.stack_id} stack={stack} />
-						))}
-					</div>
-				) : (
-					<div className="flex min-h-56 flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-primary/25 bg-card/40 text-center">
-						<LoaderIcon className="size-6 text-muted-foreground" />
-						<div>
-							<p className="text-sm font-medium">No stacks yet</p>
-							<p className="mt-1 text-xs text-muted-foreground">
-								Build one in the{" "}
-								<Link href="/builder" className="text-primary hover:underline">
-									stack builder
-								</Link>{" "}
-								and publish it to the registry.
-							</p>
-						</div>
-					</div>
-				)}
+				<Suspense fallback={<SkeletonGrid Skeleton={StackSkeleton} />}>
+					<FeaturedStacks />
+				</Suspense>
 			</section>
 		</>
 	);

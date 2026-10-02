@@ -4,6 +4,10 @@ import TemplateDetailsPage from "@/app/(main)/templates/[...templateRef]/page";
 import { createTemplate, mockTemplate } from "@/test/fixtures";
 import { renderWithQueryClient } from "@/test/render";
 
+vi.mock("@/lib/prefetch", () => ({
+	dehydrateQuery: vi.fn().mockResolvedValue({ mutations: [], queries: [] }),
+}));
+
 vi.mock("@/hooks/useAuth", () => ({
 	useAuth: vi.fn(),
 }));

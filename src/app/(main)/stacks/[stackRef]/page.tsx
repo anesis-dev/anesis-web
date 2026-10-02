@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { cache } from "react";
+import { HydrationBoundary } from "@tanstack/react-query";
 import { StackDetail } from "@/components/stacks/StackDetail";
 import {
 	registryMetadata,
@@ -6,6 +8,11 @@ import {
 } from "@/lib/registry-metadata";
 import { safeDecodeURIComponent } from "@/lib/safe-decode-uri";
 import { fetchStack } from "@/services/stack";
+import { dehydrateQuery } from "@/lib/prefetch";
+
+// cache(): generateMetadata and the page share one backend request (apiFetch
+// sets an AbortSignal, which opts out of Next's built-in fetch dedupe).
+const getStack = cache(fetchStack);
 
 export async function generateMetadata({
 	params,
@@ -15,7 +22,7 @@ export async function generateMetadata({
 	const { stackRef } = await params;
 
 	try {
-		const stack = await fetchStack(safeDecodeURIComponent(stackRef));
+		const stack = await getStack(safeDecodeURIComponent(stackRef));
 		return registryMetadata({
 			title: `${stack.name} — Anesis stack`,
 			description:
@@ -35,5 +42,15 @@ export default async function StackDetailPage({
 	params: Promise<{ stackRef: string }>;
 }) {
 	const { stackRef } = await params;
-	return <StackDetail stackRef={safeDecodeURIComponent(stackRef)} />;
+	const ref = safeDecodeURIComponent(stackRef);
+	// Same key as useStack, so the client renders from SSR data immediately.
+	const state = await dehydrateQuery({
+		queryKey: ["stack", ref],
+		queryFn: () => getStack(ref),
+	});
+	return (
+		<HydrationBoundary state={state}>
+			<StackDetail stackRef={ref} />
+		</HydrationBoundary>
+	);
 }

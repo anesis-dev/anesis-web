@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
+import { cache } from "react";
+import { HydrationBoundary } from "@tanstack/react-query";
 import { TemplateDetailsClient } from "@/components/templates/TemplateDetailsClient";
 import { getTemplateLatestHref } from "@/lib/template-ref";
 import { registryMetadata, unresolvedMetadata } from "@/lib/registry-metadata";
 import { fetchTemplate } from "@/services/template";
+import { dehydrateQuery } from "@/lib/prefetch";
+import { safeDecodeURIComponent } from "@/lib/safe-decode-uri";
+
+// cache(): generateMetadata and the page share one backend request (apiFetch
+// sets an AbortSignal, which opts out of Next's built-in fetch dedupe).
+const getTemplate = cache(fetchTemplate);
 
 function joinRef(segments: string[]): string {
-	return segments.map((segment) => decodeURIComponent(segment)).join("/");
+	return segments.map((segment) => safeDecodeURIComponent(segment)).join("/");
 }
 
 export async function generateMetadata({
@@ -16,7 +24,7 @@ export async function generateMetadata({
 	const { templateRef } = await params;
 
 	try {
-		const template = await fetchTemplate(joinRef(templateRef));
+		const template = await getTemplate(joinRef(templateRef));
 		const { metadata, technologies, languages } = template.config;
 		return registryMetadata({
 			title: `${metadata.displayName} — Anesis template`,
@@ -44,5 +52,15 @@ export default async function TemplateDetailsPage({
 	params: Promise<{ templateRef: string[] }>;
 }) {
 	const { templateRef } = await params;
-	return <TemplateDetailsClient templateRef={templateRef} />;
+	const ref = joinRef(templateRef);
+	// Same key as useTemplate, so the client renders from SSR data immediately.
+	const state = await dehydrateQuery({
+		queryKey: ["template", ref],
+		queryFn: () => getTemplate(ref),
+	});
+	return (
+		<HydrationBoundary state={state}>
+			<TemplateDetailsClient templateRef={templateRef} />
+		</HydrationBoundary>
+	);
 }

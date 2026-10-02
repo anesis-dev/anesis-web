@@ -7,6 +7,9 @@ import { dehydrateQuery } from "@/lib/prefetch";
 
 const PAGE_SIZE = 24;
 
+// ISR: without this the page is prerendered once at build and serves frozen data.
+export const revalidate = 60;
+
 export const metadata: Metadata = {
 	title: "Templates",
 	description:

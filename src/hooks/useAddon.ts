@@ -11,6 +11,9 @@ export function useAddon(addonRef: string) {
     queryKey: ["addon", addonRef],
     queryFn: () => fetchAddon(addonRef),
     enabled: !!addonRef,
+    // SSR-prefetched data is anonymous (no cookies on the server), so refetch
+    // in the background on mount to pick up per-user fields like is_starred.
+    staleTime: 0,
   });
 
   return { addon, isLoading, isError };

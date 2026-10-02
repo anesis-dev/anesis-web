@@ -4,6 +4,10 @@ import AddonDetailsPage from "@/app/(main)/addons/registry/[addonRef]/page";
 import { mockAddon } from "@/test/fixtures";
 import { renderWithQueryClient } from "@/test/render";
 
+vi.mock("@/lib/prefetch", () => ({
+  dehydrateQuery: vi.fn().mockResolvedValue({ mutations: [], queries: [] }),
+}));
+
 vi.mock("@/hooks/useAddon", () => ({
   useAddon: vi.fn(),
 }));

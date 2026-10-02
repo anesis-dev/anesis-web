@@ -112,12 +112,23 @@ function createNextConfig(): NextConfig {
     };
 
     if (apiProxyUrl) {
-        config.rewrites = async () => [
-            {
-                source: "/api/backend/:path*",
-                destination: `${apiProxyUrl}/:path*`,
-            },
-        ];
+        config.rewrites = async () => ({
+            // api.anesis.tech is served by this project and forwarded as-is to
+            // the backend (Azure Container Apps Express has no custom domains).
+            beforeFiles: [
+                {
+                    source: "/:path*",
+                    has: [{ type: "host", value: "api.anesis.tech" }],
+                    destination: `${apiProxyUrl}/:path*`,
+                },
+            ],
+            afterFiles: [
+                {
+                    source: "/api/backend/:path*",
+                    destination: `${apiProxyUrl}/:path*`,
+                },
+            ],
+        });
     }
 
     return config;

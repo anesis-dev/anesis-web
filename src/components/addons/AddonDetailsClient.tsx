@@ -31,6 +31,7 @@ import { useTemplateReadme } from "@/hooks/useTemplateReadme";
 import { formatDate } from "@/lib/date";
 import { parseGitHubTreeUrl } from "@/lib/github-tree-url";
 import { getAddonRef } from "@/lib/addon-ref";
+import { safeDecodeURIComponent } from "@/lib/safe-decode-uri";
 import { starAddon } from "@/services/addon";
 import { TemplateReadme } from "@/components/templates/TemplateReadme";
 import { AddonCommands } from "@/components/addons/AddonCommands";
@@ -75,7 +76,7 @@ function getSourceInfo(url: string) {
 }
 
 export function AddonDetailsClient({ addonRef }: { addonRef: string }) {
-	const decodedRef = decodeURIComponent(addonRef);
+	const decodedRef = safeDecodeURIComponent(addonRef);
 	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const { addon, isLoading, isError } = useAddon(decodedRef);

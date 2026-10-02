@@ -4,6 +4,7 @@ import {
 	registryMetadata,
 	unresolvedMetadata,
 } from "@/lib/registry-metadata";
+import { safeDecodeURIComponent } from "@/lib/safe-decode-uri";
 import { fetchStack } from "@/services/stack";
 
 export async function generateMetadata({
@@ -12,10 +13,9 @@ export async function generateMetadata({
 	params: Promise<{ stackRef: string }>;
 }): Promise<Metadata> {
 	const { stackRef } = await params;
-	const ref = decodeURIComponent(stackRef);
 
 	try {
-		const stack = await fetchStack(ref);
+		const stack = await fetchStack(safeDecodeURIComponent(stackRef));
 		return registryMetadata({
 			title: `${stack.name} — Anesis stack`,
 			description:
@@ -35,5 +35,5 @@ export default async function StackDetailPage({
 	params: Promise<{ stackRef: string }>;
 }) {
 	const { stackRef } = await params;
-	return <StackDetail stackRef={decodeURIComponent(stackRef)} />;
+	return <StackDetail stackRef={safeDecodeURIComponent(stackRef)} />;
 }

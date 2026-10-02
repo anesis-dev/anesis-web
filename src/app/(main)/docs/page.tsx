@@ -54,7 +54,7 @@ const pillars = [
 	{
 		title: "Creating Templates",
 		description:
-			"Build your own template with `anesis.template.json`, Tera rendering, and the project scaffolding contract.",
+			"Build your own template with `anesis.template.json`, MiniJinja rendering, and the project scaffolding contract.",
 		icon: PencilRulerIcon,
 		href: "/docs/templates/creating",
 	},

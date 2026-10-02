@@ -244,7 +244,7 @@ const stepTypes: {
 		note: (
 			<>
 				Both <code>path</code> and <code>content</code> are rendered through
-				Tera. Use input variables in the path to generate files with dynamic
+				MiniJinja. Use input variables in the path to generate files with dynamic
 				names.
 			</>
 		),
@@ -271,7 +271,7 @@ const stepTypes: {
 		code: stepReplace,
 		note: (
 			<>
-				Both <code>find</code> and <code>replace</code> are rendered through Tera.
+				Both <code>find</code> and <code>replace</code> are rendered through MiniJinja.
 				Use glob targets to apply the same replacement across many files. Use{" "}
 				<code>{"// anesis:"}</code> comment markers in your template source to create
 				predictable insertion points.
@@ -309,7 +309,7 @@ const stepTypes: {
 		name: "rename and move",
 		id: "step-rename",
 		summary:
-			"Rename a file or move it to a new location. Both the source and destination paths are rendered through Tera.",
+			"Rename a file or move it to a new location. Both the source and destination paths are rendered through MiniJinja.",
 		code: stepRename,
 	},
 	{
@@ -340,7 +340,7 @@ const stepTypes: {
 		code: stepRun,
 		note: (
 			<>
-				<code>command</code> is rendered through Tera first. Because this runs
+				<code>command</code> is rendered through MiniJinja first. Because this runs
 				unsandboxed code, Anesis always prints the exact resolved command and
 				asks for an explicit yes before executing it — unless{" "}
 				<code>--yes</code> or non-interactive mode is active. A run step is{" "}
@@ -554,7 +554,7 @@ export default function DocsAddonsCreatingPage() {
 					lead={
 						<>
 							Steps are executed in order. Every step that writes to a file
-							renders its content and paths through Tera — inputs and their
+							renders its content and paths through MiniJinja — inputs and their
 							derived forms are all available. Targets can be a single{" "}
 							<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
 								{'{ "type": "file", "file": "path" }'}

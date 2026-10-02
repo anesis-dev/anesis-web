@@ -50,7 +50,7 @@ const newSteps = [
 	},
 	{
 		title: "Render and copy files",
-		body: "Files ending in .tera are rendered through Tera with the project name and every input (plus its pascal/camel/kebab/snake forms) in scope. Any paths matched by the manifest's exclude blocks are skipped. All other files are copied exactly as-is.",
+		body: "Files ending in .tera are rendered through MiniJinja with the project name and every input (plus its pascal/camel/kebab/snake forms) in scope. Any paths matched by the manifest's exclude blocks are skipped. All other files are copied exactly as-is.",
 	},
 	{
 		title: "Print next steps",
@@ -270,7 +270,7 @@ export default function DocsTemplatesPage() {
 								Creating Templates
 							</Link>{" "}
 							— author an <code>anesis.template.json</code> manifest, declare
-							inputs, and use Tera variables for rendering.
+							inputs, and use MiniJinja variables for rendering.
 						</li>
 						<li className="pl-1">
 							<Link

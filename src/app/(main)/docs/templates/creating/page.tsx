@@ -118,7 +118,7 @@ const teraFileExamples = `// package.json.tera
 export const metadata: Metadata = {
 	title: "Creating templates",
 	description:
-		"Write an anesis.template.json manifest, add Tera placeholders, and turn any GitHub repository into an Anesis template.",
+		"Write an anesis.template.json manifest, add MiniJinja placeholders, and turn any GitHub repository into an Anesis template.",
 	alternates: { canonical: "/docs/templates/creating" },
 };
 
@@ -130,7 +130,7 @@ export const appName = "{{ project_name_snake }}";
 This project was generated from the react-vite-ts template.`;
 
 const pathRules = [
-	"Files ending in `.tera` are rendered through the Tera template engine. The `.tera` suffix is stripped from the output filename — `package.json.tera` becomes `package.json`.",
+	"Files ending in `.tera` are rendered through the MiniJinja template engine. The `.tera` suffix is stripped from the output filename — `package.json.tera` becomes `package.json`.",
 	"Files without a `.tera` suffix are copied exactly as-is, with no rendering.",
 	"Any path matched by an `exclude` block whose `when` expression is true at generation time is skipped entirely — it is never written or rendered.",
 	"Path traversal is blocked at extraction time. A template cannot write files outside the target project directory, regardless of how paths are constructed — this is enforced independently of anything the manifest declares.",
@@ -154,7 +154,7 @@ export default function DocsTemplatesCreatingPage() {
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
 							.tera
 						</code>{" "}
-						are rendered through Tera with the project name and any declared{" "}
+						are rendered through MiniJinja with the project name and any declared{" "}
 						<code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
 							inputs
 						</code>{" "}
@@ -164,7 +164,7 @@ export default function DocsTemplatesCreatingPage() {
 				}
 				chips={[
 					"anesis.template.json manifest",
-					"Tera template rendering",
+					"MiniJinja template rendering",
 					"Declared inputs + exclude blocks",
 					"project_name + input case variables",
 				]}
@@ -186,7 +186,7 @@ export default function DocsTemplatesCreatingPage() {
 				>
 					<DocsSubheading id="tera-files">*.tera files</DocsSubheading>
 					<p>
-						Rendered through the Tera template engine. The <code>.tera</code>{" "}
+						Rendered through the MiniJinja template engine. The <code>.tera</code>{" "}
 						suffix is removed from the output filename. Use these for any file
 						that should contain the project name.
 					</p>
@@ -241,8 +241,15 @@ export default function DocsTemplatesCreatingPage() {
 						Variable usage in .tera files
 					</DocsSubheading>
 					<p>
-						Use the Tera double-brace syntax anywhere in a <code>.tera</code>{" "}
+						Use the MiniJinja double-brace syntax anywhere in a <code>.tera</code>{" "}
 						file. The output filename has the <code>.tera</code> suffix removed.
+					</p>
+					<p>
+						Filters use Jinja2 syntax, for example{" "}
+						<code>{"{{ name | replace(\"a\", \"b\") }}"}</code> or{" "}
+						<code>{"{{ name | default(\"x\") }}"}</code>. A variable that is not
+						provided fails the render when printed, and is false inside{" "}
+						<code>{"{% if %}"}</code>.
 					</p>
 					<CodeBlock code={teraFileExamples} lang="plaintext" />
 				</DocsSection>
